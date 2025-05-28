@@ -59,21 +59,6 @@
             filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
         }
 
-        #progressBar::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            animation: shimmer 2s infinite;
-        }
-        
-                @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
     </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen">
@@ -1201,15 +1186,15 @@
             
             if (progressBar) {
                 progressBar.style.width = `${percentage}%`;
-                // Add a glow effect to the progress bar
-                progressBar.style.boxShadow = `0 0 20px rgba(0, 212, 170, 0.6)`;
+                // Simple glow effect without animation
+                progressBar.style.boxShadow = `0 0 10px rgba(0, 212, 170, 0.4)`;
             }
             
             if (progressText) {
-                // Animate the number counter
+                // Smooth number counter
                 const current = parseInt(progressText.textContent) || 0;
                 const diff = percentage - current;
-                const duration = 500; // milliseconds
+                const duration = 500;
                 const steps = Math.abs(diff);
                 const increment = diff / steps;
                 const stepDuration = duration / steps;
@@ -1232,8 +1217,21 @@
             const stepElement = document.querySelector(`[data-step="${stepNumber}"]`);
             if (!stepElement) return;
             
-            // Get the status span directly - it's the last span in the step item
-            const statusElement = stepElement.querySelector('span:last-child');
+            // Find the status span by looking for the span that contains "Pending" or other status text
+            const allSpans = stepElement.querySelectorAll('span');
+            let statusElement = null;
+            
+            // Find the span that contains status text (usually the last one)
+            for (let i = allSpans.length - 1; i >= 0; i--) {
+                if (allSpans[i].textContent.includes('Pending') || 
+                    allSpans[i].textContent.includes('Processing') || 
+                    allSpans[i].textContent.includes('Complete')) {
+                    statusElement = allSpans[i];
+                    break;
+                }
+            }
+            
+            // Find the number circle
             const numberCircle = stepElement.querySelector('.w-6.h-6.rounded-full');
             
             if (status === 'processing') {
