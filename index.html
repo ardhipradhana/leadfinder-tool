@@ -277,10 +277,10 @@
                             </div>
                             <div class="flex items-center space-x-3">
                                 <select class="px-3 py-2 bg-dark-primary border border-gray-600 rounded-lg text-white text-sm">
-                                    <option>Sort by Score</option>
-                                    <option>Sort by Experience</option>
-                                    <option>Sort by Location</option>
-                                </select>
+								    <option>Sort by Score</option>
+								    <option>Sort by Experience</option>
+								    <option>Sort by Location</option>
+								</select>
                                 <button id="exportBtn" class="px-4 py-2 bg-accent-cyan hover:bg-accent-teal text-dark-primary font-medium rounded-lg transition-colors flex items-center space-x-2">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -738,11 +738,14 @@
         
         // Sample search button
         document.getElementById('sampleSearchBtn').addEventListener('click', () => {
-            document.getElementById('jobTitle').value = 'Restaurant Manager';
-            document.getElementById('industry').value = 'hospitality';
-            document.getElementById('location').value = 'jakarta';
-            document.getElementById('experience').value = 'mid';
-        });
+		    document.getElementById('jobTitle').value = 'Restaurant Manager';
+		    document.getElementById('industry').value = 'hospitality';
+		    document.getElementById('location').value = 'jakarta';
+		    document.getElementById('experience').value = 'mid';
+		    
+		    // Trigger the search automatically
+		    searchForm.dispatchEvent(new Event('submit'));
+		});
         
         // Add click handlers for candidate cards
         document.addEventListener('click', (e) => {
@@ -828,6 +831,14 @@
             
             // Update analytics if you have an analytics section
             updateAnalytics(data.analytics);
+
+			// Save to history
+			saveToSearchHistory(data.query, data.results.totalFound);
+
+			// Setup filters
+			setTimeout(() => {
+			    setupResultFilters();
+			}, 100);
 
         }
         
@@ -1405,6 +1416,227 @@ Generated on: ${new Date().toLocaleDateString()}`;
                 countSpan.textContent = searchHistory.length.toString();
             }
         }
+
+		// Update the search history UI
+		function updateSearchHistoryUI() {
+		    const history = JSON.parse(localStorage.getItem('leadfinder_history') || '[]');
+		    const historyBtn = document.getElementById('searchHistoryBtn');
+		    const countSpan = historyBtn.querySelector('.bg-accent-cyan');
+		    
+		    if (countSpan) {
+		        countSpan.textContent = history.length.toString();
+		    }
+		    
+		    // Update history modal content
+		    const historyModal = document.getElementById('historyModal');
+		    const historyContainer = historyModal.querySelector('.space-y-4');
+		    
+		    if (historyContainer) {
+		        if (history.length === 0) {
+		            historyContainer.innerHTML = `
+		                <div class="text-center py-8 text-gray-400">
+		                    <svg class="w-12 h-12 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+		                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+		                    </svg>
+		                    <p>No search history yet</p>
+		                </div>
+		            `;
+		        } else {
+		            historyContainer.innerHTML = history.map(item => `
+		                <div class="bg-dark-primary rounded-lg p-4 hover:bg-dark-tertiary transition-colors cursor-pointer search-history-item" data-search='${JSON.stringify(item)}'>
+		                    <div class="flex items-center justify-between mb-2">
+		                        <h3 class="font-semibold text-white">${item.jobTitle || 'Untitled Search'} in ${item.location || 'Any Location'}</h3>
+		                        <span class="text-sm text-gray-400">${getRelativeTime(item.timestamp)}</span>
+		                    </div>
+		                    <p class="text-sm text-gray-300 mb-2">${item.industry || 'Any Industry'} • ${item.experience || 'Any Experience'}</p>
+		                    <div class="flex items-center justify-between">
+		                        <span class="text-sm text-accent-cyan">${item.resultCount} candidates found</span>
+		                        <button class="text-xs text-gray-400 hover:text-accent-cyan rerun-search-btn">Rerun Search</button>
+		                    </div>
+		                </div>
+		            `).join('');
+		        }
+    		}
+		}
+
+		// Helper function for relative time
+		function getRelativeTime(timestamp) {
+		    const now = new Date();
+		    const then = new Date(timestamp);
+		    const diffMs = now - then;
+		    const diffMins = Math.floor(diffMs / 60000);
+		    const diffHours = Math.floor(diffMs / 3600000);
+		    const diffDays = Math.floor(diffMs / 86400000);
+		    
+		    if (diffMins < 60) return `${diffMins} minutes ago`;
+		    if (diffHours < 24) return `${diffHours} hours ago`;
+		    return `${diffDays} days ago`;
+		}
+	
+		function saveToSearchHistory(searchParams, resultCount) {
+		    const searchEntry = {
+		        id: Date.now(),
+		        ...searchParams,
+		        resultCount: resultCount,
+		        timestamp: new Date().toISOString(),
+		        date: new Date().toLocaleDateString()
+		    };
+		    
+		    // Get existing history
+		    let history = JSON.parse(localStorage.getItem('leadfinder_history') || '[]');
+		    
+		    // Add new search to beginning
+		    history.unshift(searchEntry);
+		    
+		    // Keep only last 10 searches
+		    history = history.slice(0, 10);
+		    
+		    // Save back to localStorage
+		    localStorage.setItem('leadfinder_history', JSON.stringify(history));
+		    
+		    // Update history count in UI
+		    updateSearchHistoryUI();
+		}
+
+		// Add event delegation for history item clicks
+		document.addEventListener('click', (e) => {
+		    if (e.target.classList.contains('rerun-search-btn')) {
+		        e.stopPropagation();
+		        const historyItem = e.target.closest('.search-history-item');
+		        const searchData = JSON.parse(historyItem.dataset.search);
+		        
+		        // Fill form with historical search
+		        document.getElementById('jobTitle').value = searchData.jobTitle || '';
+		        document.getElementById('industry').value = searchData.industry || '';
+		        document.getElementById('location').value = searchData.location || '';
+		        document.getElementById('experience').value = searchData.experience || '';
+		        
+		        // Close modal and run search
+		        historyModal.classList.add('hidden');
+		        searchForm.dispatchEvent(new Event('submit'));
+		    }
+		});
+		
+		// 3. REAL-TIME FILTERS FOR RESULTS
+		// Add these functions for filtering
+		function setupResultFilters() {
+		    // Text filter
+		    const filterInput = document.querySelector('#resultsState input[placeholder*="Filter by name"]');
+		    if (filterInput) {
+		        filterInput.addEventListener('input', (e) => {
+		            filterCandidates();
+		        });
+		    }
+		    
+		    // Score range filter
+		    const scoreRange = document.querySelector('#resultsState input[type="range"]');
+		    const scoreValue = scoreRange?.nextElementSibling;
+		    
+		    if (scoreRange) {
+		        scoreRange.addEventListener('input', (e) => {
+		            if (scoreValue) {
+		                scoreValue.textContent = e.target.value;
+		            }
+		            filterCandidates();
+		        });
+		    }
+		    
+		    // Sort dropdown
+		    const sortSelect = document.querySelector('#resultsState select');
+		    if (sortSelect) {
+		        sortSelect.addEventListener('change', () => {
+		            sortCandidates();
+		        });
+		    }
+		}
+		
+		// Filter candidates based on criteria
+		function filterCandidates() {
+		    const filterInput = document.querySelector('#resultsState input[placeholder*="Filter by name"]');
+		    const scoreRange = document.querySelector('#resultsState input[type="range"]');
+		    const minScore = parseInt(scoreRange?.value || 0);
+		    const searchTerm = filterInput?.value.toLowerCase() || '';
+		    
+		    const candidateCards = document.querySelectorAll('.candidate-card');
+		    let visibleCount = 0;
+		    
+		    candidateCards.forEach(card => {
+		        const candidateId = card.getAttribute('data-candidate-id');
+		        const candidate = currentCandidates.find(c => c.id === candidateId);
+		        
+		        if (!candidate) {
+		            card.style.display = 'none';
+		            return;
+		        }
+		        
+		        // Check score
+		        const meetsScore = candidate.aiScore >= minScore;
+		        
+		        // Check text search
+		        const searchableText = `${candidate.name} ${candidate.title} ${candidate.location} ${candidate.strengths?.join(' ')}`.toLowerCase();
+		        const meetsSearch = searchTerm === '' || searchableText.includes(searchTerm);
+		        
+		        if (meetsScore && meetsSearch) {
+		            card.style.display = 'block';
+		            visibleCount++;
+		        } else {
+		            card.style.display = 'none';
+		        }
+		    });
+		    
+		    // Update results count
+		    updateResultsCount(visibleCount);
+		}
+		
+		// Sort candidates
+		function sortCandidates() {
+		    const sortSelect = document.querySelector('#resultsState select');
+		    const sortBy = sortSelect?.value || 'Sort by Score';
+		    const container = document.querySelector('#resultsState .space-y-4');
+		    
+		    if (!container) return;
+		    
+		    const cards = Array.from(container.querySelectorAll('.candidate-card'));
+		    
+		    cards.sort((a, b) => {
+		        const idA = a.getAttribute('data-candidate-id');
+		        const idB = b.getAttribute('data-candidate-id');
+		        const candidateA = currentCandidates.find(c => c.id === idA);
+		        const candidateB = currentCandidates.find(c => c.id === idB);
+		        
+		        if (!candidateA || !candidateB) return 0;
+		        
+		        switch (sortBy) {
+		            case 'Sort by Score':
+		                return candidateB.aiScore - candidateA.aiScore;
+		            case 'Sort by Experience':
+		                // Extract years from experience string
+		                const yearsA = parseInt(candidateA.experience?.match(/\d+/)?.[0] || '0');
+		                const yearsB = parseInt(candidateB.experience?.match(/\d+/)?.[0] || '0');
+		                return yearsB - yearsA;
+		            case 'Sort by Location':
+		                return candidateA.location.localeCompare(candidateB.location);
+		            default:
+		                return 0;
+		        }
+		    });
+		    
+		    // Reorder DOM
+		    cards.forEach(card => container.appendChild(card));
+		}
+		
+		// Update visible results count
+		function updateResultsCount(visibleCount) {
+		    const resultsDesc = document.querySelector('#resultsState p');
+		    if (resultsDesc && currentCandidates.length > 0) {
+		        const totalCount = currentCandidates.length;
+		        if (visibleCount < totalCount) {
+		            resultsDesc.textContent = `Showing ${visibleCount} of ${totalCount} candidates`;
+		        } else {
+		            resultsDesc.textContent = `Found ${totalCount} candidates matching your search`;
+		        }
+		    }
+		}
         
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
@@ -1424,6 +1656,7 @@ Generated on: ${new Date().toLocaleDateString()}`;
         
         // Initialize app
         document.addEventListener('DOMContentLoaded', () => {
+			updateSearchHistoryUI();
             updateSearchHistoryCount();
             
             // Focus on job title input
