@@ -43,6 +43,20 @@
         #progressBar {
             box-shadow: 0 0 10px rgba(0, 212, 170, 0.3);
         }
+
+        .company-context {
+            line-height: 1.6;
+            margin-top: 0.75rem;
+        }
+        
+        .verification-badge {
+            background: linear-gradient(135deg, #00d4aa, #4ecdc4);
+            box-shadow: 0 2px 4px rgba(0, 212, 170, 0.3);
+        }
+        
+        .verification-badge svg {
+            filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen">
@@ -467,7 +481,7 @@
                             </div>
                         </div>
                         <div>
-                            <span class="text-sm text-gray-400">Availability</span>
+                            <span class="text-sm text-gray-400">Profile Quality</span>
                             <div class="flex items-center space-x-2 mt-1">
                                 <div class="flex-1 bg-gray-600 rounded-full h-2">
                                     <div class="bg-accent-cyan h-2 rounded-full" style="width: 70%"></div>
@@ -856,6 +870,7 @@
                                 <div class="flex items-center space-x-4 mt-3">
                                     <span class="text-xs text-gray-400">Profile Available</span>
                                     <span class="text-xs text-gray-400">${candidate.lastUpdated}</span>
+                                    ${candidate.verificationStatus === 'Verified' ? '<span class="text-xs text-accent-cyan flex items-center"><svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>Verified</span>' : ''}
                                 </div>
                             </div>
                         </div>
@@ -922,7 +937,10 @@
             
             if (nameElement) nameElement.textContent = candidate.name;
             if (titleElement) titleElement.textContent = `${candidate.title} • ${candidate.experience || 'Experienced professional'}`;
-            if (locationElement) locationElement.textContent = `${candidate.location} • Available for Contact`;
+            if (locationElement) {
+                const contactStatus = candidate.verificationStatus === 'Verified' ? 'Verified Profile' : 'Profile Available';
+                locationElement.textContent = `${candidate.location} • ${contactStatus}`;
+            }
             
             // Update score circle
             const scoreElement = candidateModal.querySelector('.text-accent-cyan.font-bold.text-lg');
@@ -954,7 +972,7 @@
             updateScoreBar('Role Relevance', scoreBreakdown.roleRelevance || 0);
             updateScoreBar('Experience Match', scoreBreakdown.experienceMatch || 0);
             updateScoreBar('Location Fit', scoreBreakdown.locationFit || 0);
-            updateScoreBar('Profile Quality', scoreBreakdown.profileQuality || scoreBreakdown.availability || 0);
+            updateScoreBar('Profile Quality', scoreBreakdown.profileQuality || 0);
         }
         
         function updateScoreBar(label, score) {
@@ -981,19 +999,42 @@
                 ['Current Role:', candidate.title],
                 ['Location:', candidate.location],
                 ['Source:', candidate.source],
-                ['Profile Updated:', candidate.lastUpdated],
-                ['Company Context:', candidate.companyContext || 'Professional background'],
-                ['Verification:', candidate.verificationStatus || 'Unverified']
+                ['Profile Updated:', candidate.lastUpdated]
             ];
             
             const profileContent = profileSection.querySelector('.space-y-3');
             if (profileContent) {
-                profileContent.innerHTML = profileData.map(([label, value]) => `
-                    <div class="flex justify-between">
-                        <span class="text-gray-400">${label}</span>
-                        <span class="text-white">${value}</span>
+                profileContent.innerHTML = `
+                    ${profileData.map(([label, value]) => `
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">${label}</span>
+                            <span class="text-white">${value}</span>
+                        </div>
+                    `).join('')}
+                    
+                    ${candidate.companyContext ? `
+                        <div class="pt-3 border-t border-gray-600">
+                            <span class="text-gray-400 block mb-2">Company Context:</span>
+                            <span class="text-white text-sm leading-relaxed">${candidate.companyContext}</span>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="flex justify-between items-center pt-2">
+                        <span class="text-gray-400">Verification:</span>
+                        <div class="flex items-center space-x-2">
+                            ${candidate.verificationStatus === 'Verified' ? `
+                                <div class="flex items-center space-x-1 bg-accent-cyan/20 text-accent-cyan px-2 py-1 rounded-full">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.238.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span class="text-sm font-medium">Verified</span>
+                                </div>
+                            ` : `
+                                <span class="text-yellow-400 text-sm">${candidate.verificationStatus || 'Unverified'}</span>
+                            `}
+                        </div>
                     </div>
-                `).join('');
+                `;
             }
         }
         
@@ -1057,59 +1098,57 @@
             console.log('Recommended Action:', analytics.recommendedAction);
         }
         
-        // Simulate loading progress
-        // Enhanced loading animation with progress steps
-        // Enhanced loading animation with detailed progress
+        // Enhanced loading animation with realistic 40-60 second timing
         async function showEnhancedLoading() {
             const steps = [
                 { 
                     step: 1, 
                     text: 'Initializing LinkedIn search parameters', 
-                    delay: 500, 
-                    progress: 10,
+                    delay: 2000, 
+                    progress: 8,
                     tip: '🔍 Optimizing search criteria for best results'
                 },
                 { 
                     step: 2, 
                     text: 'Searching LinkedIn professional profiles', 
-                    delay: 1200, 
-                    progress: 30,
-                    tip: '🌐 Scanning thousands of LinkedIn profiles'
+                    delay: 8000, 
+                    progress: 25,
+                    tip: '🌐 Scanning thousands of LinkedIn profiles in Indonesia'
                 },
                 { 
                     step: 3, 
                     text: 'Extracting candidate information', 
-                    delay: 1800, 
-                    progress: 45,
+                    delay: 15000, 
+                    progress: 40,
                     tip: '📊 Processing profile data and work history'
                 },
                 { 
                     step: 4, 
                     text: 'Running AI analysis and scoring', 
-                    delay: 2500, 
-                    progress: 65,
-                    tip: '🤖 AI analyzing candidate qualifications'
+                    delay: 25000, 
+                    progress: 60,
+                    tip: '🤖 AI analyzing candidate qualifications and experience'
                 },
                 { 
                     step: 5, 
                     text: 'Evaluating role and experience match', 
-                    delay: 3200, 
-                    progress: 80,
-                    tip: '⚡ Calculating compatibility scores'
+                    delay: 35000, 
+                    progress: 75,
+                    tip: '⚡ Calculating compatibility scores for each candidate'
                 },
                 { 
                     step: 6, 
                     text: 'Ranking candidates by compatibility', 
-                    delay: 3800, 
+                    delay: 42000, 
                     progress: 90,
-                    tip: '🎯 Sorting by best matches first'
+                    tip: '🎯 Sorting candidates by best matches first'
                 },
                 { 
                     step: 7, 
                     text: 'Finalizing results and recommendations', 
-                    delay: 4200, 
+                    delay: 48000, 
                     progress: 100,
-                    tip: '✨ Preparing your talent recommendations'
+                    tip: '✨ Preparing your personalized talent recommendations'
                 }
             ];
             
@@ -1121,22 +1160,22 @@
                 // Update progress bar
                 updateProgressBar(stepData.progress);
                 
-                // Update step status
-                updateStepStatus(stepData.step, stepData.text, 'processing');
+                // Update step status to processing
+                updateStepStatus(stepData.step, 'processing');
                 
                 // Update tip
                 updateLoadingTip(stepData.tip);
                 
-                // Complete the step after a brief moment
-                await new Promise(resolve => setTimeout(resolve, 300));
-                updateStepStatus(stepData.step, stepData.text, 'complete');
+                // Keep processing for a moment, then complete
+                await new Promise(resolve => setTimeout(resolve, 800));
+                updateStepStatus(stepData.step, 'complete');
                 
-                previousDelay = stepData.delay + 300;
+                previousDelay = stepData.delay + 800;
             }
             
             // Final completion
-            await new Promise(resolve => setTimeout(resolve, 200));
-            updateLoadingTip('🎉 Search completed successfully!');
+            await new Promise(resolve => setTimeout(resolve, 500));
+            updateLoadingTip('🎉 Search completed successfully! Displaying results...');
         }
         
         function updateProgressBar(percentage) {
@@ -1152,7 +1191,7 @@
             }
         }
         
-        function updateStepStatus(stepNumber, text, status) {
+        function updateStepStatus(stepNumber, status) {
             const stepElement = document.querySelector(`[data-step="${stepNumber}"]`);
             if (!stepElement) return;
             
@@ -1361,7 +1400,7 @@ Generated on: ${new Date().toLocaleDateString()}`;
                             roleRelevance: 90,
                             experienceMatch: 85,
                             locationFit: 95,
-                            availability: 70
+                            profileQuality: 70
                         },
                         lastUpdated: "2 days ago",
                         strengths: [
