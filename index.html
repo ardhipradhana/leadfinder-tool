@@ -811,6 +811,27 @@
                 alert(`Search failed: ${error.message}`);
             }
         }
+
+	function showHistorySearchResult(searchData) {
+	    // Update results description
+	    const resultsTitle = document.querySelector('#resultsState h3');
+	    const resultsDesc = document.querySelector('#resultsState p');
+	    if (resultsTitle && resultsDesc) {
+	        resultsTitle.textContent = 'Search Results';
+	        resultsDesc.textContent = `Found ${searchData.resultCount} candidates matching "${searchData.jobTitle}" in ${searchData.location}`;
+	    }
+	
+	    // Update candidate cards with saved data
+	    updateCandidateCards(searchData.candidates || []);
+	
+	    // Update the global candidate state for filtering
+	    currentCandidates = searchData.candidates || [];
+	
+	    // You can optionally update analytics or filters here
+	    setTimeout(() => {
+	        setupResultFilters();
+	    }, 100);
+	}
         
         // NEW FUNCTION: Process real backend results
         function processSearchResults(data) {
@@ -1526,36 +1547,29 @@ Generated on: ${new Date().toLocaleDateString()}`;
 		});
 
 		document.addEventListener('click', (e) => {
-            const card = e.target.closest('.search-history-item');
-            // Only fire if they did NOT click rerun
-            if (card && !e.target.classList.contains('rerun-search-btn')) {
-                const searchData = JSON.parse(card.dataset.search);
-        
-                // Fill form for visual consistency (optional)
-                document.getElementById('jobTitle').value = searchData.jobTitle || '';
-                document.getElementById('industry').value = searchData.industry || '';
-                document.getElementById('location').value = searchData.location || '';
-                document.getElementById('experience').value = searchData.experience || '';
-        
-                // Close modal
-                historyModal.classList.add('hidden');
-        
-                // Show cached result
-                // Update the candidate cards and results description
-                processSearchResults({
-                    results: {
-                        totalFound: searchData.resultCount,
-                        candidates: searchData.candidates || [],
-                    },
-                    query: searchData
-                });
-        
-                // Make sure to hide loading, show results
-                initialState.classList.add('hidden');
-                loadingState.classList.add('hidden');
-                resultsState.classList.remove('hidden');
-            }
-        });
+		    const card = e.target.closest('.search-history-item');
+		    // Only fire if they did NOT click rerun
+		    if (card && !e.target.classList.contains('rerun-search-btn')) {
+		        const searchData = JSON.parse(card.dataset.search);
+		
+		        // Fill form for visual consistency (optional)
+		        document.getElementById('jobTitle').value = searchData.jobTitle || '';
+		        document.getElementById('industry').value = searchData.industry || '';
+		        document.getElementById('location').value = searchData.location || '';
+		        document.getElementById('experience').value = searchData.experience || '';
+		
+		        // Close modal
+		        historyModal.classList.add('hidden');
+		
+		        // Show cached result from history
+		        showHistorySearchResult(searchData);
+		
+		        // Show results
+		        initialState.classList.add('hidden');
+		        loadingState.classList.add('hidden');
+		        resultsState.classList.remove('hidden');
+		    }
+		});
 		
 		// 3. REAL-TIME FILTERS FOR RESULTS
 		// Add these functions for filtering
