@@ -1165,63 +1165,65 @@
             ];
             
             let previousDelay = 0;
-            
-            for (let stepData of steps) {
-                await new Promise(resolve => setTimeout(resolve, stepData.delay - previousDelay));
-                
-                // Update progress bar
-                updateProgressBar(stepData.progress);
-                
-                // Update step status to processing
-                updateStepStatus(stepData.step, 'processing');
-                
-                // Update tip
-                updateLoadingTip(stepData.tip);
-                
-                // Keep processing for a moment, then complete
-                await new Promise(resolve => setTimeout(resolve, 800));
-                updateStepStatus(stepData.step, 'complete');
-                
-                previousDelay = stepData.delay + 800;
-            }
-            
-            // Final completion
-            await new Promise(resolve => setTimeout(resolve, 500));
-            updateLoadingTip('🎉 Search completed successfully! Displaying results...');
-        }
+	    let lastProgress = 0;
+	
+	    for (let stepData of steps) {
+	        // Animate progress from lastProgress to stepData.progress over the segment duration
+	        await smoothRandomProgress(lastProgress, stepData.progress, stepData.delay - previousDelay);
+	
+	        updateStepStatus(stepData.step, 'processing');
+	        updateLoadingTip(stepData.tip);
+	
+	        await new Promise(resolve => setTimeout(resolve, 800));
+	        updateStepStatus(stepData.step, 'complete');
+	
+	        lastProgress = stepData.progress;
+	        previousDelay = stepData.delay + 800;
+	    }
+	
+	    await new Promise(resolve => setTimeout(resolve, 500));
+	    updateLoadingTip('🎉 Search completed successfully! Displaying results...');
+	}
         
         function updateProgressBar(percentage) {
 	    const progressBar = document.getElementById('progressBar');
 	    const progressText = document.getElementById('progressPercentage');
-	
 	    if (progressBar) {
-		progressBar.style.width = `${percentage}%`;
-		progressBar.style.boxShadow = `0 0 10px rgba(0, 212, 170, 0.4)`;
+	        progressBar.style.width = `${percentage}%`;
+	        progressBar.style.boxShadow = `0 0 10px rgba(0, 212, 170, 0.4)`;
 	    }
-	
 	    if (progressText) {
-		// Kill any previous interval
-		if (progressInterval) clearInterval(progressInterval);
-	
-		const current = parseInt(progressText.textContent) || 0;
-		const diff = percentage - current;
-		const duration = 500;
-		const steps = Math.abs(diff);
-		const increment = diff / steps;
-		const stepDuration = steps > 0 ? duration / steps : duration;
-	
-		let count = 0;
-		progressInterval = setInterval(() => {
-		    count++;
-		    const newValue = Math.round(current + (increment * count));
-		    progressText.textContent = `${newValue}%`;
-	
-		    if (count >= steps) {
-			clearInterval(progressInterval);
-			progressText.textContent = `${percentage}%`;
-		    }
-		}, stepDuration);
+	        progressText.textContent = `${percentage}%`;
 	    }
+	}
+
+	// Smooth, randomized progress increment between two values over a set duration
+	async function smoothRandomProgress(from, to, totalDuration = 1000) {
+	    return new Promise(resolve => {
+	        let current = from;
+	        const target = to;
+	        const increments = [];
+	        let remaining = target - current;
+	        // Create random increments between 1 and 5, sum up to the difference
+	        while (remaining > 0) {
+	            let step = Math.min(Math.floor(Math.random() * 5) + 1, remaining);
+	            increments.push(step);
+	            remaining -= step;
+	        }
+	        const stepDuration = totalDuration / increments.length;
+	
+	        function doStep(i) {
+	            if (i >= increments.length) {
+	                updateProgressBar(target); // make sure it hits the target
+	                resolve();
+	                return;
+	            }
+	            current += increments[i];
+	            updateProgressBar(current);
+	            setTimeout(() => doStep(i + 1), stepDuration);
+	        }
+	        doStep(0);
+	    });
 	}
         
         function updateStepStatus(stepNumber, status) {
@@ -1478,7 +1480,7 @@ Generated on: ${new Date().toLocaleDateString()}`;
 		    return `${diffDays} days ago`;
 		}
 	
-		function saveToSearchHistory(searchParams, resultCount) {
+		function saveToSearchHistory(searchParams, resultCount, candidates) {
 		    const searchEntry = {
 		        id: Date.now(),
 		        ...searchParams,
