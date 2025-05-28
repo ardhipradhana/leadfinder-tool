@@ -54,7 +54,7 @@
                         <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V4z"/>
                     </svg>
                     <span class="text-accent-cyan font-medium">15 CREDITS</span>
-                    <span class="text-gray-400">• 8 ULTRA</span>
+                    <span class="text-gray-400">• LinkedIn Search</span>
                 </div>
                 
                 <button class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors">
@@ -71,7 +71,7 @@
             <div class="lg:col-span-1">
                 <div class="bg-dark-secondary rounded-xl p-6">
                     <h2 class="text-xl font-semibold mb-6 text-white">Find Talent</h2>
-                    <p class="text-gray-300 mb-6">Search for candidates across multiple platforms with AI-powered ranking</p>
+                    <p class="text-gray-300 mb-6">Search for candidates from LinkedIn with AI-powered ranking</p>
                     
                     <form id="searchForm" class="space-y-4">
                         <div>
@@ -160,18 +160,19 @@
                     <div class="animate-spin w-12 h-12 border-4 border-accent-cyan border-t-transparent rounded-full mx-auto mb-4"></div>
                     <h3 class="text-xl font-semibold text-white mb-2">Searching Platforms...</h3>
                     <p class="text-gray-400 mb-4">AI is analyzing candidates from JobStreet, LinkedIn, Karir.com and more</p>
+                    <!-- Update the loading progress indicators -->
                     <div class="bg-dark-primary rounded-lg p-4">
                         <div class="text-sm text-gray-300 space-y-2">
                             <div class="flex items-center justify-between">
-                                <span>JobStreet Indonesia</span>
+                                <span>LinkedIn Professional Profiles</span>
                                 <span class="text-accent-cyan">✓ Complete</span>
                             </div>
                             <div class="flex items-center justify-between">
-                                <span>LinkedIn Public Profiles</span>
+                                <span>AI Analysis & Scoring</span>
                                 <span class="text-yellow-400">⏳ Processing...</span>
                             </div>
                             <div class="flex items-center justify-between">
-                                <span>Karir.com</span>
+                                <span>Profile Ranking</span>
                                 <span class="text-gray-500">⏸ Queued</span>
                             </div>
                         </div>
@@ -627,6 +628,7 @@
 <script>
         // State management
         let currentSearchResults = [];
+        let currentCandidates = [];
         let searchHistory = JSON.parse(localStorage.getItem('leadfinder_history') || '[]');
         
         // DOM elements
@@ -699,29 +701,14 @@
                 }
                 
                 const data = await response.json();
+
+                // Wait for loading animation to complete
+                await loadingPromise;
                 
                 if (data.success) {
-                    // Process successful response
                     processSearchResults(data);
-                    
-                    // Show results
                     loadingState.classList.add('hidden');
                     resultsState.classList.remove('hidden');
-                    
-                    // Save to history
-                    const historyItem = {
-                        ...searchParams,
-                        timestamp: data.metadata.timestamp,
-                        resultsCount: data.results.totalFound,
-                        searchId: data.metadata.searchId
-                    };
-                    searchHistory.unshift(historyItem);
-                    searchHistory = searchHistory.slice(0, 10);
-                    localStorage.setItem('leadfinder_history', JSON.stringify(searchHistory));
-                    
-                } else {
-                    // Handle backend error
-                    throw new Error(data.error?.message || 'Search failed');
                 }
                 
             } catch (error) {
@@ -734,6 +721,8 @@
         
         // NEW FUNCTION: Process real backend results
         function processSearchResults(data) {
+            // Store candidates globally for modal access
+            currentCandidates = data.results.candidates;
             // Update results description
             const resultsTitle = document.querySelector('#resultsState h3');
             const resultsDesc = document.querySelector('#resultsState p');
@@ -748,6 +737,7 @@
             
             // Update analytics if you have an analytics section
             updateAnalytics(data.analytics);
+
         }
         
         // NEW FUNCTION: Update candidate cards
@@ -823,10 +813,166 @@
         }
         
         // NEW FUNCTION: Show modal with real candidate data
+        // Real candidate modal function
         function showCandidateModal(candidate) {
-            // Update modal content with real candidate data
-            updateModalContent(candidate);
+            if (!candidate) return;
+            
+            // Update modal header
+            updateModalHeader(candidate);
+            
+            // Update AI Analysis Summary
+            updateModalAnalysis(candidate);
+            
+            // Update Profile Details
+            updateModalProfile(candidate);
+            
+            // Update Key Strengths
+            updateModalStrengths(candidate);
+            
+            // Update Concerns
+            updateModalConcerns(candidate);
+            
+            // Update Recommendation
+            updateModalRecommendation(candidate);
+            
+            // Show modal
             candidateModal.classList.remove('hidden');
+        }
+
+        function updateModalHeader(candidate) {
+            // Update name and title
+            const nameElement = candidateModal.querySelector('h2');
+            const titleElement = candidateModal.querySelector('p.text-gray-300');
+            const locationElement = candidateModal.querySelector('p.text-gray-400');
+            
+            if (nameElement) nameElement.textContent = candidate.name;
+            if (titleElement) titleElement.textContent = `${candidate.title} • ${candidate.experience || 'Experienced professional'}`;
+            if (locationElement) locationElement.textContent = `${candidate.location} • Available for Contact`;
+            
+            // Update score circle
+            const scoreElement = candidateModal.querySelector('.text-accent-cyan.font-bold.text-lg');
+            const scoreCircle = candidateModal.querySelector('.score-circle');
+            
+            if (scoreElement) scoreElement.textContent = candidate.aiScore;
+            if (scoreCircle) {
+                const scoreDegrees = candidate.aiScore * 3.6;
+                scoreCircle.style.setProperty('--score-deg', `${scoreDegrees}deg`);
+            }
+            
+            // Update initials
+            const initialsElement = candidateModal.querySelector('.w-16.h-16 span');
+            if (initialsElement) {
+                const initials = candidate.name.split(' ').map(n => n[0]).join('').substring(0, 2);
+                initialsElement.textContent = initials;
+            }
+        }
+
+        function updateModalAnalysis(candidate) {
+            // Update AI analysis summary text
+            const summaryText = candidateModal.querySelector('.bg-dark-primary p.text-gray-300');
+            if (summaryText) {
+                summaryText.textContent = candidate.recommendation || 'AI analysis based on profile matching and experience relevance.';
+            }
+            
+            // Update score breakdown bars
+            const scoreBreakdown = candidate.scoreBreakdown || {};
+            updateScoreBar('Role Relevance', scoreBreakdown.roleRelevance || 0);
+            updateScoreBar('Experience Match', scoreBreakdown.experienceMatch || 0);
+            updateScoreBar('Location Fit', scoreBreakdown.locationFit || 0);
+            updateScoreBar('Profile Quality', scoreBreakdown.profileQuality || scoreBreakdown.availability || 0);
+        }
+        
+        function updateScoreBar(label, score) {
+            const scoreElements = candidateModal.querySelectorAll('.grid.grid-cols-2 > div');
+            
+            scoreElements.forEach(element => {
+                const labelElement = element.querySelector('.text-gray-400');
+                if (labelElement && labelElement.textContent === label) {
+                    const progressBar = element.querySelector('.bg-accent-cyan');
+                    const scoreText = element.querySelector('.text-accent-cyan');
+                    
+                    if (progressBar) progressBar.style.width = `${score}%`;
+                    if (scoreText) scoreText.textContent = `${score}%`;
+                }
+            });
+        }
+        
+        function updateModalProfile(candidate) {
+            const profileSection = candidateModal.querySelector('.grid.grid-cols-1.md\\:grid-cols-2 > div:first-child');
+            if (!profileSection) return;
+            
+            const profileData = [
+                ['Experience:', candidate.experience || 'Experienced professional'],
+                ['Current Role:', candidate.title],
+                ['Location:', candidate.location],
+                ['Source:', candidate.source],
+                ['Profile Updated:', candidate.lastUpdated],
+                ['Company Context:', candidate.companyContext || 'Professional background'],
+                ['Verification:', candidate.verificationStatus || 'Unverified']
+            ];
+            
+            const profileContent = profileSection.querySelector('.space-y-3');
+            if (profileContent) {
+                profileContent.innerHTML = profileData.map(([label, value]) => `
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">${label}</span>
+                        <span class="text-white">${value}</span>
+                    </div>
+                `).join('');
+            }
+        }
+        
+        function updateModalStrengths(candidate) {
+            const strengthsSection = candidateModal.querySelector('.grid.grid-cols-1.md\\:grid-cols-2 > div:last-child .space-y-2');
+            if (!strengthsSection) return;
+            
+            const strengths = candidate.strengths || ['Professional background', 'Industry experience'];
+            
+            strengthsSection.innerHTML = strengths.map(strength => `
+                <div class="flex items-center space-x-2">
+                    <div class="w-2 h-2 bg-accent-cyan rounded-full"></div>
+                    <span class="text-gray-300 text-sm">${strength}</span>
+                </div>
+            `).join('');
+        }
+        
+        function updateModalConcerns(candidate) {
+            const concernsSection = candidateModal.querySelector('.bg-yellow-900\\/20 .space-y-2');
+            if (!concernsSection) return;
+            
+            const concerns = candidate.concerns || ['Profile verification recommended before contact'];
+            
+            concernsSection.innerHTML = concerns.map(concern => `
+                <div class="flex items-start space-x-2">
+                    <span class="text-yellow-400">•</span>
+                    <span>${concern}</span>
+                </div>
+            `).join('');
+        }
+        
+        function updateModalRecommendation(candidate) {
+            const recommendationSection = candidateModal.querySelector('.bg-accent-cyan\\/10 p.text-gray-300');
+            if (!recommendationSection) return;
+            
+            const priority = candidate.priority || 'medium';
+            const recommendation = candidate.recommendation || 'Review profile for potential match';
+            
+            recommendationSection.innerHTML = `
+                <strong>${priority.charAt(0).toUpperCase() + priority.slice(1)} Priority Contact:</strong> ${recommendation}
+            `;
+        }
+        
+        // Update the card click handler
+        function attachCandidateCardHandlers(candidates) {
+            document.querySelectorAll('.candidate-card').forEach((card, index) => {
+                card.addEventListener('click', () => {
+                    const candidateId = card.getAttribute('data-candidate-id');
+                    const candidate = candidates.find(c => c.id === candidateId);
+                    if (candidate) {
+                        showCandidateModal(candidate);
+                    }
+                });
+            });
         }
         
         // NEW FUNCTION: Update analytics display
@@ -837,19 +983,45 @@
         }
         
         // Simulate loading progress
-        async function simulateLoading() {
+        // Enhanced loading animation with progress steps
+        async function showEnhancedLoading() {
             const steps = [
-                { text: 'JobStreet Indonesia', status: 'complete', delay: 1000 },
-                { text: 'LinkedIn Public Profiles', status: 'processing', delay: 1500 },
-                { text: 'Karir.com', status: 'complete', delay: 2000 },
-                { text: 'Indeed Indonesia', status: 'complete', delay: 2500 },
-                { text: 'AI Analysis & Scoring', status: 'complete', delay: 3000 }
+                { text: 'LinkedIn Professional Profiles', status: 'processing', delay: 800 },
+                { text: 'LinkedIn Professional Profiles', status: 'complete', delay: 1500 },
+                { text: 'AI Analysis & Scoring', status: 'processing', delay: 2000 },
+                { text: 'AI Analysis & Scoring', status: 'complete', delay: 3000 },
+                { text: 'Profile Ranking', status: 'processing', delay: 3500 },
+                { text: 'Profile Ranking', status: 'complete', delay: 4000 }
             ];
             
-            for (let i = 0; i < steps.length; i++) {
-                await new Promise(resolve => setTimeout(resolve, steps[i].delay - (i > 0 ? steps[i-1].delay : 0)));
-                // You could update the loading state here if needed
+            const statusContainer = document.querySelector('#loadingState .space-y-2');
+            
+            for (let step of steps) {
+                await new Promise(resolve => setTimeout(resolve, step.delay - (steps[0].delay || 0)));
+                updateLoadingStep(step.text, step.status);
             }
+        }
+
+        function updateLoadingStep(stepText, status) {
+            const statusContainer = document.querySelector('#loadingState .space-y-2');
+            if (!statusContainer) return;
+            
+            const stepElements = statusContainer.querySelectorAll('.flex');
+            
+            stepElements.forEach(element => {
+                const textSpan = element.querySelector('span:first-child');
+                const statusSpan = element.querySelector('span:last-child');
+                
+                if (textSpan && textSpan.textContent === stepText) {
+                    if (status === 'processing') {
+                        statusSpan.className = 'text-yellow-400';
+                        statusSpan.innerHTML = '⏳ Processing...';
+                    } else if (status === 'complete') {
+                        statusSpan.className = 'text-accent-cyan';
+                        statusSpan.innerHTML = '✓ Complete';
+                    }
+                }
+            });
         }
         
         // Update results description based on search params
