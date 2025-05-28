@@ -718,6 +718,7 @@
         let currentSearchResults = [];
         let currentCandidates = [];
         let searchHistory = JSON.parse(localStorage.getItem('leadfinder_history') || '[]');
+	let progressInterval = null;
         
         // DOM elements
         const searchForm = document.getElementById('searchForm');
@@ -1192,37 +1193,38 @@
         }
         
         function updateProgressBar(percentage) {
-            const progressBar = document.getElementById('progressBar');
-            const progressText = document.getElementById('progressPercentage');
-            
-            if (progressBar) {
-                progressBar.style.width = `${percentage}%`;
-                // Simple glow effect without animation
-                progressBar.style.boxShadow = `0 0 10px rgba(0, 212, 170, 0.4)`;
-            }
-            
-            if (progressText) {
-                // Smooth number counter
-                const current = parseInt(progressText.textContent) || 0;
-                const diff = percentage - current;
-                const duration = 500;
-                const steps = Math.abs(diff);
-                const increment = diff / steps;
-                const stepDuration = duration / steps;
-                
-                let count = 0;
-                const timer = setInterval(() => {
-                    count++;
-                    const newValue = Math.round(current + (increment * count));
-                    progressText.textContent = `${newValue}%`;
-                    
-                    if (count >= steps) {
-                        clearInterval(timer);
-                        progressText.textContent = `${percentage}%`;
-                    }
-                }, stepDuration);
-            }
-        }
+	    const progressBar = document.getElementById('progressBar');
+	    const progressText = document.getElementById('progressPercentage');
+	
+	    if (progressBar) {
+		progressBar.style.width = `${percentage}%`;
+		progressBar.style.boxShadow = `0 0 10px rgba(0, 212, 170, 0.4)`;
+	    }
+	
+	    if (progressText) {
+		// Kill any previous interval
+		if (progressInterval) clearInterval(progressInterval);
+	
+		const current = parseInt(progressText.textContent) || 0;
+		const diff = percentage - current;
+		const duration = 500;
+		const steps = Math.abs(diff);
+		const increment = diff / steps;
+		const stepDuration = steps > 0 ? duration / steps : duration;
+	
+		let count = 0;
+		progressInterval = setInterval(() => {
+		    count++;
+		    const newValue = Math.round(current + (increment * count));
+		    progressText.textContent = `${newValue}%`;
+	
+		    if (count >= steps) {
+			clearInterval(progressInterval);
+			progressText.textContent = `${percentage}%`;
+		    }
+		}, stepDuration);
+	    }
+	}
         
         function updateStepStatus(stepNumber, status) {
             const stepElement = document.querySelector(`[data-step="${stepNumber}"]`);
@@ -1511,6 +1513,24 @@ Generated on: ${new Date().toLocaleDateString()}`;
 		        document.getElementById('location').value = searchData.location || '';
 		        document.getElementById('experience').value = searchData.experience || '';
 		        
+		        // Close modal and run search
+		        historyModal.classList.add('hidden');
+		        searchForm.dispatchEvent(new Event('submit'));
+		    }
+		});
+
+		document.addEventListener('click', (e) => {
+		    const card = e.target.closest('.search-history-item');
+		    // Don't fire if they clicked the rerun button (already handled above)
+		    if (card && !e.target.classList.contains('rerun-search-btn')) {
+		        const searchData = JSON.parse(card.dataset.search);
+		
+		        // Fill form with historical search
+		        document.getElementById('jobTitle').value = searchData.jobTitle || '';
+		        document.getElementById('industry').value = searchData.industry || '';
+		        document.getElementById('location').value = searchData.location || '';
+		        document.getElementById('experience').value = searchData.experience || '';
+		
 		        // Close modal and run search
 		        historyModal.classList.add('hidden');
 		        searchForm.dispatchEvent(new Event('submit'));
