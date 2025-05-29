@@ -271,25 +271,27 @@
                 <!-- Results State -->
                 <div id="resultsState" class="hidden">
                     <div class="bg-dark-secondary rounded-xl p-6 mb-6">
-                        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-2">
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-3">
 			    <div>
 			        <h3 class="text-xl font-semibold text-white">Search Results</h3>
 			        <p class="text-gray-400">
 			            Found 10 candidates matching "Restaurant Manager" in jakarta
 			        </p>
 			    </div>
-			    <div class="flex items-center space-x-2 mt-2 md:mt-0">
+			    <div class="flex flex-row items-center gap-2 w-full md:w-auto justify-end">
 			        <select class="px-3 py-2 bg-dark-primary border border-gray-600 rounded-lg text-white text-sm">
 			            <option>Sort by Score</option>
 			            <option>Sort by Experience</option>
 			            <option>Sort by Location</option>
 			        </select>
-                                <button id="exportBtn" class="flex items-center space-x-2 px-4 py-2 bg-accent-cyan hover:bg-accent-teal text-dark-primary font-medium text-sm rounded-lg transition-colors shadow-md">
-			            <svg class="w-4 h-4" ...></svg>
+			        <button id="exportBtn" class="flex items-center px-4 py-2 bg-accent-cyan hover:bg-accent-teal text-dark-primary font-medium text-sm rounded-lg shadow transition-colors">
+			            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 17l4 4 4-4m-4-5v9"/>
+			            </svg>
 			            <span>Export to CSV</span>
-                                </button>
-                            </div>
-                        </div>
+			        </button>
+			    </div>
+			</div>
                         
                         <!-- Filter Bar -->
                         <div class="flex items-center space-x-4 p-3 bg-dark-primary rounded-lg">
@@ -1613,9 +1615,8 @@ Generated on: ${new Date().toLocaleDateString()}`;
 		    
 		    // Sort dropdown
 		    const sortSelect = document.querySelector('#resultsState select');
-		    if (sortSelect) {
-		        sortSelect.addEventListener('change', () => {
-		            sortCandidates();
+				if (sortSelect) sortSelect.value = "Sort by Score";
+				sortCandidates();
 		        });
 		    }
 		}
