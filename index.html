@@ -714,6 +714,11 @@
 
 <script>
 console.log('JavaScript is running');
+console.log('Setting up DOMContentLoaded listener...');
+
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOMContentLoaded fired!');
+});
         // State management
         let currentSearchResults = [];
         let currentCandidates = [];
