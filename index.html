@@ -877,7 +877,7 @@ document.getElementById('closeAuthModal').addEventListener('click', hideAuthModa
 		    const { data: profile, error } = await supabaseClient
 		        .from('leadfinder_users')
 		        .select('credits')
-		        .eq('user_id', user.id)  // This was the issue
+		        .eq('user_id', currentUser.id)  // This was the issue
 		        .single();
 		    
 		    if (error) {
@@ -891,8 +891,8 @@ document.getElementById('closeAuthModal').addEventListener('click', hideAuthModa
 		            const { data: newProfile, error: insertError } = await supabaseClient
 		                .from('leadfinder_users')
 		                .insert({
-		                    user_id: user.id,
-		                    email: user.email,
+		                    user_id: currentUser.id,
+		                    email: currentUser.email,
 		                    credits: 10
 		                })
 		                .select()
