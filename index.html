@@ -804,17 +804,38 @@ document.addEventListener('DOMContentLoaded', () => {
 		    
 		    currentUser = user;
 		    
-		    // Get user credits from user_profiles table
+		    // Get user credits from leadfinder_users table
 		    const { data: profile, error } = await supabase
-		        .from('user_profiles')
+		        .from('leadfinder_users')
 		        .select('credits')
-		        .eq('id', user.id)
+		        .eq('user_id', user.id)
 		        .single();
 		    
 		    if (profile) {
 		        userCredits = profile.credits || 0;
 		        updateCreditsDisplay();
 		        return userCredits > 0;
+		    }
+		    
+		    return false;
+		}
+		
+		// Update deductCredit function
+		async function deductCredit() {
+		    if (userCredits <= 0) return false;
+		    
+		    const { error } = await supabase
+		        .from('leadfinder_users')
+		        .update({ 
+		            credits: userCredits - 1,
+		            updated_at: new Date().toISOString()
+		        })
+		        .eq('user_id', currentUser.id);
+		    
+		    if (!error) {
+		        userCredits -= 1;
+		        updateCreditsDisplay();
+		        return true;
 		    }
 		    
 		    return false;
@@ -978,18 +999,18 @@ document.addEventListener('DOMContentLoaded', () => {
 		        hideAuthModal();
 		        await checkAuthAndCredits();
 		        
-		        // Create user profile if doesn't exist
+		        // Create leadfinder user profile if doesn't exist
 		        const { data: existingProfile } = await supabase
-		            .from('user_profiles')
+		            .from('leadfinder_users')
 		            .select('id')
-		            .eq('id', currentUser.id)
+		            .eq('user_id', currentUser.id)
 		            .single();
 		        
 		        if (!existingProfile) {
 		            await supabase
-		                .from('user_profiles')
+		                .from('leadfinder_users')
 		                .insert({
-		                    id: currentUser.id,
+		                    user_id: currentUser.id,
 		                    email: currentUser.email,
 		                    credits: 10 // Free trial credits
 		                });
