@@ -898,6 +898,7 @@ document.getElementById('closeAuthModal').addEventListener('click', hideAuthModa
 					
 					userCredits = newProfile.credits || 10;
 					updateCreditsDisplay();
+					console.log('New user created with credits:', userCredits);
 					return true;
 		        }
 		        return false;
@@ -913,9 +914,24 @@ document.getElementById('closeAuthModal').addEventListener('click', hideAuthModa
 		}
 		
 		function updateCreditsDisplay() {
-		    const creditsElement = document.querySelector('.text-accent-cyan.font-medium');
+		    // Try multiple selectors to find the credits element
+		    let creditsElement = document.querySelector('.text-accent-cyan.font-medium');
+		    
+		    // If not found, try finding by text content
+		    if (!creditsElement) {
+		        const elements = document.querySelectorAll('.font-medium');
+		        elements.forEach(el => {
+		            if (el.textContent.includes('CREDITS')) {
+		                creditsElement = el;
+		            }
+		        });
+		    }
+		    
 		    if (creditsElement) {
 		        creditsElement.textContent = `${userCredits} CREDITS`;
+		        console.log('Credits display updated to:', userCredits); // Debug line
+		    } else {
+		        console.error('Could not find credits element to update');
 		    }
 		}
 		
