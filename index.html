@@ -2293,10 +2293,9 @@ Generated on: ${new Date().toLocaleDateString()}`;
 		    // Update history UI regardless of auth state
 		    updateSearchHistoryUI();
 		    document.getElementById('jobTitle').focus();
-		});
 		    
 		    try {
-		        updateSearchHistoryUI();
+			updateSearchHistoryUI();
 		    } catch (error) {
 		    }
 	        searchForm.addEventListener('submit', handleSearch);
