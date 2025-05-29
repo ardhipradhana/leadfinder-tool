@@ -868,12 +868,40 @@ document.getElementById('closeAuthModal').addEventListener('click', hideAuthModa
 		    
 		    currentUser = user;
 		    
-		    // Get user credits from leadfinder_users table
+		    // Fixed query - use .eq() method properly
 		    const { data: profile, error } = await supabaseClient
 		        .from('leadfinder_users')
 		        .select('credits')
-		        .eq('user_id', user.id)
+		        .eq('user_id', user.id)  // This was the issue
 		        .single();
+		    
+		    if (error) {
+		        console.error('Error fetching user profile:', error);
+		        
+		        // If user doesn't exist, create them
+		        if (error.code === 'PGRST116') { // No rows returned
+		            console.log('Creating new user profile...');
+		            const { data: newProfile, error: insertError } = await supabaseClient
+		                .from('leadfinder_users')
+		                .insert({
+		                    user_id: user.id,
+		                    email: user.email,
+		                    credits: 10
+		                })
+		                .select()
+		                .single();
+		            
+		            if (insertError) {
+		                console.error('Error creating user profile:', insertError);
+		                return false;
+		            }
+		            
+		            userCredits = 10;
+		            updateCreditsDisplay();
+		            return true;
+		        }
+		        return false;
+		    }
 		    
 		    if (profile) {
 		        userCredits = profile.credits || 0;
@@ -2396,36 +2424,20 @@ Generated on: ${new Date().toLocaleDateString()}`;
 		document.addEventListener('DOMContentLoaded', async () => {
 		
 		// Auth state change listener
+		// REPLACE the auth state change handler with this simplified version:
 		supabaseClient.auth.onAuthStateChange(async (event, session) => {
 		    if (event === 'SIGNED_IN') {
+		        console.log('User signed in:', session.user.email);
 		        currentUser = session.user;
 		        hideAuthModal();
-		        await checkAuthAndCredits();
-		        
-		        // Create leadfinder user profile if doesn't exist
-		        const { data: existingProfile } = await supabaseClient
-		            .from('leadfinder_users')
-		            .select('id')
-		            .eq('user_id', currentUser.id)
-		            .single();
-		        
-		        if (!existingProfile) {
-		            await supabaseClient
-		                .from('leadfinder_users')
-		                .insert({
-		                    user_id: currentUser.id,
-		                    email: currentUser.email,
-		                    credits: 10 // Free trial credits
-		                });
-		            userCredits = 10;
-		            updateCreditsDisplay();
-		        }
+		        await checkAuthAndCredits(); // This will handle user creation if needed
 		    } else if (event === 'SIGNED_OUT') {
 		        currentUser = null;
 		        userCredits = 0;
 		        updateCreditsDisplay();
 		    }
 		});
+			
 		    // Check if user is already logged in
 		    await checkAuthAndCredits();
 		    await updateSearchHistoryUI();
