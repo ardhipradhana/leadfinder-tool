@@ -270,6 +270,24 @@
                 
                 <!-- Results State -->
                 <div id="resultsState" class="hidden">
+					<!-- ADD THIS NEW SECTION HERE -->
+				    <div id="aiInsightsBox" class="bg-gradient-to-r from-accent-cyan/10 to-accent-teal/10 border border-accent-cyan/30 rounded-xl p-6 mb-6">
+				        <div class="flex items-start space-x-3">
+				            <div class="w-10 h-10 bg-accent-cyan/20 rounded-lg flex items-center justify-center flex-shrink-0">
+				                <svg class="w-6 h-6 text-accent-cyan" fill="currentColor" viewBox="0 0 20 20">
+				                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+				                </svg>
+				            </div>
+				            <div class="flex-1">
+				                <h3 class="text-lg font-semibold text-accent-cyan mb-2 flex items-center">
+				                    AI Search Insights
+				                </h3>
+				                <p id="aiInsightsText" class="text-gray-300 leading-relaxed">
+				                    Analyzing candidates and generating insights...
+				                </p>
+				            </div>
+				        </div>
+				    </div>
                     <div class="bg-dark-secondary rounded-xl p-6 mb-6">
                         <div class="flex flex-col md:flex-row md:items-start md:justify-between mb-4 gap-3">
 			    <div>
@@ -279,18 +297,24 @@
 			        </p>
 			    </div>
 			    <div class="flex flex-row items-center gap-2 w-full md:w-auto justify-end">
-			        <select class="px-3 py-2 bg-dark-primary border border-gray-600 rounded-lg text-white text-sm" id="sortSelect">
-					    <option value="Sort by Score">Sort by Score</option>
-					    <option value="Sort by Experience">Sort by Experience</option>
-					    <option value="Sort by Location">Sort by Location</option>
-					</select>
-			        <button id="exportBtn" class="flex items-center px-3 py-1.5 bg-accent-cyan hover:bg-accent-teal text-dark-primary font-medium text-sm rounded-lg shadow transition-colors">
-			            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-			                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 17l4 4 4-4m-4-5v9"/>
-			            </svg>
-			            <span>Export to CSV</span>
-			        </button>
-			    </div>
+				    <select class="px-3 py-2 bg-dark-primary border border-gray-600 rounded-lg text-white text-sm" id="sortSelect">
+				        <option value="Sort by Score">Sort by Score</option>
+				        <option value="Sort by Experience">Sort by Experience</option>
+				        <option value="Sort by Location">Sort by Location</option>
+				    </select>
+				    <button id="compareBtn" class="hidden flex items-center px-3 py-1.5 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-medium text-sm rounded-lg shadow transition-all">
+				        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+				        </svg>
+				        <span id="compareBtnText">Compare (0)</span>
+				    </button>
+				    <button id="exportBtn" class="flex items-center px-3 py-1.5 bg-accent-cyan hover:bg-accent-teal text-dark-primary font-medium text-sm rounded-lg shadow transition-colors">
+				        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 17l4 4 4-4m-4-5v9"/>
+				        </svg>
+				        <span>Export to CSV</span>
+				    </button>
+				</div>
 			</div>
                         
                         <!-- Filter Bar -->
@@ -614,6 +638,28 @@
         </div>
     </div>
 
+	<!-- Candidate Comparison Modal -->
+	<div id="comparisonModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
+	    <div class="bg-dark-secondary rounded-xl max-w-6xl w-full max-h-screen overflow-y-auto">
+	        <div class="p-6 border-b border-gray-700">
+	            <div class="flex items-center justify-between">
+	                <h2 class="text-2xl font-bold text-white">Candidate Comparison</h2>
+	                <button id="closeComparisonModal" class="text-gray-400 hover:text-white">
+	                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+	                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+	                    </svg>
+	                </button>
+	            </div>
+	        </div>
+	        
+	        <div class="p-6">
+	            <div id="comparisonContent" class="grid gap-6">
+	                <!-- Comparison content will be dynamically generated -->
+	            </div>
+	        </div>
+	    </div>
+	</div>
+
     <!-- Search History Modal -->
     <div id="historyModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
         <div class="bg-dark-secondary rounded-xl max-w-2xl w-full max-h-screen overflow-y-auto">
@@ -748,6 +794,18 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('closeModal').addEventListener('click', () => candidateModal.classList.add('hidden'));
         document.getElementById('closeHistoryModal').addEventListener('click', () => historyModal.classList.add('hidden'));
         document.getElementById('closeExportModal').addEventListener('click', () => exportModal.classList.add('hidden'));
+		// Compare button click handler
+		document.getElementById('compareBtn').addEventListener('click', () => {
+		    const selectedCandidates = getSelectedCandidates();
+		    if (selectedCandidates.length > 0) {
+		        showComparisonModal(selectedCandidates);
+		    }
+		});
+		
+		// Close comparison modal
+		document.getElementById('closeComparisonModal').addEventListener('click', () => {
+		    document.getElementById('comparisonModal').classList.add('hidden');
+		});
         
         // Sample search button
         document.getElementById('sampleSearchBtn').addEventListener('click', () => {
@@ -878,6 +936,10 @@ document.addEventListener('DOMContentLoaded', () => {
 			saveToSearchHistory(data.query, data.results.totalFound, data.results.candidates);
 			updateSearchHistoryUI();
 
+			// Update AI Insights
+			const aiInsights = generateAIInsights(data.results.candidates, data.query);
+			document.getElementById('aiInsightsText').textContent = aiInsights;
+
 			// Setup filters
 			setTimeout(() => {
 			    setupResultFilters();
@@ -912,6 +974,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="bg-dark-secondary rounded-xl p-6 hover:bg-dark-tertiary transition-colors cursor-pointer candidate-card" data-candidate-id="${candidate.id}">
                     <div class="flex items-start justify-between">
                         <div class="flex items-start space-x-4 flex-1">
+							<div class="pt-1">
+				                <input type="checkbox" 
+				                       class="candidate-checkbox w-4 h-4 text-accent-cyan bg-dark-primary border-gray-600 rounded focus:ring-accent-cyan focus:ring-2" 
+				                       data-candidate-id="${candidate.id}"
+				                       onclick="event.stopPropagation(); updateCompareButton();">
+				            </div>
                             <div class="w-12 h-12 bg-gray-600 rounded-full flex items-center justify-center">
                                 <span class="text-white font-semibold">${candidate.name.split(' ').map(n => n[0]).join('').substring(0, 2)}</span>
                             </div>
@@ -1154,6 +1222,165 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('Search Quality:', analytics.searchQuality);
             console.log('Recommended Action:', analytics.recommendedAction);
         }
+
+		// Generate AI insights summary
+		function generateAIInsights(candidates, searchQuery) {
+		    const totalCandidates = candidates.length;
+		    const highScoreCandidates = candidates.filter(c => c.aiScore >= 80).length;
+		    const locations = [...new Set(candidates.map(c => c.location))];
+		    const experiences = candidates.map(c => {
+		        const match = c.experience?.match(/(\d+)/);
+		        return match ? parseInt(match[0]) : 0;
+		    });
+		    const avgExperience = experiences.length > 0 ? Math.round(experiences.reduce((a, b) => a + b, 0) / experiences.length) : 0;
+		    
+		    // Generate dynamic insights
+		    let insights = `Found ${totalCandidates} candidates matching "${searchQuery.jobTitle}" in ${searchQuery.location}. `;
+		    
+		    if (highScoreCandidates > 0) {
+		        insights += `${highScoreCandidates} candidates have high compatibility scores (80+). `;
+		    }
+		    
+		    if (avgExperience > 0) {
+		        insights += `Average experience level is ${avgExperience} years. `;
+		    }
+		    
+		    if (locations.length > 1) {
+		        insights += `Candidates are spread across ${locations.length} locations. `;
+		    }
+		    
+		    // Add specific insights based on data
+		    const verifiedCount = candidates.filter(c => c.verificationStatus === 'Verified').length;
+		    if (verifiedCount > 0) {
+		        insights += `${verifiedCount} profiles are verified. `;
+		    }
+		    
+		    insights += `Best matches are ready for immediate contact.`;
+		    
+		    return insights;
+		}
+
+		// Update compare button based on selected candidates
+		function updateCompareButton() {
+		    const selectedCheckboxes = document.querySelectorAll('.candidate-checkbox:checked');
+		    const compareBtn = document.getElementById('compareBtn');
+		    const compareBtnText = document.getElementById('compareBtnText');
+		    
+		    if (selectedCheckboxes.length > 0) {
+		        compareBtn.classList.remove('hidden');
+		        compareBtnText.textContent = `Compare (${selectedCheckboxes.length})`;
+		        
+		        // Limit to max 3 selections
+		        if (selectedCheckboxes.length >= 3) {
+		            document.querySelectorAll('.candidate-checkbox:not(:checked)').forEach(cb => {
+		                cb.disabled = true;
+		                cb.parentElement.style.opacity = '0.5';
+		            });
+		        } else {
+		            document.querySelectorAll('.candidate-checkbox').forEach(cb => {
+		                cb.disabled = false;
+		                cb.parentElement.style.opacity = '1';
+		            });
+		        }
+		    } else {
+		        compareBtn.classList.add('hidden');
+		        document.querySelectorAll('.candidate-checkbox').forEach(cb => {
+		            cb.disabled = false;
+		            cb.parentElement.style.opacity = '1';
+		        });
+		    }
+		}
+		
+		// Get selected candidates for comparison
+		function getSelectedCandidates() {
+		    const selectedCheckboxes = document.querySelectorAll('.candidate-checkbox:checked');
+		    const selectedIds = Array.from(selectedCheckboxes).map(cb => cb.dataset.candidateId);
+		    return currentCandidates.filter(candidate => selectedIds.includes(candidate.id));
+		}
+
+		// Show comparison modal with selected candidates
+		function showComparisonModal(candidates) {
+		    const modal = document.getElementById('comparisonModal');
+		    const content = document.getElementById('comparisonContent');
+		    
+		    // Set grid columns based on number of candidates
+		    const gridCols = candidates.length === 2 ? 'grid-cols-2' : 'grid-cols-3';
+		    content.className = `grid gap-6 ${gridCols}`;
+		    
+		    // Generate comparison content
+		    content.innerHTML = candidates.map(candidate => `
+		        <div class="bg-dark-primary rounded-lg p-6">
+		            <!-- Header -->
+		            <div class="text-center mb-4">
+		                <div class="w-16 h-16 bg-gray-600 rounded-full flex items-center justify-center mx-auto mb-3">
+		                    <span class="text-white font-bold text-lg">${candidate.name.split(' ').map(n => n[0]).join('').substring(0, 2)}</span>
+		                </div>
+		                <h3 class="text-lg font-semibold text-white">${candidate.name}</h3>
+		                <p class="text-gray-300 text-sm">${candidate.title}</p>
+		                <div class="mt-2">
+		                    <div class="w-12 h-12 rounded-full score-circle flex items-center justify-center mx-auto" style="--score-deg: ${candidate.aiScore * 3.6}deg">
+		                        <div class="w-8 h-8 bg-dark-primary rounded-full flex items-center justify-center">
+		                            <span class="text-accent-cyan font-bold text-sm">${candidate.aiScore}</span>
+		                        </div>
+		                    </div>
+		                </div>
+		            </div>
+		            
+		            <!-- Details -->
+					<div class="space-y-3 text-sm">
+					    <div class="flex justify-between">
+					        <span class="text-gray-400">Experience:</span>
+					        <span class="text-white">${candidate.experience || 'N/A'}</span>
+					    </div>
+					    <div class="flex justify-between">
+					        <span class="text-gray-400">Location:</span>
+					        <span class="text-white">${candidate.location}</span>
+					    </div>
+					    <div class="flex justify-between">
+					        <span class="text-gray-400">Source:</span>
+					        <span class="text-accent-cyan">${candidate.source}</span>
+					    </div>
+					    <div class="flex justify-between">
+					        <span class="text-gray-400">Verified:</span>
+					        <span class="text-${candidate.verificationStatus === 'Verified' ? 'accent-cyan' : 'yellow-400'}">${candidate.verificationStatus}</span>
+					    </div>
+					</div>
+					
+					<!-- Score Breakdown -->
+					<div class="mt-4 pt-4 border-t border-gray-600">
+					    <h4 class="text-sm font-semibold text-gray-300 mb-3">AI Score Breakdown</h4>
+					    <div class="space-y-2">
+					        ${Object.entries(candidate.scoreBreakdown || {}).map(([key, score]) => `
+					            <div>
+					                <div class="flex justify-between text-xs mb-1">
+					                    <span class="text-gray-400">${key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</span>
+					                    <span class="text-accent-cyan">${score}%</span>
+					                </div>
+					                <div class="w-full bg-gray-600 rounded-full h-1.5">
+					                    <div class="bg-accent-cyan h-1.5 rounded-full" style="width: ${score}%"></div>
+					                </div>
+					            </div>
+					        `).join('')}
+					    </div>
+					</div>
+					
+					<!-- Key Strengths -->
+					<div class="mt-4 pt-4 border-t border-gray-600">
+					    <h4 class="text-sm font-semibold text-gray-300 mb-2">Key Strengths</h4>
+					    <div class="space-y-1">
+					        ${(candidate.strengths || []).slice(0, 3).map(strength => `
+					            <div class="flex items-center space-x-2">
+					                <div class="w-1.5 h-1.5 bg-accent-cyan rounded-full"></div>
+					                <span class="text-gray-300 text-xs">${strength}</span>
+					            </div>
+					        `).join('')}
+					    </div>
+					</div>
+		        </div>
+		    `).join('');
+		    
+		    modal.classList.remove('hidden');
+		}
         
         // Enhanced loading animation with realistic 40-60 second timing
         async function showEnhancedLoading() {
