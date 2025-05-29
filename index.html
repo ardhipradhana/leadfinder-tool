@@ -589,28 +589,24 @@
                 </div>
                 
                 <!-- Contact Actions -->
-                <div class="flex items-center justify-between pt-4 border-t border-gray-700">
-                    <div class="flex items-center space-x-4">
-                        <button class="px-6 py-3 bg-accent-cyan hover:bg-accent-teal text-dark-primary font-semibold rounded-lg transition-colors flex items-center space-x-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                            </svg>
-                            <span>Export Profile</span>
-                        </button>
-                        <button class="px-6 py-3 bg-dark-primary hover:bg-dark-tertiary text-white border border-gray-600 rounded-lg transition-colors flex items-center space-x-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"/>
-                            </svg>
-                            <span>Share Profile</span>
-                        </button>
-                        <button class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center space-x-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                            </svg>
-                            <span>Send to Recruitment Tool</span>
-                        </button>
-                    </div>
-                </div>
+                <div class="flex items-center space-x-4">
+		    <button class="px-4 py-2 bg-accent-cyan hover:bg-accent-teal text-dark-primary rounded-lg font-medium export-modal-btn" data-type="pdf">
+		        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+		            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v16h16V4H4zm8 4v8m4-4H8"/>
+		        </svg> Export PDF
+		    </button>
+		    <button class="px-4 py-2 bg-dark-primary border border-accent-cyan text-accent-cyan rounded-lg font-medium export-modal-btn" data-type="csv">
+		        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+		            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 17l4 4 4-4m-4-5v9"/>
+		        </svg> Export CSV
+		    </button>
+		    <button class="px-4 py-2 bg-dark-primary border border-gray-600 text-white rounded-lg font-medium export-modal-btn" data-type="clipboard">
+		        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+		            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4"/>
+		            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7H8a1 1 0 00-1 1v12a1 1 0 001 1h8a1 1 0 001-1V8a1 1 0 00-1-1z"/>
+		        </svg> Copy to Clipboard
+		    </button>
+		</div>
             </div>
         </div>
     </div>
@@ -752,6 +748,14 @@
                 candidateModal.classList.remove('hidden');
             }
         });
+
+	document.getElementById('exportBtn').addEventListener('click', async () => {
+	    showExportToast("Exporting CSV...");
+	    // Wait 1s for effect (simulate processing)
+	    await new Promise(r => setTimeout(r, 1000));
+	    downloadCSV();
+	    hideExportToast();
+	});
         
         // Handle search form submission
         async function handleSearch(e) {
@@ -1691,6 +1695,17 @@ Generated on: ${new Date().toLocaleDateString()}`;
 		        }
 		    }
 		}
+
+		function showExportToast(text = "Exporting...") {
+		    const toast = document.getElementById('exportToast');
+		    const toastText = document.getElementById('exportToastText');
+		    toastText.textContent = text;
+		    toast.classList.remove('hidden');
+		}
+		function hideExportToast() {
+		    const toast = document.getElementById('exportToast');
+		    toast.classList.add('hidden');
+		}
         
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
@@ -1727,6 +1742,24 @@ Generated on: ${new Date().toLocaleDateString()}`;
                 searchBtn.classList.remove('transform', 'scale-105');
             });
         });
+
+	// Candidate modal export handlers
+	document.addEventListener('click', async (e) => {
+	    const btn = e.target.closest('.export-modal-btn');
+	    if (btn) {
+	        const type = btn.dataset.type;
+	        showExportToast(`Exporting ${type.toUpperCase()}...`);
+	        await new Promise(r => setTimeout(r, 1000));
+	        if (type === 'pdf') {
+	            alert('PDF export for candidate coming soon!'); // Or your PDF export logic
+	        } else if (type === 'csv') {
+	            alert('CSV export for this candidate coming soon!'); // Implement single-candidate CSV logic
+	        } else if (type === 'clipboard') {
+	            alert('Copy to clipboard for this candidate coming soon!'); // Implement clipboard logic
+	        }
+	        hideExportToast();
+	    }
+	});
         
         // Mock API response structure for reference
         const mockApiResponse = {
@@ -1805,5 +1838,12 @@ Generated on: ${new Date().toLocaleDateString()}`;
             }
         }
     </script>
+<div id="exportToast" class="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-dark-secondary text-accent-cyan px-6 py-3 rounded-xl shadow-lg z-50 hidden flex items-center space-x-3">
+    <svg class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+    </svg>
+    <span id="exportToastText">Exporting...</span>
+</div>
 </body>
 </html>
