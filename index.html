@@ -837,6 +837,10 @@ function showAuthMessage(message, type) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+// Auth modal event listeners
+document.getElementById('magicLinkBtn').addEventListener('click', signInWithMagicLink);
+document.getElementById('googleAuthBtn').addEventListener('click', signInWithGoogle);
+document.getElementById('closeAuthModal').addEventListener('click', hideAuthModal);
 	
     console.log('DOMContentLoaded fired!');
     console.log('About to call updateSearchHistoryUI...');
@@ -2390,11 +2394,6 @@ Generated on: ${new Date().toLocaleDateString()}`;
         // Initialize app
 		// Replace the existing DOMContentLoaded event with:
 		document.addEventListener('DOMContentLoaded', async () => {
-
-		// Auth modal event listeners
-		document.getElementById('magicLinkBtn').addEventListener('click', signInWithMagicLink);
-		document.getElementById('googleAuthBtn').addEventListener('click', signInWithGoogle);
-		document.getElementById('closeAuthModal').addEventListener('click', hideAuthModal);
 		
 		// Auth state change listener
 		supabaseClient.auth.onAuthStateChange(async (event, session) => {
