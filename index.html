@@ -2452,12 +2452,15 @@ Generated on: ${new Date().toLocaleDateString()}`;
 		// Auth state change listener
 		// REPLACE the auth state change handler with this simplified version:
 		supabaseClient.auth.onAuthStateChange(async (event, session) => {
+		    console.log('Auth state changed:', event, session?.user?.email); // Debug line
 		    if (event === 'SIGNED_IN') {
 		        console.log('User signed in:', session.user.email);
 		        currentUser = session.user;
 		        hideAuthModal();
-				await checkAuthAndCredits(); // This will handle user creation if needed
-				updateCreditsDisplay();
+		        console.log('About to call checkAuthAndCredits...'); // Debug line
+		        await checkAuthAndCredits();
+		        console.log('About to call updateCreditsDisplay...'); // Debug line
+		        updateCreditsDisplay();
 		    } else if (event === 'SIGNED_OUT') {
 		        currentUser = null;
 		        userCredits = 0;
