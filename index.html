@@ -813,6 +813,7 @@
 </div>
 
 <script>
+	document.addEventListener('DOMContentLoaded', async () => {
 	// Supabase configuration
 	const SUPABASE_URL = 'https://brawqzylfyuotgxqmtox.supabase.co';
 	const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJyYXdxenlsZnl1b3RneHFtdG94Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg1MTU0NTUsImV4cCI6MjA2NDA5MTQ1NX0.P4qazlzBHk66eItqBRK-6k2ll2I1d754ke5_r_hNxos';
@@ -893,87 +894,16 @@ function showAuthMessage(message, type) {
 		
 
 		// Authentication and credit management
-		async function checkAuthAndCredits() {
-		    console.log("checkAuthAndCredits CALLED");
-		
-		    if (!currentUser) {
-		        console.log("No currentUser, calling supabaseClient.auth.getUser()");
-		        const { data: { user } } = await supabaseClient.auth.getUser();
-		        if (!user) {
-		            console.log("No user from supabaseClient.auth.getUser(), showing auth modal");
-		            showAuthModal();
-		            return false;
-		        }
-		        currentUser = user;
-		    }
-		
-		    console.log('Checking profile for user:', currentUser.id);
-		
-		    const { data: profile, error } = await supabaseClient
-		        .from('leadfinder_users')
-		        .select('credits')
-		        .eq('user_id', currentUser.id)
-		        .single();
-		
-		    console.log('Profile:', profile, 'Error:', error);
-		
-		    if (error) {
-		        console.log('Error fetching user profile:', error);
-		        // If user doesn't exist, create them
-		        if (error.code === 'PGRST116') { // No rows returned
-		            console.log('Creating new user profile...');
-		            console.log('About to INSERT this:', {
-		                user_id: currentUser.id,
-		                email: currentUser.email,
-		                credits: 10
-		            });
-		            const { data: newProfile, error: insertError } = await supabaseClient
-		                .from('leadfinder_users')
-		                .insert({
-		                    user_id: currentUser.id,
-		                    email: currentUser.email,
-		                    credits: 10
-		                })
-		                .select()
-		                .single();
-		            if (insertError) {
-		                console.error('Error creating user profile:', insertError);
-		                return false;
-		            }
-		            userCredits = newProfile.credits || 10;
-		            updateCreditsDisplay();
-		            console.log('New user created with credits:', userCredits);
-		            return true;
-		        } else {
-		            console.log("Error is not PGRST116, returning false.");
-		        }
-		        return false;
-		    }
-		
-		    if (profile) {
-		        console.log("Profile exists, updating credits display.");
-		        userCredits = profile.credits || 0;
-		        updateCreditsDisplay();
-		        return userCredits > 0;
-		    }
-		
-		    console.log("Reached end of function, returning false.");
-		    return false;
-		}
 		
 		function updateCreditsDisplay() {
-		    console.log('updateCreditsDisplay called with userCredits:', userCredits);
-		    
-		    // Use the selector that works from the debug
-		    const creditsElement = document.querySelector('span.text-accent-cyan.font-medium');
-		    
-		    if (creditsElement) {
-		        creditsElement.textContent = `${userCredits} CREDITS`;
-		        console.log('Credits display updated to:', userCredits);
-		    } else {
-		        console.error('Could not find credits element to update');
-		    }
-		}
+			// Your existing code to update the credits UI
+			const creditsDisplay = document.getElementById('creditsDisplay');
+			if (currentUser && userCredits > 0) {
+			    creditsDisplay.textContent = `${userCredits} credits`;
+			} else {
+			    creditsDisplay.textContent = "0 credits";
+			}
+	    }
 		
 		async function deductCredit() {
 		    if (userCredits <= 0) return false;
@@ -997,6 +927,55 @@ function showAuthMessage(message, type) {
 		function hideAuthModal() {
 		    document.getElementById('authModal').classList.add('hidden');
 		}
+
+		async function checkAuthAndCredits() {
+	        if (!currentUser) {
+	            const { data: { user } } = await supabaseClient.auth.getUser();
+	            if (!user) {
+	                showAuthModal();
+	                return false;
+	            }
+	            currentUser = user;
+	        }
+	
+	        const { data: profile, error } = await supabaseClient
+	            .from('leadfinder_users')
+	            .select('credits')
+	            .eq('user_id', currentUser.id)
+	            .single();
+	
+	        if (error) {
+	            if (error.code === 'PGRST116') { // No rows returned
+	                const { data: newProfile, error: insertError } = await supabaseClient
+	                    .from('leadfinder_users')
+	                    .insert({
+	                        user_id: currentUser.id,
+	                        email: currentUser.email,
+	                        credits: 10
+	                    })
+	                    .select()
+	                    .single();
+	                if (insertError) {
+	                    alert('User creation failed: ' + insertError.message);
+	                    return false;
+	                }
+	                userCredits = newProfile.credits || 10;
+	                updateCreditsDisplay();
+	                return true;
+	            } else {
+	                alert('Error fetching profile: ' + error.message);
+	                return false;
+	            }
+	        }
+	
+	        if (profile) {
+	            userCredits = profile.credits || 0;
+	            updateCreditsDisplay();
+	            return userCredits > 0;
+	        }
+	
+	        return false;
+	    }
 		
 		async function signInWithMagicLink() {
 		    const email = document.getElementById('authEmail').value;
@@ -2365,28 +2344,18 @@ Generated on: ${new Date().toLocaleDateString()}`;
 		    
 		    // Check for existing session
 		    const { data: { session }, error } = await supabaseClient.auth.getSession();
-		    console.log('Session check:', session, error);
-		    
-		    if (session && session.user) {
-		        console.log('Found session for:', session.user.email);
-		        currentUser = session.user;
-		        
-		        // Now check/create user profile
-		        await checkAuthAndCredits();
-		        updateCreditsDisplay();
-		    } else {
-		        console.log('No session found, showing auth modal');
-		        showAuthModal();
-		    }
+			if (session && session.user) {
+				currentUser = session.user;
+				await checkAuthAndCredits();
+				updateCreditsDisplay();
+			} else {
+				showAuthModal();
+			}
 		    
 		    // Update history UI regardless of auth state
 		    updateSearchHistoryUI();
 		    document.getElementById('jobTitle').focus();
 		});
-		// Auth modal event listeners
-		document.getElementById('magicLinkBtn').addEventListener('click', signInWithMagicLink);
-		document.getElementById('googleAuthBtn').addEventListener('click', signInWithGoogle);
-		document.getElementById('closeAuthModal').addEventListener('click', hideAuthModal);
 			
 		    console.log('DOMContentLoaded fired!');
 		    console.log('About to call updateSearchHistoryUI...');
@@ -2399,23 +2368,23 @@ Generated on: ${new Date().toLocaleDateString()}`;
 		    }
 
 		// Set up auth listener IMMEDIATELY when script loads (before DOMContentLoaded)
-		console.log("Registering auth state change listener...");
 		supabaseClient.auth.onAuthStateChange(async (event, session) => {
-		    console.log('Auth state changed:', event, session?.user?.email);
-		    if (event === 'SIGNED_IN') {
-		        console.log('User signed in:', session.user.email);
-		        currentUser = session.user;
-		        hideAuthModal();
-		        await checkAuthAndCredits();
-		        updateCreditsDisplay();
-		    } else if (event === 'SIGNED_OUT') {
-		        currentUser = null;
-		        userCredits = 0;
-		        updateCreditsDisplay();
-		    }
-		});
-
+	        if (event === 'SIGNED_IN') {
+	            currentUser = session.user;
+	            hideAuthModal();
+	            await checkAuthAndCredits();
+	            updateCreditsDisplay();
+	        } else if (event === 'SIGNED_OUT') {
+	            currentUser = null;
+	            userCredits = 0;
+	            updateCreditsDisplay();
+	        }
+	    });
 		// Event listeners
+			// Auth modal event listeners
+			document.getElementById('magicLinkBtn').addEventListener('click', signInWithMagicLink);
+			document.getElementById('googleAuthBtn').addEventListener('click', signInWithGoogle);
+			document.getElementById('closeAuthModal').addEventListener('click', hideAuthModal);
 	        searchForm.addEventListener('submit', handleSearch);
 	        document.getElementById('searchHistoryBtn').addEventListener('click', () => historyModal.classList.remove('hidden'));
 	        document.getElementById('closeModal').addEventListener('click', () => candidateModal.classList.add('hidden'));
