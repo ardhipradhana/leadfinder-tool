@@ -1618,14 +1618,13 @@ Generated on: ${new Date().toLocaleDateString()}`;
 		        });
 		    }
 		    
-		    // Sort dropdown
-		    // Sort dropdown
-			const sortSelect = document.getElementById('sortSelect');
-			if (sortSelect) {
+			// Sort dropdown
+			const sortSelectElement = document.getElementById('sortSelect');
+			if (sortSelectElement) {
 			    // Remove any existing listeners first
-			    sortSelect.removeEventListener('change', sortCandidates);
+			    sortSelectElement.removeEventListener('change', sortCandidates);
 			    // Add the listener
-			    sortSelect.addEventListener('change', sortCandidates);
+			    sortSelectElement.addEventListener('change', sortCandidates);
 			    console.log('Sort listener attached'); // Debug line
 			}
 		
@@ -1670,8 +1669,8 @@ Generated on: ${new Date().toLocaleDateString()}`;
 		// Sort candidates
 		function sortCandidates() {
 			console.log('sortCandidates called', currentCandidates.length);
-		    const sortSelect = document.getElementById('sortSelect');
-		    const sortBy = sortSelect?.value || 'Sort by Score';
+		    const sortSelectElement = document.getElementById('sortSelect');
+		    const sortBy = sortSelectElement?.value || 'Sort by Score';
 		    const container = document.querySelector('#resultsState .space-y-4');
 		    
 		    if (!container) return;
