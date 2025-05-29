@@ -1727,8 +1727,36 @@ Generated on: ${new Date().toLocaleDateString()}`;
 		                </div>
 		            `;
 		        } else {
-		            historyContainer.innerHTML = history.map(item => `
-		                <div class="bg-dark-primary rounded-lg p-4 hover:bg-dark-tertiary transition-colors cursor-pointer search-history-item" data-search='${JSON.stringify(item)}'>
+		        // Store search data safely and create click handlers after DOM insertion
+				historyContainer.innerHTML = history.map((item, index) => `
+				    <div class="bg-dark-primary rounded-lg p-4 hover:bg-dark-tertiary transition-colors cursor-pointer search-history-item" data-search-index="${index}">
+				`).join('');
+				
+				// Store the history data in a module variable for safe access
+				window.searchHistoryData = history;
+				
+				// Add click handlers after DOM is created
+				setTimeout(() => {
+				    document.querySelectorAll('.search-history-item').forEach((card, index) => {
+				        card.addEventListener('click', (e) => {
+				            if (!e.target.classList.contains('rerun-search-btn')) {
+				                const searchData = window.searchHistoryData[index];
+				                // Fill form and show results
+				                document.getElementById('jobTitle').value = searchData.jobTitle || '';
+				                document.getElementById('industry').value = searchData.industry || '';
+				                document.getElementById('location').value = searchData.location || '';
+				                document.getElementById('experience').value = searchData.experience || '';
+				                
+				                historyModal.classList.add('hidden');
+				                showHistorySearchResult(searchData);
+				                
+				                initialState.classList.add('hidden');
+				                loadingState.classList.add('hidden');
+				                resultsState.classList.remove('hidden');
+				            }
+				        });
+				    });
+				}, 100);
 		                    <div class="flex items-center justify-between mb-2">
 		                        <h3 class="font-semibold text-white">${item.jobTitle || 'Untitled Search'} in ${item.location || 'Any Location'}</h3>
 		                        <span class="text-sm text-gray-400">${getRelativeTime(item.timestamp)}</span>
@@ -1794,7 +1822,8 @@ Generated on: ${new Date().toLocaleDateString()}`;
 		    if (e.target.classList.contains('rerun-search-btn')) {
 		        e.stopPropagation();
 		        const historyItem = e.target.closest('.search-history-item');
-		        const searchData = JSON.parse(historyItem.dataset.search);
+		        const searchIndex = parseInt(historyItem.dataset.searchIndex);
+		        const searchData = window.searchHistoryData[searchIndex];
 		        
 		        // Fill form with historical search
 		        document.getElementById('jobTitle').value = searchData.jobTitle || '';
@@ -1805,37 +1834,6 @@ Generated on: ${new Date().toLocaleDateString()}`;
 		        // Close modal and run search
 		        historyModal.classList.add('hidden');
 		        searchForm.dispatchEvent(new Event('submit'));
-		    }
-		});
-
-		document.addEventListener('click', (e) => {
-		    const card = e.target.closest('.search-history-item');
-		    // Only fire if they did NOT click rerun
-		    if (card && !e.target.classList.contains('rerun-search-btn')) {
-		        try {
-		            const searchData = JSON.parse(card.dataset.search);
-		            
-		            // Fill form for visual consistency (optional)
-		            document.getElementById('jobTitle').value = searchData.jobTitle || '';
-		            document.getElementById('industry').value = searchData.industry || '';
-		            document.getElementById('location').value = searchData.location || '';
-		            document.getElementById('experience').value = searchData.experience || '';
-		
-		            // Close modal
-		            historyModal.classList.add('hidden');
-		
-		            // Show cached result from history
-		            showHistorySearchResult(searchData);
-		
-		            // Show results
-		            initialState.classList.add('hidden');
-		            loadingState.classList.add('hidden');
-		            resultsState.classList.remove('hidden');
-		        } catch (error) {
-		            console.error('Failed to parse search history item:', error);
-		            // Just skip this broken entry
-		            return;
-		        }
 		    }
 		});
 		
