@@ -1619,10 +1619,15 @@ Generated on: ${new Date().toLocaleDateString()}`;
 		    }
 		    
 		    // Sort dropdown
-		    const sortSelect = document.getElementById('sortSelect');
-			if (sortSelect) sortSelect.value = "Sort by Score";
-			sortCandidates();
-		}
+		    // Sort dropdown
+			const sortSelect = document.getElementById('sortSelect');
+			if (sortSelect) {
+			    // Remove any existing listeners first
+			    sortSelect.removeEventListener('change', sortCandidates);
+			    // Add the listener
+			    sortSelect.addEventListener('change', sortCandidates);
+			    console.log('Sort listener attached'); // Debug line
+			}
 		
 		// Filter candidates based on criteria
 		function filterCandidates() {
@@ -1664,6 +1669,7 @@ Generated on: ${new Date().toLocaleDateString()}`;
 		
 		// Sort candidates
 		function sortCandidates() {
+			console.log('sortCandidates called', currentCandidates.length);
 		    const sortSelect = document.getElementById('sortSelect');
 		    const sortBy = sortSelect?.value || 'Sort by Score';
 		    const container = document.querySelector('#resultsState .space-y-4');
