@@ -1054,13 +1054,6 @@ document.getElementById('closeAuthModal').addEventListener('click', hideAuthModa
 		    }));
 		}
 		
-		function updateCreditsDisplay() {
-		    const creditsElement = document.querySelector('.text-accent-cyan.font-medium');
-		    if (creditsElement) {
-		        creditsElement.textContent = `${userCredits} CREDITS`;
-		    }
-		}
-		
 		async function deductCredit() {
 		    if (userCredits <= 0) return false;
 		    
@@ -2469,12 +2462,13 @@ Generated on: ${new Date().toLocaleDateString()}`;
 		    // Check for existing session FIRST
 		    const { data: { session } } = await supabaseClient.auth.getSession();
 		    if (session) {
-		        console.log('Found existing session:', session.user.email);
-		        currentUser = session.user;
-		        hideAuthModal();
-		        await checkAuthAndCredits();
-		        updateCreditsDisplay();
-		    }
+			    console.log('Found existing session:', session.user.email);
+			    currentUser = session.user;
+			    hideAuthModal();
+			    await checkAuthAndCredits();
+			    console.log('userCredits after checkAuthAndCredits:', userCredits); // ADD THIS LINE
+			    updateCreditsDisplay();
+			}
 		    
 		    // Set up auth listener for future changes
 		    supabaseClient.auth.onAuthStateChange(async (event, session) => {
