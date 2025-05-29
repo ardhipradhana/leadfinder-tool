@@ -887,23 +887,6 @@ function showAuthMessage(message, type) {
         messageEl.classList.add('hidden');
     }, 5000);
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-// Auth modal event listeners
-document.getElementById('magicLinkBtn').addEventListener('click', signInWithMagicLink);
-document.getElementById('googleAuthBtn').addEventListener('click', signInWithGoogle);
-document.getElementById('closeAuthModal').addEventListener('click', hideAuthModal);
-	
-    console.log('DOMContentLoaded fired!');
-    console.log('About to call updateSearchHistoryUI...');
-    
-    try {
-        updateSearchHistoryUI();
-        console.log('updateSearchHistoryUI completed successfully');
-    } catch (error) {
-        console.log('Error in updateSearchHistoryUI:', error);
-    }
-});
         // State management
        
         let searchHistory = JSON.parse(localStorage.getItem('leadfinder_history') || '[]');
@@ -2377,23 +2360,6 @@ Generated on: ${new Date().toLocaleDateString()}`;
 		}
         
        		// Initialize app
-		// Set up auth listener IMMEDIATELY when script loads (before DOMContentLoaded)
-		console.log("Registering auth state change listener...");
-		supabaseClient.auth.onAuthStateChange(async (event, session) => {
-		    console.log('Auth state changed:', event, session?.user?.email);
-		    if (event === 'SIGNED_IN') {
-		        console.log('User signed in:', session.user.email);
-		        currentUser = session.user;
-		        hideAuthModal();
-		        await checkAuthAndCredits();
-		        updateCreditsDisplay();
-		    } else if (event === 'SIGNED_OUT') {
-		        currentUser = null;
-		        userCredits = 0;
-		        updateCreditsDisplay();
-		    }
-		});
-			
 		document.addEventListener('DOMContentLoaded', async () => {
 		    console.log('DOM loaded, checking auth...');
 		    
@@ -2416,6 +2382,37 @@ Generated on: ${new Date().toLocaleDateString()}`;
 		    // Update history UI regardless of auth state
 		    updateSearchHistoryUI();
 		    document.getElementById('jobTitle').focus();
+		});
+		// Auth modal event listeners
+		document.getElementById('magicLinkBtn').addEventListener('click', signInWithMagicLink);
+		document.getElementById('googleAuthBtn').addEventListener('click', signInWithGoogle);
+		document.getElementById('closeAuthModal').addEventListener('click', hideAuthModal);
+			
+		    console.log('DOMContentLoaded fired!');
+		    console.log('About to call updateSearchHistoryUI...');
+		    
+		    try {
+		        updateSearchHistoryUI();
+		        console.log('updateSearchHistoryUI completed successfully');
+		    } catch (error) {
+		        console.log('Error in updateSearchHistoryUI:', error);
+		    }
+		});
+		// Set up auth listener IMMEDIATELY when script loads (before DOMContentLoaded)
+		console.log("Registering auth state change listener...");
+		supabaseClient.auth.onAuthStateChange(async (event, session) => {
+		    console.log('Auth state changed:', event, session?.user?.email);
+		    if (event === 'SIGNED_IN') {
+		        console.log('User signed in:', session.user.email);
+		        currentUser = session.user;
+		        hideAuthModal();
+		        await checkAuthAndCredits();
+		        updateCreditsDisplay();
+		    } else if (event === 'SIGNED_OUT') {
+		        currentUser = null;
+		        userCredits = 0;
+		        updateCreditsDisplay();
+		    }
 		});
 
 		// Event listeners
@@ -2545,16 +2542,6 @@ Generated on: ${new Date().toLocaleDateString()}`;
 		            exportCandidateToClipboard(activeCandidate);
 		        }
 		        hideExportToast();
-		    }
-		});
-	
-		window.addEventListener("load", async () => {
-			console.log("Adding window load event listener...");
-		    const { data: { session } } = await supabaseClient.auth.getSession();
-		    if (session && session.user) {
-		        currentUser = session.user;
-		        await checkAuthAndCredits();
-		        updateCreditsDisplay();
 		    }
 		});
         
