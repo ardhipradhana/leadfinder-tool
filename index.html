@@ -1599,6 +1599,11 @@ Generated on: ${new Date().toLocaleDateString()}`;
 		            filterCandidates();
 		        });
 		    }
+
+			const sortSelect = document.querySelector('#resultsState select');
+			if (sortSelect) {
+			    sortSelect.addEventListener('change', sortCandidates);
+			}
 		    
 		    // Score range filter
 		    const scoreRange = document.querySelector('#resultsState input[type="range"]');
