@@ -2290,15 +2290,6 @@ Generated on: ${new Date().toLocaleDateString()}`;
 		    });
 		}
         
-		    // Check for existing session
-			if (session && session.user) {
-				currentUser = session.user;
-				await checkAuthAndCredits();
-				updateCreditsDisplay();
-			} else {
-				showAuthModal();
-			}
-		    
 		    // Update history UI regardless of auth state
 		    updateSearchHistoryUI();
 		    document.getElementById('jobTitle').focus();
