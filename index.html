@@ -713,6 +713,19 @@
     </div>
 
 <script>
+console.log('JavaScript is running');
+
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOMContentLoaded fired!');
+    console.log('About to call updateSearchHistoryUI...');
+    
+    try {
+        updateSearchHistoryUI();
+        console.log('updateSearchHistoryUI completed successfully');
+    } catch (error) {
+        console.log('Error in updateSearchHistoryUI:', error);
+    }
+});
         // State management
         let currentSearchResults = [];
         let currentCandidates = [];
