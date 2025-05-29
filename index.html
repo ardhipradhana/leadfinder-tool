@@ -1812,24 +1812,30 @@ Generated on: ${new Date().toLocaleDateString()}`;
 		    const card = e.target.closest('.search-history-item');
 		    // Only fire if they did NOT click rerun
 		    if (card && !e.target.classList.contains('rerun-search-btn')) {
-		        const searchData = JSON.parse(card.dataset.search);
+		        try {
+		            const searchData = JSON.parse(card.dataset.search);
+		            
+		            // Fill form for visual consistency (optional)
+		            document.getElementById('jobTitle').value = searchData.jobTitle || '';
+		            document.getElementById('industry').value = searchData.industry || '';
+		            document.getElementById('location').value = searchData.location || '';
+		            document.getElementById('experience').value = searchData.experience || '';
 		
-		        // Fill form for visual consistency (optional)
-		        document.getElementById('jobTitle').value = searchData.jobTitle || '';
-		        document.getElementById('industry').value = searchData.industry || '';
-		        document.getElementById('location').value = searchData.location || '';
-		        document.getElementById('experience').value = searchData.experience || '';
+		            // Close modal
+		            historyModal.classList.add('hidden');
 		
-		        // Close modal
-		        historyModal.classList.add('hidden');
+		            // Show cached result from history
+		            showHistorySearchResult(searchData);
 		
-		        // Show cached result from history
-		        showHistorySearchResult(searchData);
-		
-		        // Show results
-		        initialState.classList.add('hidden');
-		        loadingState.classList.add('hidden');
-		        resultsState.classList.remove('hidden');
+		            // Show results
+		            initialState.classList.add('hidden');
+		            loadingState.classList.add('hidden');
+		            resultsState.classList.remove('hidden');
+		        } catch (error) {
+		            console.error('Failed to parse search history item:', error);
+		            // Just skip this broken entry
+		            return;
+		        }
 		    }
 		});
 		
