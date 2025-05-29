@@ -914,23 +914,16 @@ document.getElementById('closeAuthModal').addEventListener('click', hideAuthModa
 		}
 		
 		function updateCreditsDisplay() {
-		    // Look for the specific credits span that contains "CREDITS"
-		    const allSpans = document.querySelectorAll('span');
-		    let creditsElement = null;
+		    console.log('updateCreditsDisplay called with userCredits:', userCredits);
 		    
-		    for (let span of allSpans) {
-		        if (span.textContent.includes('CREDITS')) {
-		            creditsElement = span;
-		            break;
-		        }
-		    }
+		    // Use the same selector as the test code that works
+		    const creditsElement = document.querySelector('span.text-accent-cyan.font-medium');
 		    
 		    if (creditsElement) {
 		        creditsElement.textContent = `${userCredits} CREDITS`;
 		        console.log('Credits display updated to:', userCredits);
 		    } else {
 		        console.error('Could not find credits element to update');
-		        console.log('Available spans:', Array.from(allSpans).map(s => s.textContent));
 		    }
 		}
 		
