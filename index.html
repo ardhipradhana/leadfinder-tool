@@ -2470,8 +2470,10 @@ Generated on: ${new Date().toLocaleDateString()}`;
 		        }
 		    });
 		    
-		    await updateSearchHistoryUI();
-		    document.getElementById('jobTitle').focus();
+		    (async () => {
+			    await updateSearchHistoryUI();
+			    document.getElementById('jobTitle').focus();
+			})();
 		    
 		    const searchBtn = document.getElementById('searchBtn');
 		    searchBtn.addEventListener('mouseenter', () => {
