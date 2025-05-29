@@ -2463,17 +2463,37 @@ Generated on: ${new Date().toLocaleDateString()}`;
 		    }
 		});
 			
-		// Replace the existing DOMContentLoaded event with:
 		document.addEventListener('DOMContentLoaded', async () => {
-			
-		    // Check if user is already logged in
-		    await checkAuthAndCredits();
-		    await updateSearchHistoryUI();
+		    console.log('DOM loaded, checking auth immediately...');
 		    
-		    // Focus on job title input
+		    // Check for existing session FIRST
+		    const { data: { session } } = await supabaseClient.auth.getSession();
+		    if (session) {
+		        console.log('Found existing session:', session.user.email);
+		        currentUser = session.user;
+		        hideAuthModal();
+		        await checkAuthAndCredits();
+		        updateCreditsDisplay();
+		    }
+		    
+		    // Set up auth listener for future changes
+		    supabaseClient.auth.onAuthStateChange(async (event, session) => {
+		        console.log('Auth state changed:', event, session?.user?.email);
+		        if (event === 'SIGNED_IN') {
+		            currentUser = session.user;
+		            hideAuthModal();
+		            await checkAuthAndCredits();
+		            updateCreditsDisplay();
+		        } else if (event === 'SIGNED_OUT') {
+		            currentUser = null;
+		            userCredits = 0;
+		            updateCreditsDisplay();
+		        }
+		    });
+		    
+		    await updateSearchHistoryUI();
 		    document.getElementById('jobTitle').focus();
 		    
-		    // Add loading animation to search button on hover
 		    const searchBtn = document.getElementById('searchBtn');
 		    searchBtn.addEventListener('mouseenter', () => {
 		        if (!searchBtn.disabled) {
