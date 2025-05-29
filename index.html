@@ -6,6 +6,7 @@
     <title>Leadfinder - AI-Powered Lead Discovery</title>
     <link rel="icon" type="image/png" href="LinkedIn_Image_Template__15_-removebg-preview.png">
     <script src="https://cdn.tailwindcss.com"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -285,7 +286,7 @@
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                     </svg>
-                                    <span>Export</span>
+                                    <span>Export to CSV</span>
                                 </button>
                             </div>
                         </div>
@@ -715,6 +716,7 @@
         let currentCandidates = [];
         let searchHistory = JSON.parse(localStorage.getItem('leadfinder_history') || '[]');
 	let progressInterval = null;
+	let activeCandidate = null;
         
         // DOM elements
         const searchForm = document.getElementById('searchForm');
@@ -728,7 +730,6 @@
         // Event listeners
         searchForm.addEventListener('submit', handleSearch);
         document.getElementById('searchHistoryBtn').addEventListener('click', () => historyModal.classList.remove('hidden'));
-        document.getElementById('exportBtn').addEventListener('click', () => exportModal.classList.remove('hidden'));
         document.getElementById('closeModal').addEventListener('click', () => candidateModal.classList.add('hidden'));
         document.getElementById('closeHistoryModal').addEventListener('click', () => historyModal.classList.add('hidden'));
         document.getElementById('closeExportModal').addEventListener('click', () => exportModal.classList.add('hidden'));
@@ -942,6 +943,7 @@
         // NEW FUNCTION: Show modal with real candidate data
         // Real candidate modal function
         function showCandidateModal(candidate) {
+			activeCandidate = candidate;
             if (!candidate) return;
             
             // Update modal header
@@ -1706,6 +1708,125 @@ Generated on: ${new Date().toLocaleDateString()}`;
 		    const toast = document.getElementById('exportToast');
 		    toast.classList.add('hidden');
 		}
+
+		function exportCandidateToCSV(candidate) {
+		    if (!candidate) return;
+		    const csvRows = [
+		        ["Name", "Title", "Experience", "Location", "AI Score", "Source", "Strengths", "Concerns", "Recommendation"],
+		        [
+		            candidate.name,
+		            candidate.title,
+		            candidate.experience,
+		            candidate.location,
+		            candidate.aiScore,
+		            candidate.source,
+		            (candidate.strengths || []).join("; "),
+		            (candidate.concerns || []).join("; "),
+		            candidate.recommendation || ""
+		        ]
+		    ];
+		    const csvContent = csvRows.map(row => row.map(value => `"${(value || '').toString().replace(/"/g, '""')}"`).join(",")).join("\n");
+		    const blob = new Blob([csvContent], { type: 'text/csv' });
+		    const url = window.URL.createObjectURL(blob);
+		    const a = document.createElement('a');
+		    a.setAttribute('hidden', '');
+		    a.setAttribute('href', url);
+		    a.setAttribute('download', `candidate_${candidate.name.replace(/\s+/g, "_")}_${new Date().toISOString().split('T')[0]}.csv`);
+		    document.body.appendChild(a);
+		    a.click();
+		    document.body.removeChild(a);
+		}
+
+		function exportCandidateToPDF(candidate) {
+		    if (!candidate) return;
+		
+		    // Use jsPDF
+		    const { jsPDF } = window.jspdf;
+		    const doc = new jsPDF();
+		
+		    // Title
+		    doc.setFontSize(18);
+		    doc.setTextColor(0, 212, 170);
+		    doc.text("Candidate Profile", 14, 16);
+		
+		    // Basic info
+		    doc.setFontSize(12);
+		    doc.setTextColor(34, 34, 34);
+		    let y = 30;
+		    doc.text(`Name: ${candidate.name}`, 14, y);
+		    y += 8;
+		    doc.text(`Title: ${candidate.title}`, 14, y);
+		    y += 8;
+		    doc.text(`Experience: ${candidate.experience || ''}`, 14, y);
+		    y += 8;
+		    doc.text(`Location: ${candidate.location}`, 14, y);
+		    y += 8;
+		    doc.text(`AI Score: ${candidate.aiScore}`, 14, y);
+		    y += 8;
+		    doc.text(`Source: ${candidate.source}`, 14, y);
+		    y += 8;
+		
+		    // Strengths
+		    doc.setFont(undefined, "bold");
+		    doc.text("Key Strengths:", 14, y);
+		    doc.setFont(undefined, "normal");
+		    y += 6;
+		    (candidate.strengths || []).forEach(strength => {
+		        doc.text(`- ${strength}`, 18, y);
+		        y += 6;
+		    });
+		
+		    // Concerns
+		    if (candidate.concerns && candidate.concerns.length > 0) {
+		        doc.setFont(undefined, "bold");
+		        doc.text("Concerns:", 14, y);
+		        doc.setFont(undefined, "normal");
+		        y += 6;
+		        (candidate.concerns || []).forEach(concern => {
+		            doc.text(`- ${concern}`, 18, y);
+		            y += 6;
+		        });
+		    }
+		
+		    // Recommendation
+		    if (candidate.recommendation) {
+		        doc.setFont(undefined, "bold");
+		        doc.text("AI Recommendation:", 14, y);
+		        doc.setFont(undefined, "normal");
+		        y += 6;
+		        doc.text(doc.splitTextToSize(candidate.recommendation, 180), 18, y);
+		        y += 12;
+		    }
+		
+		    // Download
+		    doc.save(`candidate_${candidate.name.replace(/\s+/g, "_")}_${new Date().toISOString().split('T')[0]}.pdf`);
+		}
+
+		function exportCandidateToClipboard(candidate) {
+		    if (!candidate) return;
+		    const text = `
+		Candidate Profile - ${candidate.name}
+		
+		Title: ${candidate.title}
+		Experience: ${candidate.experience || ''}
+		Location: ${candidate.location}
+		AI Score: ${candidate.aiScore}
+		Source: ${candidate.source}
+		
+		Key Strengths:
+		${(candidate.strengths || []).map(s => `- ${s}`).join('\n')}
+		
+		${candidate.concerns && candidate.concerns.length > 0 ? "Concerns:\n" + candidate.concerns.map(c => `- ${c}`).join('\n') + "\n" : ""}
+		${candidate.recommendation ? "AI Recommendation:\n" + candidate.recommendation : ""}
+		    `.trim();
+		
+		    navigator.clipboard.writeText(text).then(() => {
+		        showExportToast("Copied to clipboard!");
+		        setTimeout(hideExportToast, 1200);
+		    }).catch(() => {
+		        alert("Failed to copy to clipboard.");
+		    });
+		}
         
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
@@ -1751,11 +1872,11 @@ Generated on: ${new Date().toLocaleDateString()}`;
 	        showExportToast(`Exporting ${type.toUpperCase()}...`);
 	        await new Promise(r => setTimeout(r, 1000));
 	        if (type === 'pdf') {
-	            alert('PDF export for candidate coming soon!'); // Or your PDF export logic
+	            exportCandidateToPDF(activeCandidate);
 	        } else if (type === 'csv') {
-	            alert('CSV export for this candidate coming soon!'); // Implement single-candidate CSV logic
+	            exportCandidateToCSV(activeCandidate);
 	        } else if (type === 'clipboard') {
-	            alert('Copy to clipboard for this candidate coming soon!'); // Implement clipboard logic
+	            exportCandidateToClipboard(activeCandidate);
 	        }
 	        hideExportToast();
 	    }
