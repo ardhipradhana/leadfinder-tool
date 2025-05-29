@@ -859,6 +859,7 @@ document.getElementById('closeAuthModal').addEventListener('click', hideAuthModa
 
 		// Authentication and credit management
 		async function checkAuthAndCredits() {
+			console.log("checkAuthAndCredits CALLED");
 		    // Don't call getUser again if we already have currentUser
 		    if (!currentUser) {
 		        const { data: { user } } = await supabaseClient.auth.getUser();
