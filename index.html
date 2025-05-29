@@ -2446,20 +2446,15 @@ Generated on: ${new Date().toLocaleDateString()}`;
         });
         
         // Initialize app
-		// Replace the existing DOMContentLoaded event with:
-		document.addEventListener('DOMContentLoaded', async () => {
-		
-		// Auth state change listener
-		// REPLACE the auth state change handler with this simplified version:
+		// Set up auth listener IMMEDIATELY when script loads (before DOMContentLoaded)
+		console.log('Setting up auth listener...');
 		supabaseClient.auth.onAuthStateChange(async (event, session) => {
-		    console.log('Auth state changed:', event, session?.user?.email); // Debug line
+		    console.log('Auth state changed:', event, session?.user?.email);
 		    if (event === 'SIGNED_IN') {
 		        console.log('User signed in:', session.user.email);
 		        currentUser = session.user;
 		        hideAuthModal();
-		        console.log('About to call checkAuthAndCredits...'); // Debug line
 		        await checkAuthAndCredits();
-		        console.log('About to call updateCreditsDisplay...'); // Debug line
 		        updateCreditsDisplay();
 		    } else if (event === 'SIGNED_OUT') {
 		        currentUser = null;
@@ -2467,6 +2462,9 @@ Generated on: ${new Date().toLocaleDateString()}`;
 		        updateCreditsDisplay();
 		    }
 		});
+			
+		// Replace the existing DOMContentLoaded event with:
+		document.addEventListener('DOMContentLoaded', async () => {
 			
 		    // Check if user is already logged in
 		    await checkAuthAndCredits();
