@@ -890,6 +890,12 @@ document.getElementById('closeAuthModal').addEventListener('click', hideAuthModa
 		            console.log('Creating new user profile...');
 		            const { data: newProfile, error: insertError } = await supabaseClient
 		                .from('leadfinder_users')
+				    console.log('About to INSERT this:', {
+				    user_id: currentUser.id,
+				    email: currentUser.email,
+				    credits: 10
+				});
+
 		                .insert({
 		                    user_id: currentUser.id,
 		                    email: currentUser.email,
