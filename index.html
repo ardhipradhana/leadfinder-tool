@@ -833,6 +833,8 @@
 		
 		    // Update the global candidate state for filtering
 		    currentCandidates = searchData.candidates || [];
+
+			attachCandidateCardHandlers(currentCandidates);
 		
 		    // You can optionally update analytics or filters here
 		    setTimeout(() => {
