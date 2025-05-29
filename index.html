@@ -864,6 +864,7 @@
 
             // Save to history
 			saveToSearchHistory(data.query, data.results.totalFound, data.results.candidates);
+			updateSearchHistoryUI();
 
 			// Setup filters
 			setTimeout(() => {
@@ -1544,7 +1545,7 @@ Generated on: ${new Date().toLocaleDateString()}`;
 		    localStorage.setItem('leadfinder_history', JSON.stringify(history));
 		    
 		    // Update history count in UI
-		    updateSearchHistoryUI();
+			updateSearchHistoryCount();
 		}
 
 		// Add event delegation for history item clicks
