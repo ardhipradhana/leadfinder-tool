@@ -2397,7 +2397,7 @@ Generated on: ${new Date().toLocaleDateString()}`;
 		    } catch (error) {
 		        console.log('Error in updateSearchHistoryUI:', error);
 		    }
-		});
+
 		// Set up auth listener IMMEDIATELY when script loads (before DOMContentLoaded)
 		console.log("Registering auth state change listener...");
 		supabaseClient.auth.onAuthStateChange(async (event, session) => {
