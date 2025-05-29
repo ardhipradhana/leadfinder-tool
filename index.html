@@ -2587,45 +2587,7 @@ Generated on: ${new Date().toLocaleDateString()}`;
             }
         }
 	}
-	// Force update credits display on page load - COMPREHENSIVE DEBUG
-	window.addEventListener('load', () => {
-	    console.log('=== COMPREHENSIVE CREDITS DEBUG ===');
-	    
-	    // Try all possible selectors
-	    const selectors = [
-	        'span.text-accent-cyan.font-medium',
-	        '.text-accent-cyan.font-medium',
-	        'span.text-accent-cyan',
-	        'span.font-medium',
-	        '.text-accent-cyan',
-	        '.font-medium'
-	    ];
-	    
-	    selectors.forEach(selector => {
-	        const element = document.querySelector(selector);
-	        console.log(`Selector "${selector}":`, element);
-	        if (element) {
-	            console.log(`  Text content: "${element.textContent}"`);
-	            console.log(`  Classes: "${element.className}"`);
-	        }
-	    });
-	    
-	    // Find ALL spans and log their content and classes
-	    const allSpans = document.querySelectorAll('span');
-	    console.log('All spans on page:');
-	    allSpans.forEach((span, index) => {
-	        console.log(`  Span ${index}: "${span.textContent.trim()}" | Classes: "${span.className}"`);
-	    });
-	    
-	    // Try to find by text content
-	    const creditsSpan = Array.from(allSpans).find(span => span.textContent.includes('CREDITS'));
-	    console.log('Credits span found by text:', creditsSpan);
-	    
-	    if (creditsSpan) {
-	        console.log('FOUND IT! Updating to 999 CREDITS...');
-	        creditsSpan.textContent = '999 CREDITS';
-	    }
-	});
+	
     </script>
 <div id="exportToast" class="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-dark-secondary text-accent-cyan px-6 py-3 rounded-xl shadow-lg z-50 hidden flex items-center space-x-3">
     <svg class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
