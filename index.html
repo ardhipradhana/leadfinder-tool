@@ -2456,21 +2456,6 @@ Generated on: ${new Date().toLocaleDateString()}`;
 		    document.getElementById('jobTitle').focus();
 		});
 		    
-		    // Set up auth listener for future changes
-		    supabaseClient.auth.onAuthStateChange(async (event, session) => {
-		        console.log('Auth state changed:', event, session?.user?.email);
-		        if (event === 'SIGNED_IN') {
-		            currentUser = session.user;
-		            hideAuthModal();
-		            await checkAuthAndCredits();
-		            updateCreditsDisplay();
-		        } else if (event === 'SIGNED_OUT') {
-		            currentUser = null;
-		            userCredits = 0;
-		            updateCreditsDisplay();
-		        }
-		    });
-		    
 		    (async () => {
 			    await updateSearchHistoryUI();
 			    document.getElementById('jobTitle').focus();
