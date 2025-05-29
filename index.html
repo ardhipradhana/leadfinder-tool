@@ -2498,6 +2498,7 @@ Generated on: ${new Date().toLocaleDateString()}`;
 	});
 
 	window.addEventListener("load", async () => {
+		console.log("Adding window load event listener...");
 	    const { data: { session } } = await supabaseClient.auth.getSession();
 	    if (session && session.user) {
 	        currentUser = session.user;
