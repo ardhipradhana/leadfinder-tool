@@ -869,23 +869,23 @@
         }
         
         // NEW FUNCTION: Update candidate cards
-        function (candidates) {
-            const cardsContainer = document.querySelector('#resultsState .space-y-4');
-            
-            if (!cardsContainer) return;
-            
-            // Clear existing mock cards
-            cardsContainer.innerHTML = '';
-            
-            // Create real candidate cards
-            candidates.forEach(candidate => {
-                const cardHTML = createCandidateCardHTML(candidate);
-                cardsContainer.innerHTML += cardHTML;
-            });
-            
-            // Re-attach click handlers
-            attachCandidateCardHandlers(candidates);
-        }
+        function updateCandidateCards(candidates) {
+	    const cardsContainer = document.querySelector('#resultsState .space-y-4');
+	    
+	    if (!cardsContainer) return;
+	    
+	    // Clear existing mock cards
+	    cardsContainer.innerHTML = '';
+	    
+	    // Create real candidate cards
+	    candidates.forEach(candidate => {
+	        const cardHTML = createCandidateCardHTML(candidate);
+	        cardsContainer.innerHTML += cardHTML;
+	    });
+	    
+	    // Re-attach click handlers
+	    attachCandidateCardHandlers(candidates);
+	}
         
         // NEW FUNCTION: Create candidate card HTML
         function createCandidateCardHTML(candidate) {
