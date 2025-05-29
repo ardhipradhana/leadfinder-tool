@@ -2496,6 +2496,15 @@ Generated on: ${new Date().toLocaleDateString()}`;
 	        hideExportToast();
 	    }
 	});
+
+	window.addEventListener("load", async () => {
+	    const { data: { session } } = await supabaseClient.auth.getSession();
+	    if (session && session.user) {
+	        currentUser = session.user;
+	        await checkAuthAndCredits();
+	        updateCreditsDisplay();
+	    }
+	});
         
         // Mock API response structure for reference
         const mockApiResponse = {
