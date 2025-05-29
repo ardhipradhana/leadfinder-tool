@@ -887,15 +887,14 @@ document.getElementById('closeAuthModal').addEventListener('click', hideAuthModa
 		        
 		        // If user doesn't exist, create them
 		        if (error.code === 'PGRST116') { // No rows returned
-		            console.log('Creating new user profile...');
-		            const { data: newProfile, error: insertError } = await supabaseClient
-		                .from('leadfinder_users')
-				    console.log('About to INSERT this:', {
+				console.log('About to INSERT this:', {
 				    user_id: currentUser.id,
 				    email: currentUser.email,
 				    credits: 10
 				});
 
+		            const { data: newProfile, error: insertError } = await supabaseClient
+		                .from('leadfinder_users')
 		                .insert({
 		                    user_id: currentUser.id,
 		                    email: currentUser.email,
