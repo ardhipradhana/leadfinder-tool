@@ -282,7 +282,7 @@
 								    <option>Sort by Experience</option>
 								    <option>Sort by Location</option>
 								</select>
-                                <button id="exportBtn" class="px-4 py-2 bg-accent-cyan hover:bg-accent-teal text-dark-primary font-medium rounded-lg transition-colors flex items-center space-x-2">
+                                <button id="exportBtn" class="flex items-center space-x-2 px-4 py-2 bg-accent-cyan hover:bg-accent-teal text-dark-primary font-medium text-sm rounded-lg transition-colors shadow-md">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                     </svg>
@@ -1401,24 +1401,33 @@
         
         // Download CSV function
         function downloadCSV() {
-            const csvData = [
-                ['Name', 'Title', 'Experience', 'Location', 'AI Score', 'Source'],
-                ['Ahmad Suharto', 'Restaurant Manager', '8 years', 'Jakarta Selatan', '85', 'JobStreet'],
-                ['Sari Permata', 'Operations Manager', '6 years', 'Jakarta Pusat', '78', 'LinkedIn'],
-                ['Budi Darma', 'F&B Supervisor', '5 years', 'Jakarta Barat', '70', 'Karir.com']
-            ];
-            
-            const csvContent = csvData.map(row => row.join(',')).join('\n');
-            const blob = new Blob([csvContent], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.setAttribute('hidden', '');
-            a.setAttribute('href', url);
-            a.setAttribute('download', `leadfinder_results_${new Date().toISOString().split('T')[0]}.csv`);
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
+	    const csvRows = [
+	        ['Name', 'Title', 'Experience', 'Location', 'AI Score', 'Source', 'Strengths', 'Concerns', 'Recommendation']
+	    ];
+	    (currentCandidates || []).forEach(candidate => {
+	        csvRows.push([
+	            candidate.name,
+	            candidate.title,
+	            candidate.experience,
+	            candidate.location,
+	            candidate.aiScore,
+	            candidate.source,
+	            (candidate.strengths || []).join('; '),
+	            (candidate.concerns || []).join('; '),
+	            candidate.recommendation || ''
+	        ]);
+	    });
+	    const csvContent = csvRows.map(row => row.map(val => `"${(val || '').toString().replace(/"/g, '""')}"`).join(',')).join('\n');
+	    const blob = new Blob([csvContent], { type: 'text/csv' });
+	    const url = window.URL.createObjectURL(blob);
+	    const a = document.createElement('a');
+	    a.setAttribute('hidden', '');
+	    a.setAttribute('href', url);
+	    a.setAttribute('download', `leadfinder_results_${new Date().toISOString().split('T')[0]}.csv`);
+	    document.body.appendChild(a);
+	    a.click();
+	    document.body.removeChild(a);
+	}
         
         // Copy to clipboard function
         function copyToClipboard() {
@@ -1739,8 +1748,6 @@ Generated on: ${new Date().toLocaleDateString()}`;
 
 		function exportCandidateToPDF(candidate) {
 		    if (!candidate) return;
-		
-		    // Use jsPDF
 		    const { jsPDF } = window.jspdf;
 		    const doc = new jsPDF();
 		
@@ -1753,18 +1760,31 @@ Generated on: ${new Date().toLocaleDateString()}`;
 		    doc.setFontSize(12);
 		    doc.setTextColor(34, 34, 34);
 		    let y = 30;
-		    doc.text(`Name: ${candidate.name}`, 14, y);
-		    y += 8;
-		    doc.text(`Title: ${candidate.title}`, 14, y);
-		    y += 8;
-		    doc.text(`Experience: ${candidate.experience || ''}`, 14, y);
-		    y += 8;
-		    doc.text(`Location: ${candidate.location}`, 14, y);
-		    y += 8;
-		    doc.text(`AI Score: ${candidate.aiScore}`, 14, y);
-		    y += 8;
-		    doc.text(`Source: ${candidate.source}`, 14, y);
-		    y += 8;
+		    doc.text(`Name: ${candidate.name}`, 14, y);      y += 8;
+		    doc.text(`Title: ${candidate.title}`, 14, y);    y += 8;
+		    doc.text(`Experience: ${candidate.experience || ''}`, 14, y); y += 8;
+		    doc.text(`Location: ${candidate.location}`, 14, y);  y += 8;
+		    doc.text(`AI Score: ${candidate.aiScore}`, 14, y);   y += 8;
+		    doc.text(`Source: ${candidate.source}`, 14, y);      y += 8;
+		
+		    // AI Analysis Summary (metrics)
+		    doc.setFont(undefined, "bold");
+		    doc.text("AI Analysis Metrics:", 14, y); y += 6;
+		    doc.setFont(undefined, "normal");
+		    const m = candidate.scoreBreakdown || {};
+		    doc.text(`- Role Relevance: ${m.roleRelevance ?? 'N/A'}%`, 18, y); y += 6;
+		    doc.text(`- Experience Match: ${m.experienceMatch ?? 'N/A'}%`, 18, y); y += 6;
+		    doc.text(`- Location Fit: ${m.locationFit ?? 'N/A'}%`, 18, y); y += 6;
+		    doc.text(`- Profile Quality: ${m.profileQuality ?? 'N/A'}%`, 18, y); y += 8;
+		
+		    // Company Context
+		    doc.setFont(undefined, "bold");
+		    doc.text("Company Context:", 14, y); y += 6;
+		    doc.setFont(undefined, "normal");
+		    doc.text(doc.splitTextToSize(
+		        candidate.companyContext || "No company context provided.",
+		        180), 18, y);
+		    y += Math.max(12, doc.splitTextToSize(candidate.companyContext || "", 180).length * 6);
 		
 		    // Strengths
 		    doc.setFont(undefined, "bold");
@@ -1798,20 +1818,30 @@ Generated on: ${new Date().toLocaleDateString()}`;
 		        y += 12;
 		    }
 		
-		    // Download
 		    doc.save(`candidate_${candidate.name.replace(/\s+/g, "_")}_${new Date().toISOString().split('T')[0]}.pdf`);
 		}
 
 		function exportCandidateToClipboard(candidate) {
 		    if (!candidate) return;
+		    const m = candidate.scoreBreakdown || {};
 		    const text = `
 		Candidate Profile - ${candidate.name}
+		---------------------------------------
 		
 		Title: ${candidate.title}
 		Experience: ${candidate.experience || ''}
 		Location: ${candidate.location}
 		AI Score: ${candidate.aiScore}
 		Source: ${candidate.source}
+		
+		AI Analysis Metrics:
+		- Role Relevance: ${m.roleRelevance ?? 'N/A'}%
+		- Experience Match: ${m.experienceMatch ?? 'N/A'}%
+		- Location Fit: ${m.locationFit ?? 'N/A'}%
+		- Profile Quality: ${m.profileQuality ?? 'N/A'}%
+		
+		Company Context:
+		${candidate.companyContext || "No company context provided."}
 		
 		Key Strengths:
 		${(candidate.strengths || []).map(s => `- ${s}`).join('\n')}
