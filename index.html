@@ -934,21 +934,15 @@ document.getElementById('closeAuthModal').addEventListener('click', hideAuthModa
 		
 		async function deductCredit() {
 		    if (userCredits <= 0) return false;
-		    
 		    const { error } = await supabaseClient
 		        .from('leadfinder_users')
-		        .update({ 
-		            credits: userCredits - 1,
-		            updated_at: new Date().toISOString()
-		        })
+		        .update({ credits: userCredits - 1, updated_at: new Date().toISOString() })
 		        .eq('user_id', currentUser.id);
-		    
 		    if (!error) {
 		        userCredits -= 1;
 		        updateCreditsDisplay();
 		        return true;
 		    }
-		    
 		    return false;
 		}
 
@@ -1010,7 +1004,7 @@ document.getElementById('closeAuthModal').addEventListener('click', hideAuthModa
 		async function saveSearchToSupabase(searchParams, results) {
 		    if (!currentUser) return;
 		    
-		    const { error } = await supabase
+		    const { error } = await supabaseClient
 		        .from('search_history')
 		        .insert({
 		            user_id: currentUser.id,
@@ -1050,23 +1044,6 @@ document.getElementById('closeAuthModal').addEventListener('click', hideAuthModa
 		        candidates: item.results.candidates || [],
 		        timestamp: item.created_at
 		    }));
-		}
-		
-		async function deductCredit() {
-		    if (userCredits <= 0) return false;
-		    
-		    const { error } = await supabase
-		        .from('user_profiles')
-		        .update({ credits: userCredits - 1 })
-		        .eq('id', currentUser.id);
-		    
-		    if (!error) {
-		        userCredits -= 1;
-		        updateCreditsDisplay();
-		        return true;
-		    }
-		    
-		    return false;
 		}
         
         // DOM elements
@@ -1211,8 +1188,8 @@ document.getElementById('closeAuthModal').addEventListener('click', hideAuthModa
 		        console.error('Search failed:', error);
 		        
 		        // Refund credit on error
-		        await supabase
-		            .from('user_profiles')
+		        await supabaseClient
+		            .from('leadfinder_users')
 		            .update({ credits: userCredits + 1 })
 		            .eq('id', currentUser.id);
 		        userCredits += 1;
