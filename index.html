@@ -30,7 +30,7 @@
 	const WEBHOOK_SECRET = 'leadfinder_' + Math.random().toString(36).substring(7); // Simple secret generation
 	
 	// Initialize Supabase
-	const supabaseClient = supabaseClient.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+	const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 	
 	// Auth state management
 	
@@ -774,14 +774,16 @@
 <script>
 console.log('JavaScript is running');
 
+let currentUser = null;
+let userCredits = 0;
+let currentSearchResults = [];
+let currentCandidates = [];
+let progressInterval = null;
+let activeCandidate = null;
+let currentHistoryData = [];
+
 document.addEventListener('DOMContentLoaded', () => {
-	let currentUser = null;
-	let userCredits = 0;
- 	let currentSearchResults = [];
-        let currentCandidates = [];
-	let progressInterval = null;
-	let activeCandidate = null;
-	let currentHistoryData = [];
+	
     console.log('DOMContentLoaded fired!');
     console.log('About to call updateSearchHistoryUI...');
     
@@ -989,42 +991,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		    const selectedCandidates = getSelectedCandidates();
 		    if (selectedCandidates.length > 0) {
 		        showComparisonModal(selectedCandidates);
-		    }
-		});
-		// Auth modal event listeners
-		document.getElementById('magicLinkBtn').addEventListener('click', signInWithMagicLink);
-		document.getElementById('googleAuthBtn').addEventListener('click', signInWithGoogle);
-		document.getElementById('closeAuthModal').addEventListener('click', hideAuthModal);
-		
-		// Auth state change listener
-		supabaseClient.auth.onAuthStateChange(async (event, session) => {
-		    if (event === 'SIGNED_IN') {
-		        currentUser = session.user;
-		        hideAuthModal();
-		        await checkAuthAndCredits();
-		        
-		        // Create leadfinder user profile if doesn't exist
-		        const { data: existingProfile } = await supabase
-		            .from('leadfinder_users')
-		            .select('id')
-		            .eq('user_id', currentUser.id)
-		            .single();
-		        
-		        if (!existingProfile) {
-		            await supabase
-		                .from('leadfinder_users')
-		                .insert({
-		                    user_id: currentUser.id,
-		                    email: currentUser.email,
-		                    credits: 10 // Free trial credits
-		                });
-		            userCredits = 10;
-		            updateCreditsDisplay();
-		        }
-		    } else if (event === 'SIGNED_OUT') {
-		        currentUser = null;
-		        userCredits = 0;
-		        updateCreditsDisplay();
 		    }
 		});
 		
@@ -2363,6 +2329,43 @@ Generated on: ${new Date().toLocaleDateString()}`;
         // Initialize app
 		// Replace the existing DOMContentLoaded event with:
 		document.addEventListener('DOMContentLoaded', async () => {
+
+		// Auth modal event listeners
+		document.getElementById('magicLinkBtn').addEventListener('click', signInWithMagicLink);
+		document.getElementById('googleAuthBtn').addEventListener('click', signInWithGoogle);
+		document.getElementById('closeAuthModal').addEventListener('click', hideAuthModal);
+		
+		// Auth state change listener
+		supabaseClient.auth.onAuthStateChange(async (event, session) => {
+		    if (event === 'SIGNED_IN') {
+		        currentUser = session.user;
+		        hideAuthModal();
+		        await checkAuthAndCredits();
+		        
+		        // Create leadfinder user profile if doesn't exist
+		        const { data: existingProfile } = await supabaseClient
+		            .from('leadfinder_users')
+		            .select('id')
+		            .eq('user_id', currentUser.id)
+		            .single();
+		        
+		        if (!existingProfile) {
+		            await supabaseClient
+		                .from('leadfinder_users')
+		                .insert({
+		                    user_id: currentUser.id,
+		                    email: currentUser.email,
+		                    credits: 10 // Free trial credits
+		                });
+		            userCredits = 10;
+		            updateCreditsDisplay();
+		        }
+		    } else if (event === 'SIGNED_OUT') {
+		        currentUser = null;
+		        userCredits = 0;
+		        updateCreditsDisplay();
+		    }
+		});
 		    // Check if user is already logged in
 		    await checkAuthAndCredits();
 		    await updateSearchHistoryUI();
