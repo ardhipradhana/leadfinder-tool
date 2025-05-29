@@ -813,20 +813,12 @@
 </div>
 
 <script>
-	document.addEventListener('DOMContentLoaded', async () => {
-		const { data: { session }, error } = await supabaseClient.auth.getSession();
-	// Supabase configuration
-	const SUPABASE_URL = 'https://brawqzylfyuotgxqmtox.supabase.co';
-	const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJyYXdxenlsZnl1b3RneHFtdG94Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg1MTU0NTUsImV4cCI6MjA2NDA5MTQ1NX0.P4qazlzBHk66eItqBRK-6k2ll2I1d754ke5_r_hNxos';
-	const WEBHOOK_SECRET = 'leadfinder_secretkey123';
-	
-	// Initialize Supabase
-	const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-	console.log("Supabase client created!", supabaseClient); // ← Add this here
-	
-	// Auth state management
-	
-console.log('JavaScript is running');
+document.addEventListener('DOMContentLoaded', async () => {
+
+const SUPABASE_URL = 'https://brawqzylfyuotgxqmtox.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJyYXdxenlsZnl1b3RneHFtdG94Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg1MTU0NTUsImV4cCI6MjA2NDA5MTQ1NX0.P4qazlzBHk66eItqBRK-6k2ll2I1d754ke5_r_hNxos';
+const WEBHOOK_SECRET = 'leadfinder_secretkey123';
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let currentUser = null;
 let userCredits = 0;
@@ -845,183 +837,142 @@ function hideAuthModal() {
     document.getElementById('authModal').classList.add('hidden');
 }
 
-async function signInWithMagicLink() {
-    const email = document.getElementById('authEmail').value;
-    if (!email) {
-        showAuthMessage('Please enter your email', 'error');
-        return;
-    }
-    
-    const { error } = await supabaseClient.auth.signInWithOtp({
-        email: email,
-        options: {
-            emailRedirectTo: window.location.origin
-        }
-    });
-    
-    if (error) {
-        showAuthMessage(error.message, 'error');
-    } else {
-        showAuthMessage('Check your email for the magic link!', 'success');
-    }
-}
-
-async function signInWithGoogle() {
-    const { error } = await supabaseClient.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-            redirectTo: window.location.origin
-        }
-    });
-    
-    if (error) {
-        showAuthMessage(error.message, 'error');
-    }
+function updateCreditsDisplay() {
+	const creditsDisplay = document.getElementById('creditsDisplay');
+	if (currentUser && userCredits > 0) {
+		creditsDisplay.textContent = `${userCredits} credits`;
+	} else {
+		creditsDisplay.textContent = "0 credits";
+	}
 }
 
 function showAuthMessage(message, type) {
-    const messageEl = document.getElementById('authMessage');
-    messageEl.textContent = message;
-    messageEl.className = `text-sm text-center ${type === 'error' ? 'text-red-400' : 'text-accent-cyan'}`;
-    messageEl.classList.remove('hidden');
-    
-    setTimeout(() => {
-        messageEl.classList.add('hidden');
-    }, 5000);
+	const messageEl = document.getElementById('authMessage');
+	messageEl.textContent = message;
+	messageEl.className = `text-sm text-center ${type === 'error' ? 'text-red-400' : 'text-accent-cyan'}`;
+	messageEl.classList.remove('hidden');
+	setTimeout(() => { messageEl.classList.add('hidden'); }, 5000);
 }
-        // State management
+
+async function checkAuthAndCredits() {
+	if (!currentUser) {
+		const { data: { user } } = await supabaseClient.auth.getUser();
+		if (!user) {
+			showAuthModal();
+			return false;
+		}
+		currentUser = user;
+	}
+
+	const { data: profile, error } = await supabaseClient
+		.from('leadfinder_users')
+		.select('credits')
+		.eq('user_id', currentUser.id)
+		.single();
+
+	if (error) {
+		if (error.code === 'PGRST116') {
+			const { data: newProfile, error: insertError } = await supabaseClient
+				.from('leadfinder_users')
+				.insert({
+					user_id: currentUser.id,
+					email: currentUser.email,
+					credits: 10
+				})
+				.select()
+				.single();
+			if (insertError) {
+				alert('User creation failed: ' + insertError.message);
+				return false;
+			}
+			userCredits = newProfile.credits || 10;
+			updateCreditsDisplay();
+			return true;
+		} else {
+			alert('Error fetching profile: ' + error.message);
+			return false;
+		}
+	}
+
+	if (profile) {
+		userCredits = profile.credits || 0;
+		updateCreditsDisplay();
+		return userCredits > 0;
+	}
+
+	return false;
+}
+
+async function deductCredit() {
+	if (userCredits <= 0) return false;
+	const { error } = await supabaseClient
+		.from('leadfinder_users')
+		.update({ credits: userCredits - 1, updated_at: new Date().toISOString() })
+		.eq('user_id', currentUser.id);
+	if (!error) {
+		userCredits -= 1;
+		updateCreditsDisplay();
+		return true;
+	}
+	return false;
+}
+	
+async function signInWithMagicLink() {
+	const email = document.getElementById('authEmail').value;
+	if (!email) {
+		showAuthMessage('Please enter your email', 'error');
+		return;
+	}
+	const { error } = await supabaseClient.auth.signInWithOtp({
+		email: email,
+		options: { emailRedirectTo: window.location.origin }
+	});
+	if (error) {
+		showAuthMessage(error.message, 'error');
+	} else {
+		showAuthMessage('Check your email for the magic link!', 'success');
+	}
+}
+
+async function signInWithGoogle() {
+	const { error } = await supabaseClient.auth.signInWithOAuth({
+		provider: 'google',
+		options: { redirectTo: window.location.origin }
+	});
+	if (error) {
+		showAuthMessage(error.message, 'error');
+	}
+}
+
+supabaseClient.auth.onAuthStateChange(async (event, session) => {
+	if (event === 'SIGNED_IN') {
+		currentUser = session.user;
+		hideAuthModal();
+		await checkAuthAndCredits();
+		updateCreditsDisplay();
+	} else if (event === 'SIGNED_OUT') {
+		currentUser = null;
+		userCredits = 0;
+		updateCreditsDisplay();
+	}
+});
+
+// --- 4. Main session check on page load ---
+const { data: { session }, error } = await supabaseClient.auth.getSession();
+if (session && session.user) {
+	currentUser = session.user;
+	await checkAuthAndCredits();
+	updateCreditsDisplay();
+} else {
+	showAuthModal();
+}
+
+// --- 5. Event listeners ---
+document.getElementById('magicLinkBtn').addEventListener('click', signInWithMagicLink);
+document.getElementById('googleAuthBtn').addEventListener('click', signInWithGoogle);
+document.getElementById('closeAuthModal').addEventListener('click', hideAuthModal);
        
         let searchHistory = JSON.parse(localStorage.getItem('leadfinder_history') || '[]');
-		
-
-		// Authentication and credit management
-		
-		function updateCreditsDisplay() {
-			// Your existing code to update the credits UI
-			const creditsDisplay = document.getElementById('creditsDisplay');
-			if (currentUser && userCredits > 0) {
-			    creditsDisplay.textContent = `${userCredits} credits`;
-			} else {
-			    creditsDisplay.textContent = "0 credits";
-			}
-	    }
-		
-		async function deductCredit() {
-		    if (userCredits <= 0) return false;
-		    const { error } = await supabaseClient
-		        .from('leadfinder_users')
-		        .update({ credits: userCredits - 1, updated_at: new Date().toISOString() })
-		        .eq('user_id', currentUser.id);
-		    if (!error) {
-		        userCredits -= 1;
-		        updateCreditsDisplay();
-		        return true;
-		    }
-		    return false;
-		}
-
-		// Authentication functions
-		function showAuthModal() {
-		    document.getElementById('authModal').classList.remove('hidden');
-		}
-		
-		function hideAuthModal() {
-		    document.getElementById('authModal').classList.add('hidden');
-		}
-
-		async function checkAuthAndCredits() {
-	        if (!currentUser) {
-	            const { data: { user } } = await supabaseClient.auth.getUser();
-	            if (!user) {
-	                showAuthModal();
-	                return false;
-	            }
-	            currentUser = user;
-	        }
-	
-	        const { data: profile, error } = await supabaseClient
-	            .from('leadfinder_users')
-	            .select('credits')
-	            .eq('user_id', currentUser.id)
-	            .single();
-	
-	        if (error) {
-	            if (error.code === 'PGRST116') { // No rows returned
-	                const { data: newProfile, error: insertError } = await supabaseClient
-	                    .from('leadfinder_users')
-	                    .insert({
-	                        user_id: currentUser.id,
-	                        email: currentUser.email,
-	                        credits: 10
-	                    })
-	                    .select()
-	                    .single();
-	                if (insertError) {
-	                    alert('User creation failed: ' + insertError.message);
-	                    return false;
-	                }
-	                userCredits = newProfile.credits || 10;
-	                updateCreditsDisplay();
-	                return true;
-	            } else {
-	                alert('Error fetching profile: ' + error.message);
-	                return false;
-	            }
-	        }
-	
-	        if (profile) {
-	            userCredits = profile.credits || 0;
-	            updateCreditsDisplay();
-	            return userCredits > 0;
-	        }
-	
-	        return false;
-	    }
-		
-		async function signInWithMagicLink() {
-		    const email = document.getElementById('authEmail').value;
-		    if (!email) {
-		        showAuthMessage('Please enter your email', 'error');
-		        return;
-		    }
-		    
-		    const { error } = await supabaseClient.auth.signInWithOtp({
-		        email: email,
-		        options: {
-		            emailRedirectTo: window.location.origin
-		        }
-		    });
-		    
-		    if (error) {
-		        showAuthMessage(error.message, 'error');
-		    } else {
-		        showAuthMessage('Check your email for the magic link!', 'success');
-		    }
-		}
-		
-		async function signInWithGoogle() {
-		    const { error } = await supabaseClient.auth.signInWithOAuth({
-		        provider: 'google',
-		        options: {
-		            redirectTo: window.location.origin
-		        }
-		    });
-		    
-		    if (error) {
-		        showAuthMessage(error.message, 'error');
-		    }
-		}
-		
-		function showAuthMessage(message, type) {
-		    const messageEl = document.getElementById('authMessage');
-		    messageEl.textContent = message;
-		    messageEl.className = `text-sm text-center ${type === 'error' ? 'text-red-400' : 'text-accent-cyan'}`;
-		    messageEl.classList.remove('hidden');
-		    
-		    setTimeout(() => {
-		        messageEl.classList.add('hidden');
-		    }, 5000);
-		}
 		
 		// Save search to Supabase
 		async function saveSearchToSupabase(searchParams, results) {
@@ -2352,41 +2303,16 @@ Generated on: ${new Date().toLocaleDateString()}`;
 		    updateSearchHistoryUI();
 		    document.getElementById('jobTitle').focus();
 		});
-			
-		    console.log('DOMContentLoaded fired!');
-		    console.log('About to call updateSearchHistoryUI...');
 		    
 		    try {
 		        updateSearchHistoryUI();
-		        console.log('updateSearchHistoryUI completed successfully');
 		    } catch (error) {
-		        console.log('Error in updateSearchHistoryUI:', error);
 		    }
-
-		// Set up auth listener IMMEDIATELY when script loads (before DOMContentLoaded)
-		supabaseClient.auth.onAuthStateChange(async (event, session) => {
-	        if (event === 'SIGNED_IN') {
-	            currentUser = session.user;
-	            hideAuthModal();
-	            await checkAuthAndCredits();
-	            updateCreditsDisplay();
-	        } else if (event === 'SIGNED_OUT') {
-	            currentUser = null;
-	            userCredits = 0;
-	            updateCreditsDisplay();
-	        }
-	    });
-		// Event listeners
-			// Auth modal event listeners
-			document.getElementById('magicLinkBtn').addEventListener('click', signInWithMagicLink);
-			document.getElementById('googleAuthBtn').addEventListener('click', signInWithGoogle);
-			document.getElementById('closeAuthModal').addEventListener('click', hideAuthModal);
 	        searchForm.addEventListener('submit', handleSearch);
 	        document.getElementById('searchHistoryBtn').addEventListener('click', () => historyModal.classList.remove('hidden'));
 	        document.getElementById('closeModal').addEventListener('click', () => candidateModal.classList.add('hidden'));
 	        document.getElementById('closeHistoryModal').addEventListener('click', () => historyModal.classList.add('hidden'));
 	        document.getElementById('closeExportModal').addEventListener('click', () => exportModal.classList.add('hidden'));
-			// Compare button click handler
 			document.getElementById('compareBtn').addEventListener('click', () => {
 			    const selectedCandidates = getSelectedCandidates();
 			    if (selectedCandidates.length > 0) {
@@ -2401,10 +2327,10 @@ Generated on: ${new Date().toLocaleDateString()}`;
 	        
 	        // Sample search button
 	        document.getElementById('sampleSearchBtn').addEventListener('click', () => {
-			    document.getElementById('jobTitle').value = 'Restaurant Manager';
-			    document.getElementById('industry').value = 'hospitality';
-			    document.getElementById('location').value = 'jakarta';
-			    document.getElementById('experience').value = 'mid';
+			document.getElementById('jobTitle').value = 'Restaurant Manager';
+			document.getElementById('industry').value = 'hospitality';
+			document.getElementById('location').value = 'jakarta';
+			document.getElementById('experience').value = 'mid';
 			 
 			});
 	        
@@ -2415,7 +2341,7 @@ Generated on: ${new Date().toLocaleDateString()}`;
 	            }
 	        });
 	
-		document.getElementById('exportBtn').addEventListener('click', async () => {
+			document.getElementById('exportBtn').addEventListener('click', async () => {
 		    showExportToast("Exporting CSV...");
 		    // Wait 1s for effect (simulate processing)
 		    await new Promise(r => setTimeout(r, 1000));
@@ -2509,52 +2435,6 @@ Generated on: ${new Date().toLocaleDateString()}`;
 		        hideExportToast();
 		    }
 		});
-        
-        // Mock API response structure for reference
-        const mockApiResponse = {
-            success: true,
-            query: {
-                jobTitle: "Restaurant Manager",
-                industry: "hospitality",
-                location: "jakarta",
-                experience: "mid"
-            },
-            results: {
-                totalFound: 8,
-                candidates: [
-                    {
-                        id: "candidate_001",
-                        name: "Ahmad Suharto",
-                        title: "Restaurant Manager",
-                        experience: "8 years",
-                        location: "Jakarta Selatan",
-                        industry: "Hospitality & Tourism",
-                        snippet: "Experienced restaurant manager with strong leadership...",
-                        profileUrl: "https://jobstreet.co.id/profile/ahmad-suharto",
-                        source: "JobStreet",
-                        aiScore: 85,
-                        scoreBreakdown: {
-                            roleRelevance: 90,
-                            experienceMatch: 85,
-                            locationFit: 95,
-                            profileQuality: 70
-                        },
-                        lastUpdated: "2 days ago",
-                        strengths: [
-                            "Team Leadership & Management",
-                            "Fine Dining Experience",
-                            "Cost Control & Budget Management"
-                        ],
-                        concerns: [
-                            "Profile hasn't been updated in 2 weeks",
-                            "Current employment status unclear"
-                        ]
-                    }
-                ]
-            },
-            searchId: "search_" + Date.now(),
-            timestamp: new Date().toISOString()
-        };
         
         // Function to handle real API integration
         async function callN8NWebhook(searchParams) {
