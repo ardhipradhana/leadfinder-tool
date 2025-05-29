@@ -859,14 +859,17 @@ document.getElementById('closeAuthModal').addEventListener('click', hideAuthModa
 
 		// Authentication and credit management
 		async function checkAuthAndCredits() {
-		    const { data: { user } } = await supabaseClient.auth.getUser();
-		    
-		    if (!user) {
-		        showAuthModal();
-		        return false;
+		    // Don't call getUser again if we already have currentUser
+		    if (!currentUser) {
+		        const { data: { user } } = await supabaseClient.auth.getUser();
+		        if (!user) {
+		            showAuthModal();
+		            return false;
+		        }
+		        currentUser = user;
 		    }
 		    
-		    currentUser = user;
+		    console.log('Checking profile for user:', currentUser.id);
 		    
 		    // Fixed query - use .eq() method properly
 		    const { data: profile, error } = await supabaseClient
@@ -2452,18 +2455,28 @@ Generated on: ${new Date().toLocaleDateString()}`;
 		});
 			
 		document.addEventListener('DOMContentLoaded', async () => {
-		    console.log('DOM loaded, checking auth immediately...');
+		    console.log('DOM loaded, checking auth...');
 		    
-		    // Check for existing session FIRST
-		    const { data: { session } } = await supabaseClient.auth.getSession();
-		    if (session) {
-			    console.log('Found existing session:', session.user.email);
-			    currentUser = session.user;
-			    hideAuthModal();
-			    await checkAuthAndCredits();
-			    console.log('userCredits after checkAuthAndCredits:', userCredits); // ADD THIS LINE
-			    updateCreditsDisplay();
-			}
+		    // Check for existing session
+		    const { data: { session }, error } = await supabaseClient.auth.getSession();
+		    console.log('Session check:', session, error);
+		    
+		    if (session && session.user) {
+		        console.log('Found session for:', session.user.email);
+		        currentUser = session.user;
+		        
+		        // Now check/create user profile
+		        await checkAuthAndCredits();
+		        updateCreditsDisplay();
+		    } else {
+		        console.log('No session found, showing auth modal');
+		        showAuthModal();
+		    }
+		    
+		    // Update history UI regardless of auth state
+		    updateSearchHistoryUI();
+		    document.getElementById('jobTitle').focus();
+		});
 		    
 		    // Set up auth listener for future changes
 		    supabaseClient.auth.onAuthStateChange(async (event, session) => {
