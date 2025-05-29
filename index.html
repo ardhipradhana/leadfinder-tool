@@ -1463,6 +1463,7 @@ Generated on: ${new Date().toLocaleDateString()}`;
 		// Update the search history UI
 		function updateSearchHistoryUI() {
 		    const history = JSON.parse(localStorage.getItem('leadfinder_history') || '[]');
+			console.log('History data:', history.length, 'items');
 		    const historyBtn = document.getElementById('searchHistoryBtn');
 		    const countSpan = historyBtn.querySelector('.bg-accent-cyan');
 		    
@@ -1473,6 +1474,7 @@ Generated on: ${new Date().toLocaleDateString()}`;
 		    // Update history modal content
 		    const historyModal = document.getElementById('historyModal');
 		    const historyContainer = historyModal.querySelector('.space-y-4');
+			console.log('History container found:', !!historyContainer);
 		    
 		    if (historyContainer) {
 		        if (history.length === 0) {
