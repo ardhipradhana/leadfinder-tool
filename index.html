@@ -1887,24 +1887,26 @@ Generated on: ${new Date().toLocaleDateString()}`;
         });
         
         // Initialize app
-        document.addEventListener('DOMContentLoaded', () => {
-			updateSearchHistoryUI();
-            updateSearchHistoryCount();
-            
-            // Focus on job title input
-            document.getElementById('jobTitle').focus();
-            
-            // Add loading animation to search button on hover
-            const searchBtn = document.getElementById('searchBtn');
-            searchBtn.addEventListener('mouseenter', () => {
-                if (!searchBtn.disabled) {
-                    searchBtn.classList.add('transform', 'scale-105');
-                }
-            });
-            searchBtn.addEventListener('mouseleave', () => {
-                searchBtn.classList.remove('transform', 'scale-105');
-            });
-        });
+        // Initialize app
+	document.addEventListener('DOMContentLoaded', () => {
+	    console.log('Page loaded, initializing...'); // Debug line
+	    updateSearchHistoryUI();
+	    console.log('History UI updated'); // Debug line
+	    
+	    // Focus on job title input
+	    document.getElementById('jobTitle').focus();
+	    
+	    // Add loading animation to search button on hover
+	    const searchBtn = document.getElementById('searchBtn');
+	    searchBtn.addEventListener('mouseenter', () => {
+	        if (!searchBtn.disabled) {
+	            searchBtn.classList.add('transform', 'scale-105');
+	        }
+	    });
+	    searchBtn.addEventListener('mouseleave', () => {
+	        searchBtn.classList.remove('transform', 'scale-105');
+	    });
+	});
 
 	// Candidate modal export handlers
 	document.addEventListener('click', async (e) => {
