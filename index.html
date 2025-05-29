@@ -877,6 +877,8 @@ document.getElementById('closeAuthModal').addEventListener('click', hideAuthModa
 		    
 		    if (error) {
 		        console.error('Error fetching user profile:', error);
+				console.log('Error code:', error.code);
+				console.log('Error message:', error.message);
 		        
 		        // If user doesn't exist, create them
 		        if (error.code === 'PGRST116') { // No rows returned
