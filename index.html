@@ -271,7 +271,7 @@
                 <!-- Results State -->
                 <div id="resultsState" class="hidden">
                     <div class="bg-dark-secondary rounded-xl p-6 mb-6">
-                        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-3">
+                        <div class="flex flex-col md:flex-row md:items-start md:justify-between mb-4 gap-3">
 			    <div>
 			        <h3 class="text-xl font-semibold text-white">Search Results</h3>
 			        <p class="text-gray-400">
@@ -284,7 +284,7 @@
 			            <option>Sort by Experience</option>
 			            <option>Sort by Location</option>
 			        </select>
-			        <button id="exportBtn" class="flex items-center px-4 py-2 bg-accent-cyan hover:bg-accent-teal text-dark-primary font-medium text-sm rounded-lg shadow transition-colors">
+			        <button id="exportBtn" class="flex items-center px-3 py-1.5 bg-accent-cyan hover:bg-accent-teal text-dark-primary font-medium text-sm rounded-lg shadow transition-colors">
 			            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 			                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 17l4 4 4-4m-4-5v9"/>
 			            </svg>
@@ -1615,10 +1615,9 @@ Generated on: ${new Date().toLocaleDateString()}`;
 		    
 		    // Sort dropdown
 		    const sortSelect = document.querySelector('#resultsState select');
-				if (sortSelect) sortSelect.value = "Sort by Score";
-				sortCandidates();
-		        });
-		    }
+			if (sortSelect) sortSelect.value = "Sort by Score";
+			sortCandidates();
+			}
 		}
 		
 		// Filter candidates based on criteria
