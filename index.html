@@ -782,6 +782,60 @@ let progressInterval = null;
 let activeCandidate = null;
 let currentHistoryData = [];
 
+// Authentication functions
+function showAuthModal() {
+    document.getElementById('authModal').classList.remove('hidden');
+}
+
+function hideAuthModal() {
+    document.getElementById('authModal').classList.add('hidden');
+}
+
+async function signInWithMagicLink() {
+    const email = document.getElementById('authEmail').value;
+    if (!email) {
+        showAuthMessage('Please enter your email', 'error');
+        return;
+    }
+    
+    const { error } = await supabaseClient.auth.signInWithOtp({
+        email: email,
+        options: {
+            emailRedirectTo: window.location.origin
+        }
+    });
+    
+    if (error) {
+        showAuthMessage(error.message, 'error');
+    } else {
+        showAuthMessage('Check your email for the magic link!', 'success');
+    }
+}
+
+async function signInWithGoogle() {
+    const { error } = await supabaseClient.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+            redirectTo: window.location.origin
+        }
+    });
+    
+    if (error) {
+        showAuthMessage(error.message, 'error');
+    }
+}
+
+function showAuthMessage(message, type) {
+    const messageEl = document.getElementById('authMessage');
+    messageEl.textContent = message;
+    messageEl.className = `text-sm text-center ${type === 'error' ? 'text-red-400' : 'text-accent-cyan'}`;
+    messageEl.classList.remove('hidden');
+    
+    setTimeout(() => {
+        messageEl.classList.add('hidden');
+    }, 5000);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
 	
     console.log('DOMContentLoaded fired!');
@@ -811,7 +865,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		    currentUser = user;
 		    
 		    // Get user credits from leadfinder_users table
-		    const { data: profile, error } = await supabase
+		    const { data: profile, error } = await supabaseClient
 		        .from('leadfinder_users')
 		        .select('credits')
 		        .eq('user_id', user.id)
@@ -826,11 +880,17 @@ document.addEventListener('DOMContentLoaded', () => {
 		    return false;
 		}
 		
-		// Update deductCredit function
+		function updateCreditsDisplay() {
+		    const creditsElement = document.querySelector('.text-accent-cyan.font-medium');
+		    if (creditsElement) {
+		        creditsElement.textContent = `${userCredits} CREDITS`;
+		    }
+		}
+		
 		async function deductCredit() {
 		    if (userCredits <= 0) return false;
 		    
-		    const { error } = await supabase
+		    const { error } = await supabaseClient
 		        .from('leadfinder_users')
 		        .update({ 
 		            credits: userCredits - 1,
@@ -1028,10 +1088,11 @@ document.addEventListener('DOMContentLoaded', () => {
 		    e.preventDefault();
 		    
 		    // Check authentication and credits first
-		    if (!(await checkAuthAndCredits())) {
-		        alert('Please login and ensure you have sufficient credits');
-		        return;
-		    }
+		    const hasAuth = await checkAuthAndCredits();
+			if (!hasAuth) {
+			    // Auth modal is already shown by checkAuthAndCredits()
+			    return;
+			}
 		    
 		    if (userCredits <= 0) {
 		        alert('Insufficient credits. Please purchase more credits to continue.');
