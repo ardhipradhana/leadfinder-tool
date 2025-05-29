@@ -31,6 +31,7 @@
 	
 	// Initialize Supabase
 	const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+	console.log("Supabase client created!", supabaseClient); // ← Add this here
 	
 	// Auth state management
 	
@@ -2416,7 +2417,7 @@ Generated on: ${new Date().toLocaleDateString()}`;
         
         // Initialize app
 		// Set up auth listener IMMEDIATELY when script loads (before DOMContentLoaded)
-		console.log('Setting up auth listener...');
+		console.log("Registering auth state change listener...");
 		supabaseClient.auth.onAuthStateChange(async (event, session) => {
 		    console.log('Auth state changed:', event, session?.user?.email);
 		    if (event === 'SIGNED_IN') {
