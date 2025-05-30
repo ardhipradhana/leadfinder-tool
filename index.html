@@ -789,21 +789,21 @@
                                 <span class="text-gray-300 text-sm">Multi-location Experience</span>
                             </div>
                         </div>
-			    			<!-- Current Skills Section -->
-							<div>
-							    <h4 class="text-lg font-semibold text-white mb-3">Current Skills</h4>
-							    <div id="currentSkillsContainer" class="flex flex-wrap gap-2">
-							        <!-- Skills will be populated by JavaScript -->
-							    </div>
-							</div>
-							
-							<!-- Growth Opportunities Section -->
-							<div>
-							    <h4 class="text-lg font-semibold text-white mb-3">Growth Opportunities</h4>
-							    <div id="growthOpportunitiesContainer" class="space-y-2">
-							        <!-- Growth opportunities will be populated by JavaScript -->
-							    </div>
-							</div>
+			<!-- Current Skills Section -->
+			<div class="mt-6">
+			    <h4 class="text-lg font-semibold text-white mb-3">Current Skills</h4>
+			    <div id="currentSkillsContainer" class="flex flex-wrap gap-2">
+				<!-- Skills will be populated by JavaScript -->
+			    </div>
+			</div>
+			
+			<!-- Growth Opportunities Section -->
+			<div class="mt-6">
+			    <h4 class="text-lg font-semibold text-white mb-3">Growth Opportunities</h4>
+			    <div id="growthOpportunitiesContainer" class="space-y-2">
+				<!-- Growth opportunities will be populated by JavaScript -->
+			    </div>
+			</div>
                     </div>
                 </div>
                 
@@ -1986,7 +1986,14 @@ function updateModalGrowthOpportunities(candidate) {
 function updateModalCareerAnalytics(candidate) {
     const analyticsContainer = candidateModal.querySelector('#careerAnalyticsContent');
     if (analyticsContainer && candidate.careerAnalytics) {
-        analyticsContainer.textContent = candidate.careerAnalytics;
+        // Parse the JSON if it's still a string
+        let analyticsText = candidate.careerAnalytics;
+        if (typeof analyticsText === 'object' && analyticsText.output) {
+            // Extract from nested JSON structure
+            const parsed = JSON.parse(analyticsText.output);
+            analyticsText = parsed.careerAnalytics;
+        }
+        analyticsContainer.textContent = analyticsText;
     }
 }
 
