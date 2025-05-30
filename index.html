@@ -1268,19 +1268,28 @@ function processSearchResults(data) {
 }
 
 function showHistorySearchResult(searchData) {
-    // Update results description
+    console.log('Showing history search result for:', searchData);
+    
+    // Update results description with correct search data
     const resultsTitle = document.querySelector('#resultsState h3');
     const resultsDesc = document.querySelector('#resultsState p');
     if (resultsTitle && resultsDesc) {
         resultsTitle.textContent = 'Search Results';
         resultsDesc.textContent = `Found ${searchData.resultCount} candidates matching "${searchData.jobTitle}" in ${searchData.location}`;
     }
+    
     // Update candidate cards with saved data
     updateCandidateCards(searchData.candidates || []);
+    
     // Update the global candidate state for filtering
     currentCandidates = searchData.candidates || [];
     attachCandidateCardHandlers(currentCandidates);
-    // Optionally update analytics or filters here
+    
+    // Update AI Insights for this search
+    const aiInsights = generateAIInsights(searchData.candidates || [], searchData);
+    document.getElementById('aiInsightsText').textContent = aiInsights;
+    
+    // Setup result filters
     setTimeout(() => {
         setupResultFilters();
     }, 100);
