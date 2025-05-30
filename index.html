@@ -1423,10 +1423,59 @@ async function handleSearch(e) {
     console.log('=== HANDLE SEARCH STARTED ===');
     e.preventDefault();
     console.log('Default prevented');
-    
-    alert('Search function is working!');
-    
-    console.log('=== HANDLE SEARCH ENDED ===');
+
+    // TEMPORARILY SKIP AUTH CHECK FOR TESTING
+    console.log('Skipping auth check for testing...');
+    userCredits = 100;
+    console.log('Credits set to:', userCredits);
+
+    const isPremiumSearch = document.querySelector('input[name="searchType"]:checked').value === 'premium';
+    const creditsRequired = isPremiumSearch ? 10 : 1;
+    console.log('Premium search:', isPremiumSearch, 'Credits required:', creditsRequired);
+
+    if (userCredits < creditsRequired) {
+        console.log('FAILED: Insufficient credits');
+        alert(`Insufficient credits. You need ${creditsRequired} credits for this search type.`);
+        return;
+    }
+    console.log('Credit check passed');
+
+    const formData = new FormData(searchForm);
+    const searchParams = {
+        jobTitle: formData.get('jobTitle') || document.getElementById('jobTitle').value,
+        industry: getIndustryValue(), 
+        location: getLocationValue(), 
+        experience: formData.get('experience') || document.getElementById('experience').value,
+        includePredictiveAnalysis: isPremiumSearch
+    };
+
+    console.log('Search params:', searchParams);
+
+    // Validate required fields
+    if (!searchParams.jobTitle) {
+        console.log('FAILED: No job title');
+        alert('Please enter a job title or role');
+        return;
+    }
+    console.log('Validation passed - starting UI changes');
+
+    // Show loading state
+    initialState.classList.add('hidden');
+    resultsState.classList.add('hidden');
+    loadingState.classList.remove('hidden');
+    console.log('Loading state shown');
+
+    const loadingPromise = showEnhancedLoading();
+    console.log('Loading animation started');
+
+    try {
+        console.log('About to make API call...');
+        
+        // REST OF YOUR API CALL CODE GOES HERE
+        
+    } catch (error) {
+        console.error('Search failed:', error);
+    }
 }
 
 // --- Results Processing & Candidate Rendering ---
