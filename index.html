@@ -397,7 +397,7 @@
 				    </div>
 				    
 				    <!-- Candidate Cards -->
-				    <div class="space-y-4">
+					<div id="candidateCardsContainer" class="space-y-4">
                         <!-- Sample Candidate 1 -->
                         <div class="bg-dark-secondary rounded-xl p-6 hover:bg-dark-tertiary transition-colors cursor-pointer candidate-card" style="display: none;">
                             <div class="flex items-start justify-between">
@@ -1371,15 +1371,21 @@ function updateResultsDescription(params) {
 
 // Update the candidate cards in the UI
 function updateCandidateCards(candidates) {
-    const cardsContainer = document.querySelector('#resultsState .space-y-4');
-    if (!cardsContainer) return;
+    const cardsContainer = document.getElementById('candidateCardsContainer');
+    if (!cardsContainer) {
+        console.error('Cards container not found');
+        return;
+    }
+    
     // Clear old cards
     cardsContainer.innerHTML = '';
+    
     // Render real cards
     candidates.forEach(candidate => {
         const cardHTML = createCandidateCardHTML(candidate);
         cardsContainer.innerHTML += cardHTML;
     });
+    
     // Re-attach click handlers
     attachCandidateCardHandlers(candidates);
 }
