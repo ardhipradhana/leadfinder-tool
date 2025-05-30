@@ -2630,7 +2630,11 @@ function updateAnalytics(analytics) {
 // Generate and display AI insights summary for the search
 function generateAIInsights(candidates, searchQuery) {
 	console.log('generateAIInsights called with:', searchQuery);
-	console.log('searchQuery properties:', Object.keys(searchQuery));
+    console.log('searchQuery properties:', Object.keys(searchQuery));
+    console.log('jobTitle value:', searchQuery.jobTitle);
+    console.log('location value:', searchQuery.location);
+    console.log('searchQuery value:', searchQuery.searchQuery);
+	
     const totalCandidates = candidates.length;
     const highScoreCandidates = candidates.filter(c => c.aiScore >= 80).length;
     const locations = [...new Set(candidates.map(c => c.location))];
