@@ -1423,23 +1423,23 @@ async function handleSearch(e) {
     console.log('=== HANDLE SEARCH STARTED ===');
     e.preventDefault();
     console.log('Default prevented');
-
+    
     // TEMPORARILY SKIP AUTH CHECK FOR TESTING
     console.log('Skipping auth check for testing...');
     userCredits = 100;
     console.log('Credits set to:', userCredits);
-
+    
     const isPremiumSearch = document.querySelector('input[name="searchType"]:checked').value === 'premium';
     const creditsRequired = isPremiumSearch ? 10 : 1;
     console.log('Premium search:', isPremiumSearch, 'Credits required:', creditsRequired);
-
+    
     if (userCredits < creditsRequired) {
         console.log('FAILED: Insufficient credits');
         alert(`Insufficient credits. You need ${creditsRequired} credits for this search type.`);
         return;
     }
     console.log('Credit check passed');
-
+    
     const formData = new FormData(searchForm);
     const searchParams = {
         jobTitle: formData.get('jobTitle') || document.getElementById('jobTitle').value,
@@ -1448,9 +1448,9 @@ async function handleSearch(e) {
         experience: formData.get('experience') || document.getElementById('experience').value,
         includePredictiveAnalysis: isPremiumSearch
     };
-
+    
     console.log('Search params:', searchParams);
-
+    
     // Validate required fields
     if (!searchParams.jobTitle) {
         console.log('FAILED: No job title');
@@ -1458,64 +1458,75 @@ async function handleSearch(e) {
         return;
     }
     console.log('Validation passed - starting UI changes');
-
+    
     // Show loading state
     initialState.classList.add('hidden');
     resultsState.classList.add('hidden');
     loadingState.classList.remove('hidden');
     console.log('Loading state shown');
-
+    
     const loadingPromise = showEnhancedLoading();
     console.log('Loading animation started');
-
+    
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 minutes
+    
     try {
-	    console.log('About to make API call...');
-	    
-	    const controller = new AbortController();
-	    const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 minutes
-	
-	    const response = await fetch('https://montpro.app.n8n.cloud/webhook/leadfinder-tool', {
-	        method: 'POST',
-	        signal: controller.signal,
-	        headers: { 
-	            'Content-Type': 'application/json',
-	            'Authorization': `Bearer leadfinder_secretkey123`,
-	            'X-User-ID': 'test-user-123'
-	        },
-	        body: JSON.stringify({
-	            ...searchParams,
-	            userId: 'test-user-123',
-	            timestamp: new Date().toISOString()
-	        })
-	    });
-	    
-	    clearTimeout(timeoutId);
-	    console.log('Webhook response status:', response.status);
-	
-	    if (!response.ok) {
-	        throw new Error(`HTTP error! status: ${response.status}`);
-	    }
-	
-	    console.log('About to parse JSON response...');
-	    const data = await response.json();
-	    console.log('JSON parsed successfully:', data);
-	    
-	    // Rest of your existing code...
-	    
-	} catch (error) {
-	    clearTimeout(timeoutId);
-	    console.error('Search failed:', error);
-	    
-	    if (error.name === 'AbortError') {
-	        alert('Search timed out after 5 minutes. Please try again with a more specific search.');
-	    } else {
-	        alert(`Search failed: ${error.message}`);
-	    }
-	    
-	    // Reset UI
-	    loadingState.classList.add('hidden');
-	    initialState.classList.remove('hidden');
-	}
+        console.log('About to make API call...');
+        
+        const response = await fetch('https://montpro.app.n8n.cloud/webhook/leadfinder-tool', {
+            method: 'POST',
+            signal: controller.signal,
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer leadfinder_secretkey123`,
+                'X-User-ID': 'test-user-123'
+            },
+            body: JSON.stringify({
+                ...searchParams,
+                userId: 'test-user-123',
+                timestamp: new Date().toISOString()
+            })
+        });
+        
+        clearTimeout(timeoutId);
+        console.log('Webhook response status:', response.status);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        console.log('About to parse JSON response...');
+        const data = await response.json();
+        console.log('JSON parsed successfully:', data);
+        
+        await loadingPromise;
+        console.log('Loading animation completed');
+
+        if (data.success) {
+            console.log('Data has success=true, processing results...');
+            // Save search to Supabase
+            saveToSearchHistory(searchParams, data.results.totalFound, data.results.candidates);
+
+            processSearchResults(data);
+            loadingState.classList.add('hidden');
+            resultsState.classList.remove('hidden');
+        }
+        
+    } catch (error) {
+        clearTimeout(timeoutId);
+        console.error('Search failed:', error);
+        
+        if (error.name === 'AbortError') {
+            alert('Search timed out after 5 minutes. Please try again with a more specific search.');
+        } else {
+            alert(`Search failed: ${error.message}`);
+        }
+        
+        // Reset UI
+        loadingState.classList.add('hidden');
+        initialState.classList.remove('hidden');
+    }
 }
 // --- Results Processing & Candidate Rendering ---
 
