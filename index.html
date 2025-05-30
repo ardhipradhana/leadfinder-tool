@@ -341,25 +341,53 @@
 				                    
 				                    <!-- Location Dropdown -->
 				                    <div id="locationDropdown" class="hidden absolute top-full left-0 mt-1 w-48 bg-dark-secondary border border-gray-600 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
-				                        <div class="p-2 space-y-1">
-				                            <label class="flex items-center space-x-2 p-2 hover:bg-dark-tertiary rounded cursor-pointer">
-				                                <input type="checkbox" class="location-checkbox w-4 h-4 text-accent-cyan" value="jakarta" checked>
-				                                <span class="text-sm text-gray-300">Jakarta</span>
-				                            </label>
-				                            <label class="flex items-center space-x-2 p-2 hover:bg-dark-tertiary rounded cursor-pointer">
-				                                <input type="checkbox" class="location-checkbox w-4 h-4 text-accent-cyan" value="tangerang" checked>
-				                                <span class="text-sm text-gray-300">Tangerang</span>
-				                            </label>
-				                            <label class="flex items-center space-x-2 p-2 hover:bg-dark-tertiary rounded cursor-pointer">
-				                                <input type="checkbox" class="location-checkbox w-4 h-4 text-accent-cyan" value="bandung" checked>
-				                                <span class="text-sm text-gray-300">Bandung</span>
-				                            </label>
-				                            <label class="flex items-center space-x-2 p-2 hover:bg-dark-tertiary rounded cursor-pointer">
-				                                <input type="checkbox" class="location-checkbox w-4 h-4 text-accent-cyan" value="surabaya" checked>
-				                                <span class="text-sm text-gray-300">Surabaya</span>
-				                            </label>
-				                        </div>
-				                    </div>
+									    <div class="p-2 space-y-1">
+									        <label class="flex items-center space-x-2 p-2 hover:bg-dark-tertiary rounded cursor-pointer">
+									            <input type="checkbox" class="location-checkbox w-4 h-4 text-accent-cyan" value="jakarta" checked>
+									            <span class="text-sm text-gray-300">Jakarta</span>
+									        </label>
+									        <label class="flex items-center space-x-2 p-2 hover:bg-dark-tertiary rounded cursor-pointer">
+									            <input type="checkbox" class="location-checkbox w-4 h-4 text-accent-cyan" value="surabaya" checked>
+									            <span class="text-sm text-gray-300">Surabaya</span>
+									        </label>
+									        <label class="flex items-center space-x-2 p-2 hover:bg-dark-tertiary rounded cursor-pointer">
+									            <input type="checkbox" class="location-checkbox w-4 h-4 text-accent-cyan" value="bandung" checked>
+									            <span class="text-sm text-gray-300">Bandung</span>
+									        </label>
+									        <label class="flex items-center space-x-2 p-2 hover:bg-dark-tertiary rounded cursor-pointer">
+									            <input type="checkbox" class="location-checkbox w-4 h-4 text-accent-cyan" value="medan" checked>
+									            <span class="text-sm text-gray-300">Medan</span>
+									        </label>
+									        <label class="flex items-center space-x-2 p-2 hover:bg-dark-tertiary rounded cursor-pointer">
+									            <input type="checkbox" class="location-checkbox w-4 h-4 text-accent-cyan" value="semarang" checked>
+									            <span class="text-sm text-gray-300">Semarang</span>
+									        </label>
+									        <label class="flex items-center space-x-2 p-2 hover:bg-dark-tertiary rounded cursor-pointer">
+									            <input type="checkbox" class="location-checkbox w-4 h-4 text-accent-cyan" value="makassar" checked>
+									            <span class="text-sm text-gray-300">Makassar</span>
+									        </label>
+									        <label class="flex items-center space-x-2 p-2 hover:bg-dark-tertiary rounded cursor-pointer">
+									            <input type="checkbox" class="location-checkbox w-4 h-4 text-accent-cyan" value="palembang" checked>
+									            <span class="text-sm text-gray-300">Palembang</span>
+									        </label>
+									        <label class="flex items-center space-x-2 p-2 hover:bg-dark-tertiary rounded cursor-pointer">
+									            <input type="checkbox" class="location-checkbox w-4 h-4 text-accent-cyan" value="tangerang" checked>
+									            <span class="text-sm text-gray-300">Tangerang</span>
+									        </label>
+									        <label class="flex items-center space-x-2 p-2 hover:bg-dark-tertiary rounded cursor-pointer">
+									            <input type="checkbox" class="location-checkbox w-4 h-4 text-accent-cyan" value="depok" checked>
+									            <span class="text-sm text-gray-300">Depok</span>
+									        </label>
+									        <label class="flex items-center space-x-2 p-2 hover:bg-dark-tertiary rounded cursor-pointer">
+									            <input type="checkbox" class="location-checkbox w-4 h-4 text-accent-cyan" value="bekasi" checked>
+									            <span class="text-sm text-gray-300">Bekasi</span>
+									        </label>
+									        <label class="flex items-center space-x-2 p-2 hover:bg-dark-tertiary rounded cursor-pointer">
+									            <input type="checkbox" class="location-checkbox w-4 h-4 text-accent-cyan" value="other" checked>
+									            <span class="text-sm text-gray-300">Other Locations</span>
+									        </label>
+									    </div>
+									</div>
 				                </div>
 				                
 				                <!-- Clear Filters -->
@@ -1813,24 +1841,24 @@ function filterCandidatesEnhanced() {
         
         const passesVerificationFilter = !verifiedOnly || candidate.verificationStatus === 'Verified';
         
-        const candidateLocation = candidate.location.toLowerCase();
-        const passesLocationFilter = selectedLocations.length === 0 || 
-            selectedLocations.some(loc => candidateLocation.includes(loc));
-        
-        const allTestsPass = passesTextFilter && passesExperienceFilter && passesScoreFilter && 
-            passesVerificationFilter && passesLocationFilter;
-        
-        if (!allTestsPass) {
-            console.log('Candidate filtered out:', candidate.name, {
-                passesTextFilter,
-                passesExperienceFilter,
-                passesScoreFilter,
-                passesVerificationFilter,
-                passesLocationFilter,
-                experienceYears,
-                candidateLocation
-            });
-        }
+        // Location filter
+		const candidateLocation = candidate.location.toLowerCase();
+		const specificCities = ['jakarta', 'surabaya', 'bandung', 'medan', 'semarang', 'makassar', 'palembang', 'tangerang', 'depok', 'bekasi'];
+		const candidateHasSpecificCity = specificCities.some(city => candidateLocation.includes(city));
+		
+		let passesLocationFilter;
+		if (candidateHasSpecificCity) {
+		    // If candidate has a specific city, check if that city is selected
+		    passesLocationFilter = selectedLocations.some(loc => candidateLocation.includes(loc));
+		} else {
+		    // If candidate has no specific city (like "Indonesia"), check if "other" is selected
+		    passesLocationFilter = selectedLocations.includes('other');
+		}
+		
+		// If no locations are selected, show all
+		if (selectedLocations.length === 0) {
+		    passesLocationFilter = true;
+		}
         
         if (allTestsPass) {
             card.style.display = 'block';
