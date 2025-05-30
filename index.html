@@ -1484,7 +1484,7 @@ function processSearchResults(data) {
     if (data.analytics) updateAnalytics(data.analytics);
 
     // Save to local search history as well
-    saveToSearchHistory(data.query, data.results.totalFound, data.results.candidates);
+    // saveToSearchHistory(data.query, data.results.totalFound, data.results.candidates);
     updateSearchHistoryUI();
 
     // Update AI Insights
