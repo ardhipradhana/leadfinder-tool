@@ -88,6 +88,34 @@
 		    );
 		}
 
+		.candidate-card {
+			transition: all 0.3s ease-in-out;
+			border: 1px solid transparent;
+		}
+		
+		.candidate-card:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 8px 25px rgba(0, 212, 170, 0.15);
+			border-color: rgba(0, 212, 170, 0.3);
+			background: linear-gradient(135deg, #16213e 0%, #1a1a2e 100%);
+		}
+		
+		.candidate-card:hover .enhanced-score-circle {
+			transform: scale(1.05);
+			filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
+		}
+		
+		.candidate-card:hover h4 {
+			color: #00d4aa;
+			transition: color 0.3s ease;
+		}
+		
+		.candidate-card:hover .verification-badge,
+		.candidate-card:hover [class*="priority-badge"] {
+			transform: scale(1.02);
+			transition: transform 0.3s ease;
+		}
+
     </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen">
