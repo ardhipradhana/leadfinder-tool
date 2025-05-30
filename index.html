@@ -1233,6 +1233,22 @@ if (searchForm) {
     console.log('ERROR: searchForm not found!');
 }
 
+// Handle custom location input
+document.getElementById('location').addEventListener('change', function() {
+    const locationSelect = this;
+    const customLocationInput = document.getElementById('customLocation');
+    
+    if (locationSelect.value === 'other') {
+        // Show custom input with smooth animation
+        customLocationInput.classList.remove('hidden');
+        customLocationInput.focus();
+    } else {
+        // Hide custom input
+        customLocationInput.classList.add('hidden');
+        customLocationInput.value = ''; // Clear the custom input when hidden
+    }
+});
+
 // ADD THESE DEBUG LINES:
 console.log('Search form found:', document.getElementById('searchForm'));
 console.log('Sample search button found:', document.getElementById('sampleSearchBtn'));
@@ -1283,6 +1299,20 @@ document.getElementById('exportBtn').addEventListener('click', async () => {
 
 // --- Main Search Handler and Helpers ---
 
+// Get location value (either from dropdown or custom input)
+function getLocationValue() {
+    const locationSelect = document.getElementById('location');
+    const customLocation = document.getElementById('customLocation');
+    
+    if (locationSelect.value === 'other' && customLocation.value.trim()) {
+        return customLocation.value.trim();
+    } else if (locationSelect.value && locationSelect.value !== 'other') {
+        return locationSelect.value;
+    } else {
+        return '';
+    }
+}
+	
 // Handle search form submission
 async function handleSearch(e) {
     e.preventDefault();
@@ -1306,12 +1336,12 @@ async function handleSearch(e) {
     }
 
     const formData = new FormData(searchForm);
-    const searchParams = {
-        jobTitle: formData.get('jobTitle') || document.getElementById('jobTitle').value,
-        industry: formData.get('industry') || document.getElementById('industry').value,
-        location: formData.get('location') || document.getElementById('location').value,
-        experience: formData.get('experience') || document.getElementById('experience').value
-    };
+	const searchParams = {
+	    jobTitle: formData.get('jobTitle') || document.getElementById('jobTitle').value,
+	    industry: formData.get('industry') || document.getElementById('industry').value,
+	    location: getLocationValue(), // Use custom function instead of direct value
+	    experience: formData.get('experience') || document.getElementById('experience').value
+	};
 
     console.log('Search params:', searchParams);
 
