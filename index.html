@@ -980,6 +980,7 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
 // --- 4. Main session check on page load ---
 console.log('Step 4: About to check Supabase session...');
 try {
+console.log('Step 4.5: About to call getSession...');
     const { data: { session }, error } = await supabaseClient.auth.getSession();
     console.log('Step 5: Session check completed', session, error);
     if (session && session.user) {
