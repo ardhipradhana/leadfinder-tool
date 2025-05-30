@@ -272,7 +272,7 @@
                 
                 <!-- Results State -->
                 <div id="resultsState" class="hidden">
-					<!-- ADD THIS NEW SECTION HERE -->
+				    <!-- AI Insights Box -->
 				    <div id="aiInsightsBox" class="bg-gradient-to-r from-accent-cyan/10 to-accent-teal/10 border border-accent-cyan/30 rounded-xl p-6 mb-6">
 				        <div class="flex items-start space-x-3">
 				            <div class="w-10 h-10 bg-accent-cyan/20 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -290,110 +290,114 @@
 				            </div>
 				        </div>
 				    </div>
-                    <div class="bg-dark-secondary rounded-xl p-6 mb-6">
-					    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-3">
-					
-					        <!-- Enhanced Filter Bar -->
-							<div class="space-y-4 p-4 bg-dark-primary rounded-lg">
-							    <!-- First Row: Text Search and Score Filter -->
-							    <div class="flex flex-col md:flex-row md:items-center space-y-3 md:space-y-0 md:space-x-6">
-							        <div class="flex-1">
-							            <input type="text" id="nameFilter" placeholder="Filter by name, title, skills..." class="w-full px-3 py-2 bg-dark-secondary border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-accent-cyan focus:outline-none">
-							        </div>
-							        
-							        <div class="flex items-center space-x-3">
-							            <span class="text-sm text-gray-400 whitespace-nowrap">Min Score:</span>
-							            <input type="range" id="scoreFilter" min="0" max="100" value="0" class="w-20 accent-accent-cyan">
-							            <span id="scoreValue" class="text-sm text-accent-cyan font-medium w-8">0</span>
-							        </div>
-							    </div>
-							    
-							    <!-- Second Row: Other Filters -->
-							    <div class="flex flex-wrap items-center gap-4">
-							        <!-- Experience Filter -->
-							        <div class="flex items-center space-x-3">
-							            <span class="text-sm text-gray-400">Experience:</span>
-							            <div class="flex items-center space-x-2">
-							                <span class="text-xs text-gray-500">0y</span>
-							                <input type="range" id="experienceFilter" min="0" max="15" value="0" class="w-24 accent-accent-cyan">
-							                <span class="text-xs text-gray-500">15y+</span>
-							            </div>
-							            <span id="experienceValue" class="text-sm text-accent-cyan font-medium">0+</span>
-							        </div>
-							        
-							        <!-- Verification Filter -->
-							        <div class="flex items-center space-x-3">
-							            <span class="text-sm text-gray-400">Verified:</span>
-							            <label class="flex items-center space-x-2 cursor-pointer">
-							                <input type="checkbox" id="verifiedFilter" class="w-4 h-4 text-accent-cyan bg-dark-secondary border-gray-600 rounded focus:ring-accent-cyan focus:ring-2">
-							                <span class="text-sm text-gray-300">Only verified</span>
-							            </label>
-							        </div>
-							        
-							        <!-- Location Filter -->
-							        <div class="relative">
-							            <button id="locationFilterBtn" class="flex items-center space-x-2 px-3 py-2 bg-dark-secondary border border-gray-600 rounded-lg text-white hover:border-accent-cyan transition-colors">
-							                <span class="text-sm">All Locations</span>
-							                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-							                </svg>
-							            </button>
-							            
-							            <!-- Location Dropdown -->
-							            <div id="locationDropdown" class="hidden absolute top-full left-0 mt-1 w-48 bg-dark-secondary border border-gray-600 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
-							                <div class="p-2 space-y-1">
-							                    <label class="flex items-center space-x-2 p-2 hover:bg-dark-tertiary rounded cursor-pointer">
-							                        <input type="checkbox" class="location-checkbox w-4 h-4 text-accent-cyan" value="jakarta" checked>
-							                        <span class="text-sm text-gray-300">Jakarta</span>
-							                    </label>
-							                    <label class="flex items-center space-x-2 p-2 hover:bg-dark-tertiary rounded cursor-pointer">
-							                        <input type="checkbox" class="location-checkbox w-4 h-4 text-accent-cyan" value="tangerang" checked>
-							                        <span class="text-sm text-gray-300">Tangerang</span>
-							                    </label>
-							                    <label class="flex items-center space-x-2 p-2 hover:bg-dark-tertiary rounded cursor-pointer">
-							                        <input type="checkbox" class="location-checkbox w-4 h-4 text-accent-cyan" value="bandung" checked>
-							                        <span class="text-sm text-gray-300">Bandung</span>
-							                    </label>
-							                    <label class="flex items-center space-x-2 p-2 hover:bg-dark-tertiary rounded cursor-pointer">
-							                        <input type="checkbox" class="location-checkbox w-4 h-4 text-accent-cyan" value="surabaya" checked>
-							                        <span class="text-sm text-gray-300">Surabaya</span>
-							                    </label>
-							                </div>
-							            </div>
-							        </div>
-							        
-							        <!-- Clear Filters -->
-							        <button id="clearFilters" class="px-3 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm rounded-lg transition-colors">
-							            Clear All
-							        </button>
-							    </div>
-							</div>
-					        
-					        <!-- Controls -->
-					        <div class="flex flex-row items-center gap-2">
-					            <select class="px-3 py-2 bg-dark-primary border border-gray-600 rounded-lg text-white text-sm" id="sortSelect">
-					                <option value="Sort by Score">Sort by Score</option>
-					                <option value="Sort by Experience">Sort by Experience</option>
-					                <option value="Sort by Location">Sort by Location</option>
-					            </select>
-					            <button id="compareBtn" class="hidden flex items-center justify-center px-3 py-2 w-32 bg-dark-primary border border-purple-500 text-purple-400 hover:bg-purple-500 hover:text-white font-medium text-sm rounded-lg transition-colors">
-					                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-					                </svg>
-					                <span id="compareBtnText" class="text-xs">Compare</span>
-					            </button>
-					            <button id="exportBtn" class="flex items-center justify-center px-3 py-2 w-32 bg-accent-cyan hover:bg-accent-teal text-dark-primary font-medium text-sm rounded-lg transition-colors">
-					                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M8 17l4 4 4-4m-4-5v9"/>
-					                </svg>
-					                <span class="text-xs">Export to CSV</span>
-					            </button>
-					        </div>
-					    </div>
-					</div>
-                    
-                    <!-- Candidate Cards -->
-                    <div class="space-y-4">
+				
+				    <!-- Filter and Controls Section -->
+				    <div class="bg-dark-secondary rounded-xl p-6 mb-6">
+				        <!-- Enhanced Filter Bar -->
+				        <div class="space-y-4 p-4 bg-dark-primary rounded-lg mb-4">
+				            <!-- First Row: Text Search and Score Filter -->
+				            <div class="flex flex-col md:flex-row md:items-center space-y-3 md:space-y-0 md:space-x-6">
+				                <div class="flex-1">
+				                    <input type="text" id="nameFilter" placeholder="Filter by name, title, skills..." class="w-full px-3 py-2 bg-dark-secondary border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-accent-cyan focus:outline-none">
+				                </div>
+				                
+				                <div class="flex items-center space-x-3">
+				                    <span class="text-sm text-gray-400 whitespace-nowrap">Min Score:</span>
+				                    <input type="range" id="scoreFilter" min="0" max="100" value="0" class="w-20 accent-accent-cyan">
+				                    <span id="scoreValue" class="text-sm text-accent-cyan font-medium w-8">0</span>
+				                </div>
+				            </div>
+				            
+				            <!-- Second Row: Other Filters -->
+				            <div class="flex flex-wrap items-center gap-4">
+				                <!-- Experience Filter -->
+				                <div class="flex items-center space-x-3">
+				                    <span class="text-sm text-gray-400">Experience:</span>
+				                    <div class="flex items-center space-x-2">
+				                        <span class="text-xs text-gray-500">0y</span>
+				                        <input type="range" id="experienceFilter" min="0" max="15" value="0" class="w-24 accent-accent-cyan">
+				                        <span class="text-xs text-gray-500">15y+</span>
+				                    </div>
+				                    <span id="experienceValue" class="text-sm text-accent-cyan font-medium">0+</span>
+				                </div>
+				                
+				                <!-- Verification Filter -->
+				                <div class="flex items-center space-x-3">
+				                    <span class="text-sm text-gray-400">Verified:</span>
+				                    <label class="flex items-center space-x-2 cursor-pointer">
+				                        <input type="checkbox" id="verifiedFilter" class="w-4 h-4 text-accent-cyan bg-dark-secondary border-gray-600 rounded focus:ring-accent-cyan focus:ring-2">
+				                        <span class="text-sm text-gray-300">Only verified</span>
+				                    </label>
+				                </div>
+				                
+				                <!-- Location Filter -->
+				                <div class="relative">
+				                    <button id="locationFilterBtn" class="flex items-center space-x-2 px-3 py-2 bg-dark-secondary border border-gray-600 rounded-lg text-white hover:border-accent-cyan transition-colors">
+				                        <span class="text-sm">All Locations</span>
+				                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+				                        </svg>
+				                    </button>
+				                    
+				                    <!-- Location Dropdown -->
+				                    <div id="locationDropdown" class="hidden absolute top-full left-0 mt-1 w-48 bg-dark-secondary border border-gray-600 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
+				                        <div class="p-2 space-y-1">
+				                            <label class="flex items-center space-x-2 p-2 hover:bg-dark-tertiary rounded cursor-pointer">
+				                                <input type="checkbox" class="location-checkbox w-4 h-4 text-accent-cyan" value="jakarta" checked>
+				                                <span class="text-sm text-gray-300">Jakarta</span>
+				                            </label>
+				                            <label class="flex items-center space-x-2 p-2 hover:bg-dark-tertiary rounded cursor-pointer">
+				                                <input type="checkbox" class="location-checkbox w-4 h-4 text-accent-cyan" value="tangerang" checked>
+				                                <span class="text-sm text-gray-300">Tangerang</span>
+				                            </label>
+				                            <label class="flex items-center space-x-2 p-2 hover:bg-dark-tertiary rounded cursor-pointer">
+				                                <input type="checkbox" class="location-checkbox w-4 h-4 text-accent-cyan" value="bandung" checked>
+				                                <span class="text-sm text-gray-300">Bandung</span>
+				                            </label>
+				                            <label class="flex items-center space-x-2 p-2 hover:bg-dark-tertiary rounded cursor-pointer">
+				                                <input type="checkbox" class="location-checkbox w-4 h-4 text-accent-cyan" value="surabaya" checked>
+				                                <span class="text-sm text-gray-300">Surabaya</span>
+				                            </label>
+				                        </div>
+				                    </div>
+				                </div>
+				                
+				                <!-- Clear Filters -->
+				                <button id="clearFilters" class="px-3 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm rounded-lg transition-colors">
+				                    Clear All
+				                </button>
+				            </div>
+				        </div>
+				
+				        <!-- Controls Row -->
+				        <div class="flex flex-row items-center justify-between">
+				            <div class="text-sm text-gray-400">
+				                Use filters above to narrow down candidates
+				            </div>
+				            <div class="flex flex-row items-center gap-2">
+				                <select class="px-3 py-2 bg-dark-primary border border-gray-600 rounded-lg text-white text-sm" id="sortSelect">
+				                    <option value="Sort by Score">Sort by Score</option>
+				                    <option value="Sort by Experience">Sort by Experience</option>
+				                    <option value="Sort by Location">Sort by Location</option>
+				                </select>
+				                <button id="compareBtn" class="hidden flex items-center justify-center px-3 py-2 w-32 bg-dark-primary border border-purple-500 text-purple-400 hover:bg-purple-500 hover:text-white font-medium text-sm rounded-lg transition-colors">
+				                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+				                    </svg>
+				                    <span id="compareBtnText" class="text-xs">Compare</span>
+				                </button>
+				                <button id="exportBtn" class="flex items-center justify-center px-3 py-2 w-32 bg-accent-cyan hover:bg-accent-teal text-dark-primary font-medium text-sm rounded-lg transition-colors">
+				                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M8 17l4 4 4-4m-4-5v9"/>
+				                    </svg>
+				                    <span class="text-xs">Export to CSV</span>
+				                </button>
+				            </div>
+				        </div>
+				    </div>
+				    
+				    <!-- Candidate Cards -->
+				    <div class="space-y-4">
                         <!-- Sample Candidate 1 -->
                         <div class="bg-dark-secondary rounded-xl p-6 hover:bg-dark-tertiary transition-colors cursor-pointer candidate-card" style="display: none;">
                             <div class="flex items-start justify-between">
