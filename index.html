@@ -62,6 +62,32 @@
             filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
         }
 
+		.enhanced-score-circle {
+		    background: conic-gradient(
+		        from 0deg, 
+		        var(--score-color) 0deg, 
+		        var(--score-color) var(--score-deg), 
+		        #374151 var(--score-deg), 
+		        #374151 360deg
+		    );
+		    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+		    position: relative;
+		}
+		
+		.enhanced-score-circle::before {
+		    content: '';
+		    position: absolute;
+		    inset: 2px;
+		    border-radius: 50%;
+		    background: conic-gradient(
+		        from 0deg,
+		        rgba(255, 255, 255, 0.1) 0deg,
+		        rgba(255, 255, 255, 0.1) var(--score-deg),
+		        transparent var(--score-deg),
+		        transparent 360deg
+		    );
+		}
+
     </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen">
@@ -1451,6 +1477,13 @@ function getVerificationBadge(status) {
     }
 }
 
+// Get color based on AI score
+function getScoreColor(score) {
+    if (score >= 80) return '#10b981'; // Green
+    if (score >= 60) return '#f59e0b'; // Yellow/Orange  
+    return '#6b7280'; // Gray
+}
+
 // Render 1 candidate card as HTML
 function createCandidateCardHTML(candidate) {
     const scorePercentage = (candidate.aiScore * 3.6); // For speedometer UI
@@ -1484,12 +1517,12 @@ function createCandidateCardHTML(candidate) {
                 </div>
                 <div class="flex flex-col items-center ml-4">
                     <div class="relative w-16 h-16 mb-2">
-                        <div class="w-16 h-16 rounded-full score-circle flex items-center justify-center" style="--score-deg: ${scorePercentage}deg">
-                            <div class="w-12 h-12 bg-dark-secondary rounded-full flex items-center justify-center">
-                                <span class="text-accent-cyan font-bold text-sm">${candidate.aiScore}</span>
-                            </div>
-                        </div>
-                    </div>
+					    <div class="w-16 h-16 rounded-full enhanced-score-circle flex items-center justify-center" style="--score-deg: ${scorePercentage}deg; --score-color: ${getScoreColor(candidate.aiScore)}">
+					        <div class="w-12 h-12 bg-dark-secondary rounded-full flex items-center justify-center shadow-inner">
+					            <span class="font-bold text-sm" style="color: ${getScoreColor(candidate.aiScore)}">${candidate.aiScore}</span>
+					        </div>
+					    </div>
+					</div>
                     <span class="text-xs text-gray-400">AI Score</span>
                 </div>
             </div>
