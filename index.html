@@ -294,77 +294,79 @@
 					    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-3">
 					
 					        <!-- Enhanced Filter Bar -->
-							<div class="flex flex-col lg:flex-row lg:items-center space-y-4 lg:space-y-0 lg:space-x-6 p-4 bg-dark-primary rounded-lg">
-							    <!-- Text Search -->
-							    <div class="flex-1">
-							        <input type="text" id="nameFilter" placeholder="Filter by name, title, skills..." class="w-full px-3 py-2 bg-dark-secondary border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-accent-cyan focus:outline-none">
-							    </div>
-							    
-							    <!-- Experience Filter -->
-							    <div class="flex items-center space-x-3">
-							        <span class="text-sm text-gray-400 whitespace-nowrap">Experience:</span>
-							        <div class="flex items-center space-x-2">
-							            <span class="text-xs text-gray-500">0y</span>
-							            <input type="range" id="experienceFilter" min="0" max="15" value="0" class="w-24 accent-accent-cyan">
-							            <span class="text-xs text-gray-500">15y+</span>
+							<div class="space-y-4 p-4 bg-dark-primary rounded-lg">
+							    <!-- First Row: Text Search and Score Filter -->
+							    <div class="flex flex-col md:flex-row md:items-center space-y-3 md:space-y-0 md:space-x-6">
+							        <div class="flex-1">
+							            <input type="text" id="nameFilter" placeholder="Filter by name, title, skills..." class="w-full px-3 py-2 bg-dark-secondary border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-accent-cyan focus:outline-none">
 							        </div>
-							        <span id="experienceValue" class="text-sm text-accent-cyan font-medium w-8">0+</span>
-							    </div>
-							    
-							    <!-- AI Score Filter -->
-							    <div class="flex items-center space-x-3">
-							        <span class="text-sm text-gray-400 whitespace-nowrap">Min Score:</span>
-							        <div class="flex items-center space-x-2">
+							        
+							        <div class="flex items-center space-x-3">
+							            <span class="text-sm text-gray-400 whitespace-nowrap">Min Score:</span>
 							            <input type="range" id="scoreFilter" min="0" max="100" value="0" class="w-20 accent-accent-cyan">
 							            <span id="scoreValue" class="text-sm text-accent-cyan font-medium w-8">0</span>
 							        </div>
 							    </div>
 							    
-							    <!-- Verification Filter -->
-							    <div class="flex items-center space-x-3">
-							        <span class="text-sm text-gray-400">Verified:</span>
-							        <label class="flex items-center space-x-2 cursor-pointer">
-							            <input type="checkbox" id="verifiedFilter" class="w-4 h-4 text-accent-cyan bg-dark-secondary border-gray-600 rounded focus:ring-accent-cyan focus:ring-2">
-							            <span class="text-sm text-gray-300">Only verified</span>
-							        </label>
-							    </div>
-							    
-							    <!-- Location Filter -->
-							    <div class="relative">
-							        <button id="locationFilterBtn" class="flex items-center space-x-2 px-3 py-2 bg-dark-secondary border border-gray-600 rounded-lg text-white hover:border-accent-cyan transition-colors">
-							            <span class="text-sm">All Locations</span>
-							            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-							            </svg>
-							        </button>
+							    <!-- Second Row: Other Filters -->
+							    <div class="flex flex-wrap items-center gap-4">
+							        <!-- Experience Filter -->
+							        <div class="flex items-center space-x-3">
+							            <span class="text-sm text-gray-400">Experience:</span>
+							            <div class="flex items-center space-x-2">
+							                <span class="text-xs text-gray-500">0y</span>
+							                <input type="range" id="experienceFilter" min="0" max="15" value="0" class="w-24 accent-accent-cyan">
+							                <span class="text-xs text-gray-500">15y+</span>
+							            </div>
+							            <span id="experienceValue" class="text-sm text-accent-cyan font-medium">0+</span>
+							        </div>
 							        
-							        <!-- Location Dropdown -->
-							        <div id="locationDropdown" class="hidden absolute top-full left-0 mt-1 w-48 bg-dark-secondary border border-gray-600 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
-							            <div class="p-2 space-y-1">
-							                <label class="flex items-center space-x-2 p-2 hover:bg-dark-tertiary rounded cursor-pointer">
-							                    <input type="checkbox" class="location-checkbox w-4 h-4 text-accent-cyan" value="jakarta" checked>
-							                    <span class="text-sm text-gray-300">Jakarta</span>
-							                </label>
-							                <label class="flex items-center space-x-2 p-2 hover:bg-dark-tertiary rounded cursor-pointer">
-							                    <input type="checkbox" class="location-checkbox w-4 h-4 text-accent-cyan" value="tangerang" checked>
-							                    <span class="text-sm text-gray-300">Tangerang</span>
-							                </label>
-							                <label class="flex items-center space-x-2 p-2 hover:bg-dark-tertiary rounded cursor-pointer">
-							                    <input type="checkbox" class="location-checkbox w-4 h-4 text-accent-cyan" value="bandung" checked>
-							                    <span class="text-sm text-gray-300">Bandung</span>
-							                </label>
-							                <label class="flex items-center space-x-2 p-2 hover:bg-dark-tertiary rounded cursor-pointer">
-							                    <input type="checkbox" class="location-checkbox w-4 h-4 text-accent-cyan" value="surabaya" checked>
-							                    <span class="text-sm text-gray-300">Surabaya</span>
-							                </label>
+							        <!-- Verification Filter -->
+							        <div class="flex items-center space-x-3">
+							            <span class="text-sm text-gray-400">Verified:</span>
+							            <label class="flex items-center space-x-2 cursor-pointer">
+							                <input type="checkbox" id="verifiedFilter" class="w-4 h-4 text-accent-cyan bg-dark-secondary border-gray-600 rounded focus:ring-accent-cyan focus:ring-2">
+							                <span class="text-sm text-gray-300">Only verified</span>
+							            </label>
+							        </div>
+							        
+							        <!-- Location Filter -->
+							        <div class="relative">
+							            <button id="locationFilterBtn" class="flex items-center space-x-2 px-3 py-2 bg-dark-secondary border border-gray-600 rounded-lg text-white hover:border-accent-cyan transition-colors">
+							                <span class="text-sm">All Locations</span>
+							                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+							                </svg>
+							            </button>
+							            
+							            <!-- Location Dropdown -->
+							            <div id="locationDropdown" class="hidden absolute top-full left-0 mt-1 w-48 bg-dark-secondary border border-gray-600 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
+							                <div class="p-2 space-y-1">
+							                    <label class="flex items-center space-x-2 p-2 hover:bg-dark-tertiary rounded cursor-pointer">
+							                        <input type="checkbox" class="location-checkbox w-4 h-4 text-accent-cyan" value="jakarta" checked>
+							                        <span class="text-sm text-gray-300">Jakarta</span>
+							                    </label>
+							                    <label class="flex items-center space-x-2 p-2 hover:bg-dark-tertiary rounded cursor-pointer">
+							                        <input type="checkbox" class="location-checkbox w-4 h-4 text-accent-cyan" value="tangerang" checked>
+							                        <span class="text-sm text-gray-300">Tangerang</span>
+							                    </label>
+							                    <label class="flex items-center space-x-2 p-2 hover:bg-dark-tertiary rounded cursor-pointer">
+							                        <input type="checkbox" class="location-checkbox w-4 h-4 text-accent-cyan" value="bandung" checked>
+							                        <span class="text-sm text-gray-300">Bandung</span>
+							                    </label>
+							                    <label class="flex items-center space-x-2 p-2 hover:bg-dark-tertiary rounded cursor-pointer">
+							                        <input type="checkbox" class="location-checkbox w-4 h-4 text-accent-cyan" value="surabaya" checked>
+							                        <span class="text-sm text-gray-300">Surabaya</span>
+							                    </label>
+							                </div>
 							            </div>
 							        </div>
+							        
+							        <!-- Clear Filters -->
+							        <button id="clearFilters" class="px-3 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm rounded-lg transition-colors">
+							            Clear All
+							        </button>
 							    </div>
-							    
-							    <!-- Clear Filters -->
-							    <button id="clearFilters" class="px-3 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm rounded-lg transition-colors">
-							        Clear All
-							    </button>
 							</div>
 					        
 					        <!-- Controls -->
