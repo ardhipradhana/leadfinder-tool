@@ -1029,6 +1029,18 @@ const exportModal = document.getElementById('exportModal');
 // Form submission
 searchForm.addEventListener('submit', handleSearch);
 
+// ADD THESE DEBUG LINES:
+console.log('Search form found:', document.getElementById('searchForm'));
+console.log('Sample search button found:', document.getElementById('sampleSearchBtn'));
+
+// Test sample search button manually
+const sampleBtn = document.getElementById('sampleSearchBtn');
+if (sampleBtn) {
+    console.log('Sample button exists, adding listener');
+} else {
+    console.log('Sample button NOT found!');
+}
+
 // Modal open/close
 document.getElementById('searchHistoryBtn').addEventListener('click', () => historyModal.classList.remove('hidden'));
 document.getElementById('closeModal').addEventListener('click', () => candidateModal.classList.add('hidden'));
