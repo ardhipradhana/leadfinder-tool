@@ -2594,7 +2594,7 @@ function saveToSearchHistory(searchParams, resultCount, candidates) {
     // Get existing history
     let history = JSON.parse(localStorage.getItem('leadfinder_history') || '[]');
     history.unshift(searchEntry);
-    history = history.slice(0, 10);
+    history = history.slice(0, 50);
     localStorage.setItem('leadfinder_history', JSON.stringify(history));
     updateSearchHistoryCount();
 }
