@@ -1310,8 +1310,7 @@ function createCandidateCardHTML(candidate) {
                     <div class="pt-1">
                         <input type="checkbox" 
                             class="candidate-checkbox w-4 h-4 text-accent-cyan bg-dark-primary border-gray-600 rounded focus:ring-accent-cyan focus:ring-2" 
-                            data-candidate-id="${candidate.id}"
-                            onclick="event.stopPropagation(); updateCompareButton();">
+                            data-candidate-id="${candidate.id}">
                     </div>
                     <div class="w-12 h-12 bg-gray-600 rounded-full flex items-center justify-center">
                         <span class="text-white font-semibold">${candidate.name.split(' ').map(n => n[0]).join('').substring(0, 2)}</span>
@@ -1357,6 +1356,14 @@ function attachCandidateCardHandlers(candidates) {
             if (candidate) {
                 showCandidateModal(candidate);
             }
+        });
+    });
+	// ADD THIS: Attach checkbox event listeners
+    document.querySelectorAll('.candidate-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', function(e) {
+            e.stopPropagation();
+            console.log('Checkbox clicked:', this.checked);
+            updateCompareButton();
         });
     });
 }
@@ -1647,8 +1654,11 @@ function updateResultsCount(visibleCount) {
 
 // Update the compare button based on selected candidates
 function updateCompareButton() {
+console.log('updateCompareButton called');
     const selectedCheckboxes = document.querySelectorAll('.candidate-checkbox:checked');
+	console.log('Selected checkboxes:', selectedCheckboxes.length);
     const compareBtn = document.getElementById('compareBtn');
+	console.log('Compare button found:', compareBtn);
     const compareBtnText = document.getElementById('compareBtnText');
 
     if (selectedCheckboxes.length > 0) {
@@ -2404,6 +2414,15 @@ document.addEventListener('click', async (e) => {
         }
         hideExportToast();
     }
+	// Manual test for checkboxes
+setTimeout(() => {
+    console.log('Testing checkbox listeners...');
+    const checkboxes = document.querySelectorAll('.candidate-checkbox');
+    console.log('Found checkboxes:', checkboxes.length);
+    checkboxes.forEach((cb, i) => {
+        console.log(`Checkbox ${i}:`, cb);
+    });
+}, 2000);
 });
 });
     </script>
