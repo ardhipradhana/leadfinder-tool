@@ -1157,12 +1157,17 @@ async function handleSearch(e) {
 
     try {
         console.log('About to deduct credit...');
-        // Deduct credit before search
-        const creditDeducted = await deductCredit();
-        console.log('Credit deducted:', creditDeducted);
-        if (!creditDeducted) {
-            throw new Error('Failed to deduct credit');
-        }
+	// TEMPORARILY SKIP CREDIT DEDUCTION FOR TESTING
+	console.log('Skipping credit deduction for testing...');
+	const creditDeducted = true; // Mock successful credit deduction
+	console.log('Credit deducted:', creditDeducted);
+	/*
+	// Deduct credit before search
+	const creditDeducted = await deductCredit();
+	if (!creditDeducted) {
+	    throw new Error('Failed to deduct credit');
+	}
+	*/
         console.log('About to call webhook...');
 
         // SECURED N8N WEBHOOK CALL
