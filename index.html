@@ -1471,7 +1471,42 @@ async function handleSearch(e) {
     try {
         console.log('About to make API call...');
         
-        // REST OF YOUR API CALL CODE GOES HERE
+        // SECURED N8N WEBHOOK CALL
+    	const mockUserId = 'test-user-123'; // Mock user ID for testing
+        const response = await fetch('https://montpro.app.n8n.cloud/webhook-test/leadfinder-tool', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer leadfinder_secretkey123`,
+                'X-User-ID': mockUserId
+            },
+            body: JSON.stringify({
+                ...searchParams,
+                userId: mockUserId,
+                timestamp: new Date().toISOString()
+            })
+        });
+        console.log('Webhook response status:', response.status);
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+    	console.log('About to parse JSON response...');
+        const data = await response.json();
+		console.log('JSON parsed successfully:', data);
+        await loadingPromise;
+		console.log('Loading animation completed');
+
+        if (data.success) {
+		console.log('Data has success=true, processing results...');
+            // Save search to Supabase
+            saveToSearchHistory(searchParams, data.results.totalFound, data.results.candidates);
+
+            processSearchResults(data);
+            loadingState.classList.add('hidden');
+            resultsState.classList.remove('hidden');
+        }
         
     } catch (error) {
         console.error('Search failed:', error);
