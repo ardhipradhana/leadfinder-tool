@@ -1019,6 +1019,7 @@ async function loadSearchHistory() {
 		        
 // DOM elements
 const searchForm = document.getElementById('searchForm');
+console.log('searchForm element:', searchForm);
 const initialState = document.getElementById('initialState');
 const loadingState = document.getElementById('loadingState');
 const resultsState = document.getElementById('resultsState');
@@ -1027,7 +1028,17 @@ const historyModal = document.getElementById('historyModal');
 const exportModal = document.getElementById('exportModal');
 
 // Form submission
-searchForm.addEventListener('submit', handleSearch);
+if (searchForm) {
+    console.log('Adding submit listener to form');
+    searchForm.addEventListener('submit', function(e) {
+        console.log('Form submitted! Preventing default...');
+        e.preventDefault();
+        console.log('About to call handleSearch');
+        handleSearch(e);
+    });
+} else {
+    console.log('ERROR: searchForm not found!');
+}
 
 // ADD THESE DEBUG LINES:
 console.log('Search form found:', document.getElementById('searchForm'));
