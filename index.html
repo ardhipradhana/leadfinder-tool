@@ -291,33 +291,104 @@
 				        </div>
 				    </div>
                     <div class="bg-dark-secondary rounded-xl p-6 mb-6">
-                        <div class="flex flex-col md:flex-row md:items-start md:justify-between mb-4 gap-3">
-			    <div>
-			        <h3 class="text-xl font-semibold text-white">Search Results</h3>
-			        <p class="text-gray-400">
-			            Found 10 candidates matching "Restaurant Manager" in jakarta
-			        </p>
-			    </div>
-			    <div class="flex flex-row items-center gap-2 w-full md:w-auto justify-end">
-				    <select class="px-3 py-2 bg-dark-primary border border-gray-600 rounded-lg text-white text-sm" id="sortSelect">
-				        <option value="Sort by Score">Sort by Score</option>
-				        <option value="Sort by Experience">Sort by Experience</option>
-				        <option value="Sort by Location">Sort by Location</option>
-				    </select>
-				    <button id="compareBtn" class="hidden flex items-center justify-center px-3 py-2 w-32 bg-dark-primary border border-purple-500 text-purple-400 hover:bg-purple-500 hover:text-white font-medium text-sm rounded-lg transition-colors">
-				        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-				            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-				        </svg>
-				        <span id="compareBtnText" class="text-xs">Compare</span>
-				    </button>
-				    <button id="exportBtn" class="flex items-center justify-center px-3 py-2 w-32 bg-accent-cyan hover:bg-accent-teal text-dark-primary font-medium text-sm rounded-lg transition-colors">
-				        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-				            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M8 17l4 4 4-4m-4-5v9"/>
-				        </svg>
-				        <span class="text-xs">Export to CSV</span>
-				    </button>
-				</div>
-			</div>
+					    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-3">
+					
+					        <!-- Enhanced Filter Bar -->
+							<div class="flex flex-col lg:flex-row lg:items-center space-y-4 lg:space-y-0 lg:space-x-6 p-4 bg-dark-primary rounded-lg">
+							    <!-- Text Search -->
+							    <div class="flex-1">
+							        <input type="text" id="nameFilter" placeholder="Filter by name, title, skills..." class="w-full px-3 py-2 bg-dark-secondary border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-accent-cyan focus:outline-none">
+							    </div>
+							    
+							    <!-- Experience Filter -->
+							    <div class="flex items-center space-x-3">
+							        <span class="text-sm text-gray-400 whitespace-nowrap">Experience:</span>
+							        <div class="flex items-center space-x-2">
+							            <span class="text-xs text-gray-500">0y</span>
+							            <input type="range" id="experienceFilter" min="0" max="15" value="0" class="w-24 accent-accent-cyan">
+							            <span class="text-xs text-gray-500">15y+</span>
+							        </div>
+							        <span id="experienceValue" class="text-sm text-accent-cyan font-medium w-8">0+</span>
+							    </div>
+							    
+							    <!-- AI Score Filter -->
+							    <div class="flex items-center space-x-3">
+							        <span class="text-sm text-gray-400 whitespace-nowrap">Min Score:</span>
+							        <div class="flex items-center space-x-2">
+							            <input type="range" id="scoreFilter" min="0" max="100" value="0" class="w-20 accent-accent-cyan">
+							            <span id="scoreValue" class="text-sm text-accent-cyan font-medium w-8">0</span>
+							        </div>
+							    </div>
+							    
+							    <!-- Verification Filter -->
+							    <div class="flex items-center space-x-3">
+							        <span class="text-sm text-gray-400">Verified:</span>
+							        <label class="flex items-center space-x-2 cursor-pointer">
+							            <input type="checkbox" id="verifiedFilter" class="w-4 h-4 text-accent-cyan bg-dark-secondary border-gray-600 rounded focus:ring-accent-cyan focus:ring-2">
+							            <span class="text-sm text-gray-300">Only verified</span>
+							        </label>
+							    </div>
+							    
+							    <!-- Location Filter -->
+							    <div class="relative">
+							        <button id="locationFilterBtn" class="flex items-center space-x-2 px-3 py-2 bg-dark-secondary border border-gray-600 rounded-lg text-white hover:border-accent-cyan transition-colors">
+							            <span class="text-sm">All Locations</span>
+							            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+							            </svg>
+							        </button>
+							        
+							        <!-- Location Dropdown -->
+							        <div id="locationDropdown" class="hidden absolute top-full left-0 mt-1 w-48 bg-dark-secondary border border-gray-600 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
+							            <div class="p-2 space-y-1">
+							                <label class="flex items-center space-x-2 p-2 hover:bg-dark-tertiary rounded cursor-pointer">
+							                    <input type="checkbox" class="location-checkbox w-4 h-4 text-accent-cyan" value="jakarta" checked>
+							                    <span class="text-sm text-gray-300">Jakarta</span>
+							                </label>
+							                <label class="flex items-center space-x-2 p-2 hover:bg-dark-tertiary rounded cursor-pointer">
+							                    <input type="checkbox" class="location-checkbox w-4 h-4 text-accent-cyan" value="tangerang" checked>
+							                    <span class="text-sm text-gray-300">Tangerang</span>
+							                </label>
+							                <label class="flex items-center space-x-2 p-2 hover:bg-dark-tertiary rounded cursor-pointer">
+							                    <input type="checkbox" class="location-checkbox w-4 h-4 text-accent-cyan" value="bandung" checked>
+							                    <span class="text-sm text-gray-300">Bandung</span>
+							                </label>
+							                <label class="flex items-center space-x-2 p-2 hover:bg-dark-tertiary rounded cursor-pointer">
+							                    <input type="checkbox" class="location-checkbox w-4 h-4 text-accent-cyan" value="surabaya" checked>
+							                    <span class="text-sm text-gray-300">Surabaya</span>
+							                </label>
+							            </div>
+							        </div>
+							    </div>
+							    
+							    <!-- Clear Filters -->
+							    <button id="clearFilters" class="px-3 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm rounded-lg transition-colors">
+							        Clear All
+							    </button>
+							</div>
+					        
+					        <!-- Controls -->
+					        <div class="flex flex-row items-center gap-2">
+					            <select class="px-3 py-2 bg-dark-primary border border-gray-600 rounded-lg text-white text-sm" id="sortSelect">
+					                <option value="Sort by Score">Sort by Score</option>
+					                <option value="Sort by Experience">Sort by Experience</option>
+					                <option value="Sort by Location">Sort by Location</option>
+					            </select>
+					            <button id="compareBtn" class="hidden flex items-center justify-center px-3 py-2 w-32 bg-dark-primary border border-purple-500 text-purple-400 hover:bg-purple-500 hover:text-white font-medium text-sm rounded-lg transition-colors">
+					                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+					                </svg>
+					                <span id="compareBtnText" class="text-xs">Compare</span>
+					            </button>
+					            <button id="exportBtn" class="flex items-center justify-center px-3 py-2 w-32 bg-accent-cyan hover:bg-accent-teal text-dark-primary font-medium text-sm rounded-lg transition-colors">
+					                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M8 17l4 4 4-4m-4-5v9"/>
+					                </svg>
+					                <span class="text-xs">Export to CSV</span>
+					            </button>
+					        </div>
+					    </div>
+					</div>
                         
                         <!-- Filter Bar -->
                         <div class="flex items-center space-x-4 p-3 bg-dark-primary rounded-lg">
@@ -1552,6 +1623,7 @@ function updateModalRecommendation(candidate) {
 // --- Result Filters and Sorting ---
 
 function setupResultFilters() {
+	setupEnhancedFilters();
     // Text filter
     const filterInput = document.querySelector('#resultsState input[placeholder*="Filter by name"]');
     if (filterInput) {
@@ -1620,6 +1692,151 @@ function filterCandidates() {
 
     // Update results count
     updateResultsCount(visibleCount);
+}
+
+// Enhanced filtering functionality
+function setupEnhancedFilters() {
+    // Experience filter
+    const experienceFilter = document.getElementById('experienceFilter');
+    const experienceValue = document.getElementById('experienceValue');
+    if (experienceFilter && experienceValue) {
+        experienceFilter.addEventListener('input', (e) => {
+            experienceValue.textContent = e.target.value + '+';
+            filterCandidatesEnhanced();
+        });
+    }
+    
+    // Score filter  
+    const scoreFilter = document.getElementById('scoreFilter');
+    const scoreValue = document.getElementById('scoreValue');
+    if (scoreFilter && scoreValue) {
+        scoreFilter.addEventListener('input', (e) => {
+            scoreValue.textContent = e.target.value;
+            filterCandidatesEnhanced();
+        });
+    }
+    
+    // Text filter
+    const nameFilter = document.getElementById('nameFilter');
+    if (nameFilter) {
+        nameFilter.addEventListener('input', filterCandidatesEnhanced);
+    }
+    
+    // Verification filter
+    const verifiedFilter = document.getElementById('verifiedFilter');
+    if (verifiedFilter) {
+        verifiedFilter.addEventListener('change', filterCandidatesEnhanced);
+    }
+    
+    // Location dropdown
+    const locationBtn = document.getElementById('locationFilterBtn');
+    const locationDropdown = document.getElementById('locationDropdown');
+    if (locationBtn && locationDropdown) {
+        locationBtn.addEventListener('click', () => {
+            locationDropdown.classList.toggle('hidden');
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!locationBtn.contains(e.target) && !locationDropdown.contains(e.target)) {
+                locationDropdown.classList.add('hidden');
+            }
+        });
+        
+        // Location checkboxes
+        document.querySelectorAll('.location-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                updateLocationButtonText();
+                filterCandidatesEnhanced();
+            });
+        });
+    }
+    
+    // Clear filters
+    const clearFilters = document.getElementById('clearFilters');
+    if (clearFilters) {
+        clearFilters.addEventListener('click', () => {
+            document.getElementById('nameFilter').value = '';
+            document.getElementById('experienceFilter').value = '0';
+            document.getElementById('scoreFilter').value = '0';
+            document.getElementById('verifiedFilter').checked = false;
+            document.querySelectorAll('.location-checkbox').forEach(cb => cb.checked = true);
+            experienceValue.textContent = '0+';
+            scoreValue.textContent = '0';
+            updateLocationButtonText();
+            filterCandidatesEnhanced();
+        });
+    }
+}
+
+// Enhanced filter function
+function filterCandidatesEnhanced() {
+    const nameFilter = document.getElementById('nameFilter')?.value.toLowerCase() || '';
+    const minExperience = parseInt(document.getElementById('experienceFilter')?.value || 0);
+    const minScore = parseInt(document.getElementById('scoreFilter')?.value || 0);
+    const verifiedOnly = document.getElementById('verifiedFilter')?.checked || false;
+    
+    const selectedLocations = Array.from(document.querySelectorAll('.location-checkbox:checked'))
+        .map(cb => cb.value.toLowerCase());
+    
+    const candidateCards = document.querySelectorAll('.candidate-card');
+    let visibleCount = 0;
+    
+    candidateCards.forEach(card => {
+        const candidateId = card.getAttribute('data-candidate-id');
+        const candidate = currentCandidates.find(c => c.id === candidateId);
+        
+        if (!candidate) {
+            card.style.display = 'none';
+            return;
+        }
+        
+        // Name/text filter
+        const searchableText = `${candidate.name} ${candidate.title} ${candidate.location}`.toLowerCase();
+        const passesTextFilter = nameFilter === '' || searchableText.includes(nameFilter);
+        
+        // Experience filter
+        const experienceYears = parseInt(candidate.experience?.match(/\d+/)?.[0] || '0');
+        const passesExperienceFilter = experienceYears >= minExperience;
+        
+        // Score filter
+        const passesScoreFilter = candidate.aiScore >= minScore;
+        
+        // Verification filter
+        const passesVerificationFilter = !verifiedOnly || candidate.verificationStatus === 'Verified';
+        
+        // Location filter
+        const candidateLocation = candidate.location.toLowerCase();
+        const passesLocationFilter = selectedLocations.length === 0 || 
+            selectedLocations.some(loc => candidateLocation.includes(loc));
+        
+        if (passesTextFilter && passesExperienceFilter && passesScoreFilter && 
+            passesVerificationFilter && passesLocationFilter) {
+            card.style.display = 'block';
+            visibleCount++;
+        } else {
+            card.style.display = 'none';
+        }
+    });
+    
+    updateResultsCount(visibleCount);
+}
+
+// Update location button text
+function updateLocationButtonText() {
+    const selectedLocations = Array.from(document.querySelectorAll('.location-checkbox:checked'));
+    const locationBtn = document.getElementById('locationFilterBtn');
+    const btnText = locationBtn.querySelector('span');
+    
+    if (selectedLocations.length === 0) {
+        btnText.textContent = 'No Locations';
+    } else if (selectedLocations.length === document.querySelectorAll('.location-checkbox').length) {
+        btnText.textContent = 'All Locations';
+    } else if (selectedLocations.length === 1) {
+        btnText.textContent = selectedLocations[0].nextElementSibling.textContent;
+    } else {
+        btnText.textContent = `${selectedLocations.length} Locations`;
+    }
 }
 
 // Sort candidates
