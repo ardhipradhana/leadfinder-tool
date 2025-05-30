@@ -2627,6 +2627,16 @@ function updateAnalytics(analytics) {
     console.log('Recommended Action:', analytics.recommendedAction);
 }
 
+// Extract job title from search query string
+function extractJobTitleFromQuery(queryString) {
+    if (!queryString) return null;
+    // Remove location and extra keywords, keep first 2-3 words
+    const words = queryString.split(' ').filter(word => 
+        !['indonesia', 'jakarta', 'bandung', '-jobs', '-hiring', '-vacancy'].includes(word.toLowerCase())
+    );
+    return words.slice(0, 3).join(' '); // Take first 3 words as job title
+}
+
 // Generate and display AI insights summary for the search
 function generateAIInsights(candidates, searchQuery) {
 	console.log('generateAIInsights called with:', searchQuery);
@@ -2647,7 +2657,7 @@ function generateAIInsights(candidates, searchQuery) {
         : 0;
 
 	// FIX: Use the correct property names
-    const jobTitle = searchQuery.jobTitle || searchQuery.query || 'the position';
+    const jobTitle = extractJobTitleFromQuery(searchQuery.searchQuery) || searchQuery.jobTitle || 'the position';
     const location = searchQuery.location || 'the specified location';
 
     let insights = `Found ${totalCandidates} candidates matching "${jobTitle}" in ${location}. `;
