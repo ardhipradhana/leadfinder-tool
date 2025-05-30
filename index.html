@@ -2439,6 +2439,17 @@ setTimeout(() => {
 	        showComparisonModal(selectedCandidates);
 	    }
 	});
+	// ADD THIS: Comparison modal close handlers
+	document.getElementById('closeComparisonModal').addEventListener('click', function() {
+	    document.getElementById('comparisonModal').classList.add('hidden');
+	});
+	
+	// Close comparison modal when clicking outside
+	document.getElementById('comparisonModal').addEventListener('click', function(e) {
+	    if (e.target === this) {
+	        this.classList.add('hidden');
+	    }
+	});
 });
     </script>
 </body>
