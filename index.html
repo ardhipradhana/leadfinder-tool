@@ -1061,29 +1061,12 @@ if (searchForm) {
 console.log('Search form found:', document.getElementById('searchForm'));
 console.log('Sample search button found:', document.getElementById('sampleSearchBtn'));
 
-// Test sample search button manually
-const sampleBtn = document.getElementById('sampleSearchBtn');
-if (sampleBtn) {
-    console.log('Sample button exists, adding listener');
-} else {
-    console.log('Sample button NOT found!');
-}
-
-// Modal open/close
-document.getElementById('searchHistoryBtn').addEventListener('click', () => historyModal.classList.remove('hidden'));
-document.getElementById('closeModal').addEventListener('click', () => candidateModal.classList.add('hidden'));
-document.getElementById('closeHistoryModal').addEventListener('click', () => historyModal.classList.add('hidden'));
-document.getElementById('closeExportModal').addEventListener('click', () => exportModal.classList.add('hidden'));
-
-// Compare button
-document.getElementById('compareBtn').addEventListener('click', () => {
-    const selectedCandidates = getSelectedCandidates();
-    if (selectedCandidates.length > 0) {
-        showComparisonModal(selectedCandidates);
-    }
-});
-document.getElementById('closeComparisonModal').addEventListener('click', () => {
-    document.getElementById('comparisonModal').classList.add('hidden');
+// Sample search (fills the form with a demo search)
+document.getElementById('sampleSearchBtn').addEventListener('click', () => {
+    document.getElementById('jobTitle').value = 'Restaurant Manager';
+    document.getElementById('industry').value = 'hospitality';
+    document.getElementById('location').value = 'jakarta';
+    document.getElementById('experience').value = 'mid';
 });
 
 // Sample search (fills the form with a demo search)
