@@ -194,8 +194,11 @@
                                 <option value="healthcare">Healthcare</option>
                                 <option value="finance">Finance</option>
                                 <option value="education">Education</option>
-                                <option value="other">Other</option>
+                                <option value="custom">Other (Custom Industry)</option>
                             </select>
+				<!-- Custom Industry Input (hidden by default) -->
+				<input type="text" id="customIndustry" placeholder="Enter custom industry (e.g., Gaming, Logistics, Real Estate)" 
+				       class="w-full px-4 py-3 bg-dark-primary border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-accent-cyan focus:outline-none hidden mt-3">
                         </div>
                         
                         <div>
@@ -1249,6 +1252,22 @@ document.getElementById('location').addEventListener('change', function() {
     }
 });
 
+// Handle custom industry input
+document.getElementById('industry').addEventListener('change', function() {
+    const industrySelect = this;
+    const customIndustryInput = document.getElementById('customIndustry');
+    
+    if (industrySelect.value === 'custom') {
+        // Show custom input with smooth animation
+        customIndustryInput.classList.remove('hidden');
+        customIndustryInput.focus();
+    } else {
+        // Hide custom input
+        customIndustryInput.classList.add('hidden');
+        customIndustryInput.value = ''; // Clear the custom input when hidden
+    }
+});
+
 // ADD THESE DEBUG LINES:
 console.log('Search form found:', document.getElementById('searchForm'));
 console.log('Sample search button found:', document.getElementById('sampleSearchBtn'));
@@ -1312,6 +1331,20 @@ function getLocationValue() {
         return '';
     }
 }
+
+// Get industry value (either from dropdown or custom input)
+function getIndustryValue() {
+    const industrySelect = document.getElementById('industry');
+    const customIndustry = document.getElementById('customIndustry');
+    
+    if (industrySelect.value === 'custom' && customIndustry.value.trim()) {
+        return customIndustry.value.trim();
+    } else if (industrySelect.value && industrySelect.value !== 'custom') {
+        return industrySelect.value;
+    } else {
+        return '';
+    }
+}
 	
 // Handle search form submission
 async function handleSearch(e) {
@@ -1338,8 +1371,8 @@ async function handleSearch(e) {
     const formData = new FormData(searchForm);
 	const searchParams = {
 	    jobTitle: formData.get('jobTitle') || document.getElementById('jobTitle').value,
-	    industry: formData.get('industry') || document.getElementById('industry').value,
-	    location: getLocationValue(), // Use custom function instead of direct value
+	    industry: getIndustryValue(), 
+	    location: getLocationValue(), 
 	    experience: formData.get('experience') || document.getElementById('experience').value
 	};
 
