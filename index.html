@@ -2481,6 +2481,41 @@ setTimeout(() => {
 	        this.classList.add('hidden');
 	    }
 	});
+	// Event delegation for search history items
+	document.addEventListener('click', (e) => {
+	    // Existing rerun search button handler
+	    if (e.target.classList.contains('rerun-search-btn')) {
+	        e.stopPropagation();
+	        const historyItem = e.target.closest('.search-history-item');
+	        const searchIndex = parseInt(historyItem.dataset.searchIndex);
+	        const searchData = window.searchHistoryData[searchIndex];
+	        // Fill form with historical search
+	        document.getElementById('jobTitle').value = searchData.jobTitle || '';
+	        document.getElementById('industry').value = searchData.industry || '';
+	        document.getElementById('location').value = searchData.location || '';
+	        document.getElementById('experience').value = searchData.experience || '';
+	        // Close modal and run search
+	        document.getElementById('historyModal').classList.add('hidden');
+	        document.getElementById('searchForm').dispatchEvent(new Event('submit'));
+	    }
+	    
+	    // ADD THIS: Click on history item to show results
+	    if (e.target.closest('.search-history-item') && !e.target.closest('.rerun-search-btn')) {
+	        const historyItem = e.target.closest('.search-history-item');
+	        const searchIndex = parseInt(historyItem.dataset.searchIndex);
+	        const searchData = window.searchHistoryData[searchIndex];
+	        
+	        console.log('History item clicked:', searchData);
+	        
+	        // Show the previous results without running new search
+	        showHistorySearchResult(searchData);
+	        
+	        // Close history modal and show results
+	        document.getElementById('historyModal').classList.add('hidden');
+	        document.getElementById('initialState').classList.add('hidden');
+	        document.getElementById('resultsState').classList.remove('hidden');
+	    }
+	});
 });
     </script>
 </body>
