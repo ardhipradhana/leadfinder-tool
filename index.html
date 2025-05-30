@@ -127,6 +127,15 @@
 			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 		}
 
+	    	.salary-badge {
+		    background: linear-gradient(135deg, #059669, #10b981);
+		    box-shadow: 0 2px 4px rgba(5, 150, 105, 0.3);
+		}
+		
+		.difficulty-easy { @apply bg-green-500/20 text-green-400 border-green-500/30; }
+		.difficulty-medium { @apply bg-yellow-500/20 text-yellow-400 border-yellow-500/30; }
+		.difficulty-hard { @apply bg-red-500/20 text-red-400 border-red-500/30; }
+
     </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen">
@@ -1643,6 +1652,11 @@ function getSourceBadge(source) {
 // Render 1 candidate card as HTML
 function createCandidateCardHTML(candidate) {
     const scorePercentage = (candidate.aiScore * 3.6); // For speedometer UI
+    
+    // Extract hiring difficulty level for CSS class
+    const difficultyLevel = candidate.hiringDifficulty?.toLowerCase().includes('easy') ? 'easy' :
+                           candidate.hiringDifficulty?.toLowerCase().includes('hard') ? 'hard' : 'medium';
+    
     return `
         <div class="bg-dark-secondary rounded-xl p-6 hover:bg-dark-tertiary transition-colors cursor-pointer candidate-card" data-candidate-id="${candidate.id}">
             <div class="flex items-start justify-between">
@@ -1657,12 +1671,19 @@ function createCandidateCardHTML(candidate) {
                     </div>
                     <div class="flex-1">
                         <div class="flex items-center space-x-2 mb-1">
-						    <h4 class="text-lg font-semibold text-white">${candidate.name}</h4>
-						    ${getSourceBadge(candidate.source)}
-						    ${getPriorityBadge(candidate.aiScore)}
-						</div>
+                            <h4 class="text-lg font-semibold text-white">${candidate.name}</h4>
+                            ${getSourceBadge(candidate.source)}
+                            ${getPriorityBadge(candidate.aiScore)}
+                        </div>
                         <p class="text-gray-300 mb-2">${candidate.title}</p>
-                        <p class="text-gray-400 text-sm mb-3">${candidate.location} • ${candidate.experience || 'Experienced professional'}</p>
+                        <p class="text-gray-400 text-sm mb-2">${candidate.location} • ${candidate.experience || 'Experienced professional'}</p>
+                        
+                        <!-- NEW: Salary and Difficulty badges -->
+                        <div class="flex items-center space-x-2 mb-3">
+                            ${candidate.salaryRange ? `<span class="salary-badge px-2 py-1 text-white text-xs rounded-full font-medium">${candidate.salaryRange}</span>` : ''}
+                            ${candidate.hiringDifficulty ? `<span class="difficulty-${difficultyLevel} px-2 py-1 text-xs rounded-full font-medium border">${candidate.hiringDifficulty.split(' - ')[0]}</span>` : ''}
+                        </div>
+                        
                         <p class="text-gray-300 text-sm">${candidate.snippet}</p>
                         <div class="flex items-center space-x-4 mt-3">
                             <span class="text-xs text-gray-400">Profile Available</span>
@@ -1673,12 +1694,12 @@ function createCandidateCardHTML(candidate) {
                 </div>
                 <div class="flex flex-col items-center ml-4">
                     <div class="relative w-16 h-16 mb-2">
-					    <div class="w-16 h-16 rounded-full enhanced-score-circle flex items-center justify-center" style="--score-deg: ${scorePercentage}deg; --score-color: ${getScoreColor(candidate.aiScore)}">
-					        <div class="w-12 h-12 bg-dark-secondary rounded-full flex items-center justify-center shadow-inner">
-					            <span class="font-bold text-sm" style="color: ${getScoreColor(candidate.aiScore)}">${candidate.aiScore}</span>
-					        </div>
-					    </div>
-					</div>
+                        <div class="w-16 h-16 rounded-full enhanced-score-circle flex items-center justify-center" style="--score-deg: ${scorePercentage}deg; --score-color: ${getScoreColor(candidate.aiScore)}">
+                            <div class="w-12 h-12 bg-dark-secondary rounded-full flex items-center justify-center shadow-inner">
+                                <span class="font-bold text-sm" style="color: ${getScoreColor(candidate.aiScore)}">${candidate.aiScore}</span>
+                            </div>
+                        </div>
+                    </div>
                     <span class="text-xs text-gray-400">AI Score</span>
                 </div>
             </div>
@@ -1793,12 +1814,14 @@ function updateModalProfile(candidate) {
     if (!profileSection) return;
 
     const profileData = [
-        ['Experience:', candidate.experience || 'Experienced professional'],
-        ['Current Role:', candidate.title],
-        ['Location:', candidate.location],
-        ['Source:', candidate.source],
-        ['Profile Updated:', candidate.lastUpdated]
-    ];
+	    ['Experience:', candidate.experience || 'Experienced professional'],
+	    ['Current Role:', candidate.title],
+	    ['Location:', candidate.location],
+	    ['Source:', candidate.source],
+	    ['Salary Range:', candidate.salaryRange || 'Not specified'],
+	    ['Hiring Difficulty:', candidate.hiringDifficulty || 'Not assessed'],
+	    ['Profile Updated:', candidate.lastUpdated]
+	];
 
     const profileContent = profileSection.querySelector('.space-y-3');
     if (profileContent) {
