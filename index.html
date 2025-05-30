@@ -1363,9 +1363,14 @@ function attachCandidateCardHandlers(candidates) {
     document.querySelectorAll('.candidate-checkbox').forEach(checkbox => {
         checkbox.addEventListener('change', function(e) {
             e.stopPropagation();
+			e.preventDefault();
             console.log('Checkbox clicked:', this.checked);
             updateCompareButton();
         });
+		// Also prevent clicks from bubbling
+	    checkbox.addEventListener('click', function(e) {
+	        e.stopPropagation();
+	    });
     });
 }
 
@@ -2425,6 +2430,15 @@ setTimeout(() => {
     });
 }, 2000);
 });
+	// Compare button event listener
+	document.getElementById('compareBtn').addEventListener('click', function() {
+	    console.log('Compare button clicked');
+	    const selectedCandidates = getSelectedCandidates();
+	    console.log('Selected candidates:', selectedCandidates.length);
+	    if (selectedCandidates.length > 0) {
+	        showComparisonModal(selectedCandidates);
+	    }
+	});
 });
     </script>
 </body>
