@@ -876,33 +876,42 @@ async function checkAuthAndCredits() {
 		.single();
 
 	if (error) {
-		if (error.code === 'PGRST116') {
-		// Try to insert, but handle duplicate user gracefully
-		const { data: newProfile, error: insertError } = await supabaseClient
-			.from('leadfinder_users')
-			.insert({
-				user_id: currentUser.id,
-				email: currentUser.email,
-				credits: 10
-			})
-			.select()
-			.single();
-		if (insertError) {
-			// If user already exists, just fetch their existing profile
-			if (insertError.code === '23505') { // duplicate key error
-				const { data: existingProfile } = await supabaseClient
-					.from('leadfinder_users')
-					.select('credits')
-					.eq('user_id', currentUser.id)
-					.single();
-				userCredits = existingProfile?.credits || 0;
-				updateCreditsDisplay();
-				return true;
-			} else {
-				alert('User creation failed: ' + insertError.message);
-				return false;
-			}
-		}
+	    if (error.code === 'PGRST116') {
+	        // Try to insert, but handle duplicate user gracefully
+	        const { data: newProfile, error: insertError } = await supabaseClient
+	            .from('leadfinder_users')
+	            .insert({
+	                user_id: currentUser.id,
+	                email: currentUser.email,
+	                credits: 10
+	            })
+	            .select()
+	            .single();
+	        if (insertError) {
+	            // If user already exists, just fetch their existing profile
+	            if (insertError.code === '23505') { // duplicate key error
+	                const { data: existingProfile } = await supabaseClient
+	                    .from('leadfinder_users')
+	                    .select('credits')
+	                    .eq('user_id', currentUser.id)
+	                    .single();
+	                userCredits = existingProfile?.credits || 0;
+	                updateCreditsDisplay();
+	                return true;
+	            } else {
+	                alert('User creation failed: ' + insertError.message);
+	                return false;
+	            }
+	        } else {
+	            // Success: new user created
+	            userCredits = newProfile.credits || 10;
+	            updateCreditsDisplay();
+	            return true;
+	        }
+	    } else {
+	        alert('Error fetching profile: ' + error.message);
+	        return false;
+	    }
 	}
 
 	if (profile) {
