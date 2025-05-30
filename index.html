@@ -1657,6 +1657,9 @@ function createCandidateCardHTML(candidate) {
     const difficultyLevel = candidate.hiringDifficulty?.toLowerCase().includes('easy') ? 'easy' :
                            candidate.hiringDifficulty?.toLowerCase().includes('hard') ? 'hard' : 'medium';
     
+    // Get top 2-3 current skills for display
+    const displaySkills = (candidate.currentSkills || []).slice(0, 3);
+    
     return `
         <div class="bg-dark-secondary rounded-xl p-6 hover:bg-dark-tertiary transition-colors cursor-pointer candidate-card" data-candidate-id="${candidate.id}">
             <div class="flex items-start justify-between">
@@ -1673,12 +1676,16 @@ function createCandidateCardHTML(candidate) {
                         <div class="flex items-center space-x-2 mb-1">
                             <h4 class="text-lg font-semibold text-white">${candidate.name}</h4>
                             ${getSourceBadge(candidate.source)}
-                            ${getPriorityBadge(candidate.aiScore)}
                         </div>
                         <p class="text-gray-300 mb-2">${candidate.title}</p>
                         <p class="text-gray-400 text-sm mb-2">${candidate.location} • ${candidate.experience || 'Experienced professional'}</p>
                         
-                        <!-- NEW: Salary and Difficulty badges -->
+                        <!-- Skills badges (replacing priority badge) -->
+                        <div class="flex items-center space-x-2 mb-3">
+                            ${displaySkills.map(skill => `<span class="px-2 py-1 bg-blue-500/20 text-blue-400 border border-blue-500/30 text-xs rounded-full font-medium">${skill}</span>`).join('')}
+                        </div>
+                        
+                        <!-- Salary and Difficulty badges -->
                         <div class="flex items-center space-x-2 mb-3">
                             ${candidate.salaryRange ? `<span class="salary-badge px-2 py-1 text-white text-xs rounded-full font-medium">${candidate.salaryRange}</span>` : ''}
                             ${candidate.hiringDifficulty ? `<span class="difficulty-${difficultyLevel} px-2 py-1 text-xs rounded-full font-medium border">${candidate.hiringDifficulty.split(' - ')[0]}</span>` : ''}
