@@ -1190,12 +1190,16 @@ async function handleSearch(e) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
+    	console.log('About to parse JSON response...');
         const data = await response.json();
+		console.log('JSON parsed successfully:', data);
         await loadingPromise;
+		console.log('Loading animation completed');
 
         if (data.success) {
+			console.log('Data has success=true, processing results...');
             // Save search to Supabase
-            await saveSearchToSupabase(searchParams, data.results);
+            //await saveSearchToSupabase(searchParams, data.results);
 
             processSearchResults(data);
             loadingState.classList.add('hidden');
