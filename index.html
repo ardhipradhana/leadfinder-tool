@@ -1206,9 +1206,9 @@ async function handleSearch(e) {
 		console.log('Loading animation completed');
 
         if (data.success) {
-			console.log('Data has success=true, processing results...');
+		console.log('Data has success=true, processing results...');
             // Save search to Supabase
-            //await saveSearchToSupabase(searchParams, data.results);
+            saveToSearchHistory(searchParams, data.results.totalFound, data.results.candidates);
 
             processSearchResults(data);
             loadingState.classList.add('hidden');
@@ -2030,9 +2030,9 @@ function updateSearchHistoryCount() {
     }
 }
 
-// Update the search history UI with recent history (from Supabase)
+// Update the search history UI with recent history
 async function updateSearchHistoryUI() {
-    const history = await loadSearchHistory();
+    const history = JSON.parse(localStorage.getItem('leadfinder_history') || '[]');
     const historyBtn = document.getElementById('searchHistoryBtn');
     const countSpan = historyBtn.querySelector('.bg-accent-cyan');
     
