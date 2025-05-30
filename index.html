@@ -1650,38 +1650,15 @@ function updateModalRecommendation(candidate) {
 }
 
 // --- Result Filters and Sorting ---
-
 function setupResultFilters() {
-	setupEnhancedFilters();
-    // Text filter
-    const filterInput = document.querySelector('#resultsState input[placeholder*="Filter by name"]');
-    if (filterInput) {
-        filterInput.addEventListener('input', (e) => {
-            filterCandidates();
-        });
-    }
-
-    // Score range filter
-    const scoreRange = document.querySelector('#resultsState input[type="range"]');
-    const scoreValue = scoreRange?.nextElementSibling;
-
-    if (scoreRange) {
-        scoreRange.addEventListener('input', (e) => {
-            if (scoreValue) {
-                scoreValue.textContent = e.target.value;
-            }
-            filterCandidates();
-        });
-    }
-
+    console.log('setupResultFilters called');
+    setupEnhancedFilters();
+    
     // Sort dropdown
     const sortSelectElement = document.getElementById('sortSelect');
     if (sortSelectElement) {
-        // Remove any existing listeners first
-        sortSelectElement.removeEventListener('change', sortCandidates);
-        // Add the listener
         sortSelectElement.addEventListener('change', sortCandidates);
-        console.log('Sort listener attached'); // Debug line
+        console.log('Sort listener attached');
     }
 }
 
@@ -1860,7 +1837,10 @@ function filterCandidatesEnhanced() {
 		    passesLocationFilter = true;
 		}
         
-        if (allTestsPass) {
+        const allTestsPass = passesTextFilter && passesExperienceFilter && passesScoreFilter && 
+		    passesVerificationFilter && passesLocationFilter;
+		
+		if (allTestsPass) {
             card.style.display = 'block';
             visibleCount++;
         } else {
