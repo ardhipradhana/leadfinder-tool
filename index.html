@@ -815,14 +815,17 @@
 <script>
 document.addEventListener('DOMContentLoaded', async () => {
 	console.log('JavaScript is running!');
+	console.log('Step 1: Starting initialization...');
 
 const SUPABASE_URL = 'https://brawqzylfyuotgxqmtox.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJyYXdxenlsZnl1b3RneHFtdG94Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg1MTU0NTUsImV4cCI6MjA2NDA5MTQ1NX0.P4qazlzBHk66eItqBRK-6k2ll2I1d754ke5_r_hNxos';
 const WEBHOOK_SECRET = 'leadfinder_secretkey123';
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+	console.log('Step 2: Supabase initialized');
 
 let currentUser = null;
 let userCredits = 0;
+	console.log('Step 3: Variables declared');
 let currentSearchResults = [];
 let currentCandidates = [];
 let progressInterval = null;
@@ -1018,9 +1021,11 @@ async function loadSearchHistory() {
 }
 		        
 // DOM elements
+console.log('Step 4: Looking for DOM elements...');
 const searchForm = document.getElementById('searchForm');
 console.log('searchForm element:', searchForm);
 const initialState = document.getElementById('initialState');
+console.log('initialState found:', initialState);
 const loadingState = document.getElementById('loadingState');
 const resultsState = document.getElementById('resultsState');
 const candidateModal = document.getElementById('candidateModal');
