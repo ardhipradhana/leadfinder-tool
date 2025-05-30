@@ -2095,7 +2095,10 @@ function sortCandidates() {
     console.log('sortCandidates called', currentCandidates.length);
     const sortSelectElement = document.getElementById('sortSelect');
     const sortBy = sortSelectElement?.value || 'Sort by Score';
+	console.log('Sort by:', sortBy);
+    	console.log('Current candidates:', currentCandidates.length);
     const container = document.querySelector('#resultsState .space-y-4');
+	console.log('Container found:', !!container);
 
     if (!container) return;
 
@@ -2570,6 +2573,7 @@ function getRelativeTime(timestamp) {
 
 // Save a search to local history (still useful as fallback or secondary record)
 function saveToSearchHistory(searchParams, resultCount, candidates) {
+	console.log('Saving search to history:', searchParams);
     const searchEntry = {
         id: Date.now(),
         ...searchParams,
@@ -2578,6 +2582,7 @@ function saveToSearchHistory(searchParams, resultCount, candidates) {
         timestamp: new Date().toISOString(),
         date: new Date().toLocaleDateString()
     };
+	console.log('Search entry created:', searchEntry);
     // Get existing history
     let history = JSON.parse(localStorage.getItem('leadfinder_history') || '[]');
     history.unshift(searchEntry);
