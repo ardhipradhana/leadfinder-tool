@@ -1420,132 +1420,13 @@ function getIndustryValue() {
 	
 // Handle search form submission
 async function handleSearch(e) {
+    console.log('=== HANDLE SEARCH STARTED ===');
     e.preventDefault();
-    console.log('Search button clicked');
-
-    // TEMPORARILY SKIP AUTH CHECK FOR TESTING
-	console.log('Skipping auth check for testing...');
-	// Simulate having credits for testing
-	userCredits = 100;
-	/*
-	// Check authentication and credits first  
-	const hasAuth = await checkAuthAndCredits();
-	if (!hasAuth) {
-	    return;
-	}
-	*/
-
-    if (userCredits < creditsRequired) {
-	    alert(`Insufficient credits. You need ${creditsRequired} credits for this search type.`);
-	    return;
-	}
-
-    const formData = new FormData(searchForm);
-	const isPremiumSearch = document.querySelector('input[name="searchType"]:checked').value === 'premium';
-	const creditsRequired = isPremiumSearch ? 10 : 1;
-	console.log('Premium search:', isPremiumSearch, 'Credits required:', creditsRequired);
-
-	if (userCredits < creditsRequired) {
-	    alert(`Insufficient credits. You need ${creditsRequired} credits for this search type.`);
-	    return;
-	}
-	console.log('Credit check passed');
-	
-	const searchParams = {
-	    jobTitle: formData.get('jobTitle') || document.getElementById('jobTitle').value,
-	    industry: getIndustryValue(), 
-	    location: getLocationValue(), 
-	    experience: formData.get('experience') || document.getElementById('experience').value,
-	    includePredictiveAnalysis: isPremiumSearch
-	};
-
-	console.log('Search params:', searchParams);
-
-    console.log('Search params:', searchParams);
-
-    // Validate required fields
-    if (!searchParams.jobTitle) {
-        alert('Please enter a job title or role');
-        return;
-    }
-	console.log('Validation passed');
-
-    console.log('Starting search animation...');
-
-    // Show loading state
-    initialState.classList.add('hidden');
-    resultsState.classList.add('hidden');
-    loadingState.classList.remove('hidden');
-
-    const loadingPromise = showEnhancedLoading();
-
-    try {
-        console.log('About to deduct credit...');
-	// TEMPORARILY SKIP CREDIT DEDUCTION FOR TESTING
-	console.log('Skipping credit deduction for testing...');
-	const creditDeducted = true; // Mock successful credit deduction
-	console.log('Credit deducted:', creditDeducted);
-	/*
-	// Deduct credit before search
-	const creditDeducted = await deductCredit();
-	if (!creditDeducted) {
-	    throw new Error('Failed to deduct credit');
-	}
-	*/
-        console.log('About to call webhook...');
-
-        // SECURED N8N WEBHOOK CALL
-    	const mockUserId = 'test-user-123'; // Mock user ID for testing
-        const response = await fetch('https://montpro.app.n8n.cloud/webhook-test/leadfinder-tool', {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer leadfinder_secretkey123`,
-                'X-User-ID': mockUserId
-            },
-            body: JSON.stringify({
-                ...searchParams,
-                userId: mockUserId,
-                timestamp: new Date().toISOString()
-            })
-        });
-        console.log('Webhook response status:', response.status);
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-    	console.log('About to parse JSON response...');
-        const data = await response.json();
-		console.log('JSON parsed successfully:', data);
-        await loadingPromise;
-		console.log('Loading animation completed');
-
-        if (data.success) {
-		console.log('Data has success=true, processing results...');
-            // Save search to Supabase
-            saveToSearchHistory(searchParams, data.results.totalFound, data.results.candidates);
-
-            processSearchResults(data);
-            loadingState.classList.add('hidden');
-            resultsState.classList.remove('hidden');
-        }
-
-    } catch (error) {
-        console.error('Search failed:', error);
-
-        // Refund credit on error
-        await supabaseClient
-            .from('leadfinder_users')
-            .update({ credits: userCredits + 1 })
-            .eq('user_id', currentUser.id);
-        userCredits += 1;
-        updateCreditsDisplay();
-
-        loadingState.classList.add('hidden');
-        initialState.classList.remove('hidden');
-        alert(`Search failed: ${error.message}`);
-    }
+    console.log('Default prevented');
+    
+    alert('Search function is working!');
+    
+    console.log('=== HANDLE SEARCH ENDED ===');
 }
 
 // --- Results Processing & Candidate Rendering ---
