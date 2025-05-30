@@ -1754,31 +1754,40 @@ function setupEnhancedFilters() {
     }
     
     // Clear filters
-    const clearFilters = document.getElementById('clearFilters');
-    if (clearFilters) {
-        clearFilters.addEventListener('click', () => {
-            document.getElementById('nameFilter').value = '';
-            document.getElementById('experienceFilter').value = '0';
-            document.getElementById('scoreFilter').value = '0';
-            document.getElementById('verifiedFilter').checked = false;
-            document.querySelectorAll('.location-checkbox').forEach(cb => cb.checked = true);
-            experienceValue.textContent = '0+';
-            scoreValue.textContent = '0';
-            updateLocationButtonText();
-            filterCandidatesEnhanced();
-        });
-    }
+	const clearFilters = document.getElementById('clearFilters');
+	if (clearFilters) {
+	    clearFilters.addEventListener('click', () => {
+	        console.log('Clear filters clicked');
+	        console.log('Total candidates before clear:', currentCandidates.length);
+	        
+	        document.getElementById('nameFilter').value = '';
+	        document.getElementById('experienceFilter').value = '0';
+	        document.getElementById('scoreFilter').value = '0';
+	        document.getElementById('verifiedFilter').checked = false;
+	        document.querySelectorAll('.location-checkbox').forEach(cb => cb.checked = true);
+	        experienceValue.textContent = '0+';
+	        scoreValue.textContent = '0';
+	        updateLocationButtonText();
+	        
+	        console.log('About to call filterCandidatesEnhanced');
+	        filterCandidatesEnhanced();
+	    });
+	}
 }
 
-// Enhanced filter function
 function filterCandidatesEnhanced() {
+    console.log('filterCandidatesEnhanced called');
     const nameFilter = document.getElementById('nameFilter')?.value.toLowerCase() || '';
     const minExperience = parseInt(document.getElementById('experienceFilter')?.value || 0);
     const minScore = parseInt(document.getElementById('scoreFilter')?.value || 0);
     const verifiedOnly = document.getElementById('verifiedFilter')?.checked || false;
     
+    console.log('Filter values:', { nameFilter, minExperience, minScore, verifiedOnly });
+    
     const selectedLocations = Array.from(document.querySelectorAll('.location-checkbox:checked'))
         .map(cb => cb.value.toLowerCase());
+    
+    console.log('Selected locations:', selectedLocations);
     
     const candidateCards = document.querySelectorAll('.candidate-card');
     let visibleCount = 0;
@@ -1788,31 +1797,42 @@ function filterCandidatesEnhanced() {
         const candidate = currentCandidates.find(c => c.id === candidateId);
         
         if (!candidate) {
+            console.log('Candidate not found for card:', candidateId);
             card.style.display = 'none';
             return;
         }
         
-        // Name/text filter
+        // Test each filter condition
         const searchableText = `${candidate.name} ${candidate.title} ${candidate.location}`.toLowerCase();
         const passesTextFilter = nameFilter === '' || searchableText.includes(nameFilter);
         
-        // Experience filter
         const experienceYears = parseInt(candidate.experience?.match(/\d+/)?.[0] || '0');
         const passesExperienceFilter = experienceYears >= minExperience;
         
-        // Score filter
         const passesScoreFilter = candidate.aiScore >= minScore;
         
-        // Verification filter
         const passesVerificationFilter = !verifiedOnly || candidate.verificationStatus === 'Verified';
         
-        // Location filter
         const candidateLocation = candidate.location.toLowerCase();
         const passesLocationFilter = selectedLocations.length === 0 || 
             selectedLocations.some(loc => candidateLocation.includes(loc));
         
-        if (passesTextFilter && passesExperienceFilter && passesScoreFilter && 
-            passesVerificationFilter && passesLocationFilter) {
+        const allTestsPass = passesTextFilter && passesExperienceFilter && passesScoreFilter && 
+            passesVerificationFilter && passesLocationFilter;
+        
+        if (!allTestsPass) {
+            console.log('Candidate filtered out:', candidate.name, {
+                passesTextFilter,
+                passesExperienceFilter,
+                passesScoreFilter,
+                passesVerificationFilter,
+                passesLocationFilter,
+                experienceYears,
+                candidateLocation
+            });
+        }
+        
+        if (allTestsPass) {
             card.style.display = 'block';
             visibleCount++;
         } else {
@@ -1820,6 +1840,7 @@ function filterCandidatesEnhanced() {
         }
     });
     
+    console.log('Visible count after filtering:', visibleCount);
     updateResultsCount(visibleCount);
 }
 
