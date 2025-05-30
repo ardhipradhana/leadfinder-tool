@@ -1488,7 +1488,9 @@ function processSearchResults(data) {
     updateSearchHistoryUI();
 
     // Update AI Insights
+	console.log('About to generate AI insights with query:', data.query);
     const aiInsights = generateAIInsights(data.results.candidates, data.query);
+	console.log('Generated insights:', aiInsights);
     document.getElementById('aiInsightsText').textContent = aiInsights;
 
     // Setup result filters
@@ -2627,6 +2629,7 @@ function updateAnalytics(analytics) {
 
 // Generate and display AI insights summary for the search
 function generateAIInsights(candidates, searchQuery) {
+	console.log('generateAIInsights called with:', searchQuery);
     const totalCandidates = candidates.length;
     const highScoreCandidates = candidates.filter(c => c.aiScore >= 80).length;
     const locations = [...new Set(candidates.map(c => c.location))];
