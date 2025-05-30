@@ -963,13 +963,20 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
 });
 
 // --- 4. Main session check on page load ---
-const { data: { session }, error } = await supabaseClient.auth.getSession();
-if (session && session.user) {
-	currentUser = session.user;
-	await checkAuthAndCredits();
-	updateCreditsDisplay();
-} else {
-	showAuthModal();
+console.log('Step 4: About to check Supabase session...');
+try {
+    const { data: { session }, error } = await supabaseClient.auth.getSession();
+    console.log('Step 5: Session check completed', session, error);
+    if (session && session.user) {
+        currentUser = session.user;
+        await checkAuthAndCredits();
+        updateCreditsDisplay();
+    } else {
+        showAuthModal();
+    }
+    console.log('Step 6: Auth handling completed');
+} catch (err) {
+    console.error('ERROR in session check:', err);
 }
 
 // --- 5. Event listeners ---
