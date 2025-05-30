@@ -2630,6 +2630,7 @@ function updateAnalytics(analytics) {
 // Generate and display AI insights summary for the search
 function generateAIInsights(candidates, searchQuery) {
 	console.log('generateAIInsights called with:', searchQuery);
+	console.log('searchQuery properties:', Object.keys(searchQuery));
     const totalCandidates = candidates.length;
     const highScoreCandidates = candidates.filter(c => c.aiScore >= 80).length;
     const locations = [...new Set(candidates.map(c => c.location))];
@@ -2641,7 +2642,11 @@ function generateAIInsights(candidates, searchQuery) {
         ? Math.round(experiences.reduce((a, b) => a + b, 0) / experiences.length)
         : 0;
 
-    let insights = `Found ${totalCandidates} candidates matching "${searchQuery.jobTitle}" in ${searchQuery.location}. `;
+	// FIX: Use the correct property names
+    const jobTitle = searchQuery.jobTitle || searchQuery.query || 'the position';
+    const location = searchQuery.location || 'the specified location';
+
+    let insights = `Found ${totalCandidates} candidates matching "${jobTitle}" in ${location}. `;
     if (highScoreCandidates > 0) {
         insights += `${highScoreCandidates} candidates have high compatibility scores (80+). `;
     }
