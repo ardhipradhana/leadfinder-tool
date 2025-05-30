@@ -2095,14 +2095,14 @@ function sortCandidates() {
     console.log('sortCandidates called', currentCandidates.length);
     const sortSelectElement = document.getElementById('sortSelect');
     const sortBy = sortSelectElement?.value || 'Sort by Score';
-	console.log('Sort by:', sortBy);
-    	console.log('Current candidates:', currentCandidates.length);
-    const container = document.querySelector('#resultsState .space-y-4');
-	console.log('Container found:', !!container);
+    console.log('Sort by:', sortBy);
+    const container = document.querySelector('#candidateCardsContainer');
+    console.log('Container found:', !!container);
 
     if (!container) return;
 
     const cards = Array.from(container.querySelectorAll('.candidate-card'));
+    console.log('Cards found for sorting:', cards.length); // ADD THIS
 
     cards.sort((a, b) => {
         const idA = a.getAttribute('data-candidate-id');
@@ -2110,25 +2110,31 @@ function sortCandidates() {
         const candidateA = currentCandidates.find(c => c.id === idA);
         const candidateB = currentCandidates.find(c => c.id === idB);
 
+        console.log('Comparing:', candidateA?.name, 'vs', candidateB?.name); // ADD THIS
+
         if (!candidateA || !candidateB) return 0;
 
         switch (sortBy) {
             case 'Sort by Score':
+                console.log('Sorting by score:', candidateB.aiScore, 'vs', candidateA.aiScore); // ADD THIS
                 return candidateB.aiScore - candidateA.aiScore;
             case 'Sort by Experience':
-                // Extract years from experience string
                 const yearsA = parseInt(candidateA.experience?.match(/\d+/)?.[0] || '0');
                 const yearsB = parseInt(candidateB.experience?.match(/\d+/)?.[0] || '0');
+                console.log('Sorting by experience:', yearsB, 'vs', yearsA); // ADD THIS
                 return yearsB - yearsA;
             case 'Sort by Location':
+                console.log('Sorting by location:', candidateA.location, 'vs', candidateB.location); // ADD THIS
                 return candidateA.location.localeCompare(candidateB.location);
             default:
                 return 0;
         }
     });
 
+    console.log('About to reorder DOM elements'); // ADD THIS
     // Reorder DOM
     cards.forEach(card => container.appendChild(card));
+    console.log('DOM reordering complete'); // ADD THIS
 }
 
 // Update visible results count
