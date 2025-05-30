@@ -978,25 +978,10 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
 });
 
 // --- 4. Main session check on page load ---
-console.log('Step 4: About to check Supabase session...');
-try {
-console.log('Step 4.5: About to call getSession...');
-    const { data: { session }, error } = await supabaseClient.auth.getSession();
-    console.log('Step 5: Session check completed', session, error);
-    if (session && session.user) {
-        currentUser = session.user;
-        await checkAuthAndCredits();
-        updateCreditsDisplay();
-    } else {
-        console.log('No session found, showing auth modal');
-        showAuthModal();
-    }
-    console.log('Step 6: Auth handling completed');
-} catch (err) {
-    console.error('Supabase error, continuing without auth:', err);
-    // Continue execution even if Supabase fails
-    showAuthModal();
-}
+console.log('Step 4: Skipping Supabase session check for now...');
+// Temporarily skip Supabase to test the rest of the app
+// showAuthModal(); // Comment this out so we don't show auth modal
+console.log('Step 6: Auth handling completed');
 
 console.log('Step 7: Moving to DOM elements...');
 
