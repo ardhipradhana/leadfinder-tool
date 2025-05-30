@@ -2466,6 +2466,21 @@ setTimeout(() => {
 	        alert('LinkedIn profile URL not available for this candidate');
 	    }
 	});
+	// Search History modal handler
+	document.getElementById('searchHistoryBtn').addEventListener('click', function() {
+	    updateSearchHistoryUI();
+	    document.getElementById('historyModal').classList.remove('hidden');
+	});
+	// Close history modal handlers
+	document.getElementById('closeHistoryModal').addEventListener('click', function() {
+	    document.getElementById('historyModal').classList.add('hidden');
+	});
+	
+	document.getElementById('historyModal').addEventListener('click', function(e) {
+	    if (e.target === this) {
+	        this.classList.add('hidden');
+	    }
+	});
 });
     </script>
 </body>
