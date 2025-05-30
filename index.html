@@ -1087,12 +1087,24 @@ document.getElementById('closeComparisonModal').addEventListener('click', () => 
 });
 
 // Sample search (fills the form with a demo search)
-document.getElementById('sampleSearchBtn').addEventListener('click', () => {
-    document.getElementById('jobTitle').value = 'Restaurant Manager';
-    document.getElementById('industry').value = 'hospitality';
-    document.getElementById('location').value = 'jakarta';
-    document.getElementById('experience').value = 'mid';
-});
+const sampleBtn = document.getElementById('sampleSearchBtn');
+if (sampleBtn) {
+    console.log('Attaching click listener to sample button');
+    sampleBtn.addEventListener('click', (e) => {
+        console.log('Sample button clicked!');
+        e.preventDefault();
+        e.stopPropagation();
+        
+        document.getElementById('jobTitle').value = 'Restaurant Manager';
+        document.getElementById('industry').value = 'hospitality';
+        document.getElementById('location').value = 'jakarta';
+        document.getElementById('experience').value = 'mid';
+        console.log('Form values set');
+    });
+    console.log('Sample button listener attached');
+} else {
+    console.log('Sample button not found!');
+}
 
 // Candidate card modal opening by card click (delegated)
 document.addEventListener('click', (e) => {
