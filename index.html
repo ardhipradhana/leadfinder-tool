@@ -1418,6 +1418,23 @@ function updateCandidateCards(candidates) {
     attachCandidateCardHandlers(candidates);
 }
 
+// Generate priority badge based on AI score
+function getPriorityBadge(score) {
+    if (score >= 80) {
+        return `<span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded font-medium border border-green-500/30">
+            High Priority
+        </span>`;
+    } else if (score >= 60) {
+        return `<span class="px-2 py-1 bg-yellow-500/20 text-yellow-400 text-xs rounded font-medium border border-yellow-500/30">
+            Medium Priority
+        </span>`;
+    } else {
+        return `<span class="px-2 py-1 bg-gray-500/20 text-gray-400 text-xs rounded font-medium border border-gray-500/30">
+            Low Priority
+        </span>`;
+    }
+}
+
 // Render 1 candidate card as HTML
 function createCandidateCardHTML(candidate) {
     const scorePercentage = (candidate.aiScore * 3.6); // For speedometer UI
@@ -1435,9 +1452,10 @@ function createCandidateCardHTML(candidate) {
                     </div>
                     <div class="flex-1">
                         <div class="flex items-center space-x-2 mb-1">
-                            <h4 class="text-lg font-semibold text-white">${candidate.name}</h4>
-                            <span class="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded">${candidate.source}</span>
-                        </div>
+						    <h4 class="text-lg font-semibold text-white">${candidate.name}</h4>
+						    <span class="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded">${candidate.source}</span>
+						    ${getPriorityBadge(candidate.aiScore)}
+						</div>
                         <p class="text-gray-300 mb-2">${candidate.title}</p>
                         <p class="text-gray-400 text-sm mb-3">${candidate.location} • ${candidate.experience || 'Experienced professional'}</p>
                         <p class="text-gray-300 text-sm">${candidate.snippet}</p>
