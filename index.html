@@ -754,6 +754,21 @@
                                 <span class="text-gray-300 text-sm">Multi-location Experience</span>
                             </div>
                         </div>
+			    			<!-- Current Skills Section -->
+							<div>
+							    <h4 class="text-lg font-semibold text-white mb-3">Current Skills</h4>
+							    <div id="currentSkillsContainer" class="flex flex-wrap gap-2">
+							        <!-- Skills will be populated by JavaScript -->
+							    </div>
+							</div>
+							
+							<!-- Growth Opportunities Section -->
+							<div>
+							    <h4 class="text-lg font-semibold text-white mb-3">Growth Opportunities</h4>
+							    <div id="growthOpportunitiesContainer" class="space-y-2">
+							        <!-- Growth opportunities will be populated by JavaScript -->
+							    </div>
+							</div>
                     </div>
                 </div>
                 
@@ -1752,6 +1767,8 @@ function showCandidateModal(candidate) {
     updateModalAnalysis(candidate);
     updateModalProfile(candidate);
     updateModalStrengths(candidate);
+	updateModalCurrentSkills(candidate);
+	updateModalGrowthOpportunities(candidate);
     updateModalConcerns(candidate);
     updateModalRecommendation(candidate);
 
@@ -1821,14 +1838,14 @@ function updateModalProfile(candidate) {
     if (!profileSection) return;
 
     const profileData = [
-	    ['Experience:', candidate.experience || 'Experienced professional'],
-	    ['Current Role:', candidate.title],
-	    ['Location:', candidate.location],
-	    ['Source:', candidate.source],
-	    ['Salary Range:', candidate.salaryRange || 'Not specified'],
-	    ['Hiring Difficulty:', candidate.hiringDifficulty || 'Not assessed'],
-	    ['Profile Updated:', candidate.lastUpdated]
-	];
+        ['Experience:', candidate.experience || 'Experienced professional'],
+        ['Current Role:', candidate.title],
+        ['Location:', candidate.location],
+        ['Source:', candidate.source],
+        ['Salary Range:', candidate.salaryRange || 'Not specified'],
+        ['Hiring Difficulty:', candidate.hiringDifficulty || 'Not assessed'],
+        ['Profile Updated:', candidate.lastUpdated]
+    ];
 
     const profileContent = profileSection.querySelector('.space-y-3');
     if (profileContent) {
@@ -1900,6 +1917,33 @@ function updateModalRecommendation(candidate) {
     recommendationSection.innerHTML = `
         <strong>${priority.charAt(0).toUpperCase() + priority.slice(1)} Priority Contact:</strong> ${recommendation}
     `;
+}
+
+// Update current skills section in modal
+function updateModalCurrentSkills(candidate) {
+    const skillsContainer = candidateModal.querySelector('#currentSkillsContainer');
+    if (!skillsContainer) return;
+
+    const currentSkills = candidate.currentSkills || [];
+    skillsContainer.innerHTML = currentSkills.map(skill => `
+        <span class="px-3 py-1 bg-blue-500/20 text-blue-400 border border-blue-500/30 text-sm rounded-full font-medium">
+            ${skill}
+        </span>
+    `).join('');
+}
+
+// Update growth opportunities section in modal
+function updateModalGrowthOpportunities(candidate) {
+    const growthContainer = candidateModal.querySelector('#growthOpportunitiesContainer');
+    if (!growthContainer) return;
+
+    const growthOpportunities = candidate.growthOpportunities || [];
+    growthContainer.innerHTML = growthOpportunities.map(opportunity => `
+        <div class="flex items-start space-x-2">
+            <div class="w-2 h-2 bg-accent-cyan rounded-full mt-2"></div>
+            <span class="text-gray-300 text-sm">${opportunity}</span>
+        </div>
+    `).join('');
 }
 
 // --- Result Filters and Sorting ---
