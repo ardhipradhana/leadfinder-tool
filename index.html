@@ -1426,7 +1426,7 @@ async function handleSearch(e) {
     // TEMPORARILY SKIP AUTH CHECK FOR TESTING
 	console.log('Skipping auth check for testing...');
 	// Simulate having credits for testing
-	userCredits = 10;
+	userCredits = 100;
 	/*
 	// Check authentication and credits first  
 	const hasAuth = await checkAuthAndCredits();
@@ -1443,6 +1443,11 @@ async function handleSearch(e) {
     const formData = new FormData(searchForm);
 	const isPremiumSearch = document.querySelector('input[name="searchType"]:checked').value === 'premium';
 	const creditsRequired = isPremiumSearch ? 10 : 1;
+
+	if (userCredits < creditsRequired) {
+	    alert(`Insufficient credits. You need ${creditsRequired} credits for this search type.`);
+	    return;
+	}
 	
 	const searchParams = {
 	    jobTitle: formData.get('jobTitle') || document.getElementById('jobTitle').value,
