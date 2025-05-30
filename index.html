@@ -1443,11 +1443,13 @@ async function handleSearch(e) {
     const formData = new FormData(searchForm);
 	const isPremiumSearch = document.querySelector('input[name="searchType"]:checked').value === 'premium';
 	const creditsRequired = isPremiumSearch ? 10 : 1;
+	console.log('Premium search:', isPremiumSearch, 'Credits required:', creditsRequired);
 
 	if (userCredits < creditsRequired) {
 	    alert(`Insufficient credits. You need ${creditsRequired} credits for this search type.`);
 	    return;
 	}
+	console.log('Credit check passed');
 	
 	const searchParams = {
 	    jobTitle: formData.get('jobTitle') || document.getElementById('jobTitle').value,
@@ -1457,6 +1459,8 @@ async function handleSearch(e) {
 	    includePredictiveAnalysis: isPremiumSearch
 	};
 
+	console.log('Search params:', searchParams);
+
     console.log('Search params:', searchParams);
 
     // Validate required fields
@@ -1464,6 +1468,7 @@ async function handleSearch(e) {
         alert('Please enter a job title or role');
         return;
     }
+	console.log('Validation passed');
 
     console.log('Starting search animation...');
 
