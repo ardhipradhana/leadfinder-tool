@@ -3256,19 +3256,20 @@ async function upgradeIndividualCandidate(candidateId) {
         const responseText = await response.text();
         console.log('Raw response text:', responseText);
         
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}, response: ${responseText}`);
-        }
-        
-	const data = JSON.parse(responseText);
+        const data = JSON.parse(responseText);
 	console.log('Parsed response data:', data);
 	
-	// Handle the new array format from backend
+	// Handle both success (200) and server errors (500) that still return valid data
+	if (!response.ok && response.status !== 500) {
+	    throw new Error(`HTTP error! status: ${response.status}, response: ${responseText}`);
+	}
+	
+	// Handle the new direct object format from backend
 	let updatedCandidate = { ...candidate };
 	
-	if (Array.isArray(data) && data.length > 0 && data[0].careerAnalytics) {
-	    // Extract career analytics from the first array element
-	    updatedCandidate.careerAnalytics = data[0].careerAnalytics;
+	if (data && data.careerAnalytics) {
+	    // Extract career analytics directly from the object
+	    updatedCandidate.careerAnalytics = data.careerAnalytics;
 	    console.log('Career analytics extracted:', updatedCandidate.careerAnalytics.substring(0, 100) + '...');
 	    
 	    // Update candidate in the array
@@ -3296,7 +3297,7 @@ async function upgradeIndividualCandidate(candidateId) {
 	    }
 	} else {
 	    throw new Error('No analytics data received from service - invalid format');
-	}        
+	}    
     } catch (error) {
         clearTimeout(timeoutId);
         console.error('Individual analytics failed:', error);
