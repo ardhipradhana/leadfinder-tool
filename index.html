@@ -2102,6 +2102,7 @@ function updateModalCareerAnalytics(candidate) {
 		console.log('Parsed sections details:', JSON.stringify(sections, null, 2));
         
         if (sections) {
+		console.log('=== APPLYING NEW HTML ===');
             analyticsContainer.innerHTML = `
 	    <!-- Executive Summary -->
 	    <div class="mb-4 p-4 bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-purple-500/30 rounded-lg">
@@ -2169,7 +2170,10 @@ function updateModalCareerAnalytics(candidate) {
 	        <p class="text-gray-300 leading-relaxed mb-0">${sections.hiringRecommendation}</p>
 	    </div>
 	`;
+		console.log('=== HTML APPLIED ===');
+   		console.log('Container after update:', analyticsContainer.innerHTML.substring(0, 200));
         } else {
+		console.log('=== USING FALLBACK ===');
             // Fallback to original display
             analyticsContainer.textContent = analyticsText;
         }
