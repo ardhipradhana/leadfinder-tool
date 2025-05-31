@@ -2106,28 +2106,20 @@ function cleanAndFormatSection(text) {
 function formatSubSection(text, sectionType) {
     if (!text) return '';
     
-    const lines = text.split('\n').filter(line => line.trim());
-    let capturing = false;
-    let result = [];
+    // Split text into paragraphs
+    const paragraphs = text.split('\n\n');
     
-    for (let line of lines) {
-        if (line.includes(sectionType)) {
-            capturing = true;
-            continue;
-        }
-        
-        if (capturing) {
-            if (line.match(/^[A-Z][a-z]+:/) || line.includes(':')) {
-                result.push(line);
-            } else if (line.trim() === '') {
-                break;
-            } else {
-                result.push(line);
-            }
+    // Find the paragraph that contains our section type
+    for (let paragraph of paragraphs) {
+        if (paragraph.includes(sectionType)) {
+            // Remove the header line and return the content
+            const lines = paragraph.split('\n');
+            const contentLines = lines.slice(1); // Skip the header line
+            return contentLines.join('<br>').trim();
         }
     }
     
-    return result.join('<br>');
+    return '';
 }
 
 // Update career analytics section in modal
@@ -2155,6 +2147,7 @@ function updateModalCareerAnalytics(candidate) {
         
         if (sections) {
 		console.log('=== APPLYING NEW HTML ===');
+		console.log('Current Strengths raw text:', sections.currentStrengths);
             analyticsContainer.innerHTML = `
 	    <!-- Executive Summary -->
 	    <div class="mb-5 p-5 bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-purple-500/30 rounded-lg">
