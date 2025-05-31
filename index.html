@@ -428,23 +428,29 @@
                 <!-- Results State -->
                 <div id="resultsState" class="hidden">
 				    <!-- AI Insights Box -->
-				    <div id="aiInsightsBox" class="bg-gradient-to-r from-accent-cyan/10 to-accent-teal/10 border border-accent-cyan/30 rounded-xl p-6 mb-6">
-				        <div class="flex items-start space-x-3">
-				            <div class="w-10 h-10 bg-accent-cyan/20 rounded-lg flex items-center justify-center flex-shrink-0">
-				                <svg class="w-6 h-6 text-accent-cyan" fill="currentColor" viewBox="0 0 20 20">
-				                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-				                </svg>
-				            </div>
-				            <div class="flex-1">
-				                <h3 class="text-lg font-semibold text-accent-cyan mb-2 flex items-center">
-				                    AI Search Insights
-				                </h3>
-				                <p id="aiInsightsText" class="text-gray-300 leading-relaxed">
-				                    Analyzing candidates and generating insights...
-				                </p>
-				            </div>
-				        </div>
-				    </div>
+					<div id="aiInsightsBox" class="bg-gradient-to-r from-accent-cyan/10 to-accent-teal/10 border border-accent-cyan/30 rounded-xl p-6 mb-6">
+					    <div class="flex items-start space-x-3">
+					        <div class="w-10 h-10 bg-accent-cyan/20 rounded-lg flex items-center justify-center flex-shrink-0">
+					            <svg class="w-6 h-6 text-accent-cyan" fill="currentColor" viewBox="0 0 20 20">
+					                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+					            </svg>
+					        </div>
+					        <div class="flex-1">
+					            <h3 class="text-lg font-semibold text-accent-cyan mb-3 flex items-center">
+					                AI Search Intelligence
+					                <span class="ml-2 px-2 py-1 bg-accent-cyan/20 text-accent-cyan text-xs rounded-full font-medium">Live Analysis</span>
+					            </h3>
+					            <div id="aiInsightsText" class="text-gray-300 leading-relaxed">
+					                Analyzing candidates and generating insights...
+					            </div>
+					            
+					            <!-- Enhanced Stats Grid -->
+					            <div id="statsGrid" class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 pt-4 border-t border-accent-cyan/20">
+					                <!-- Stats will be populated by JavaScript -->
+					            </div>
+					        </div>
+					    </div>
+					</div>
 				
 				    <!-- Filter and Controls Section -->
 				    <div class="bg-dark-secondary rounded-xl p-6 mb-6">
@@ -1614,10 +1620,17 @@ function processSearchResults(data) {
 
     // Update AI Insights
 	console.log('About to generate AI insights with query:', data.query);
-    const aiInsights = generateAIInsights(data.results.candidates, data.query);
+	const aiInsights = generateAIInsights(data.results.candidates, data.query);
 	console.log('Generated insights:', aiInsights);
-    document.getElementById('aiInsightsText').textContent = aiInsights;
-
+	
+	// Update insights text with markdown-style formatting
+	const formattedInsights = aiInsights.replace(/\*\*(.*?)\*\*/g, '<strong class="text-accent-cyan">$1</strong>');
+	document.getElementById('aiInsightsText').innerHTML = formattedInsights;
+	
+	// Generate and populate stats grid
+	const statsGrid = generateStatsGrid(data.results.candidates);
+	document.getElementById('statsGrid').innerHTML = statsGrid;
+	
     // Setup result filters
     setTimeout(() => {
         setupResultFilters();
@@ -1649,8 +1662,13 @@ function showHistorySearchResult(searchData) {
     attachCandidateCardHandlers(currentCandidates);
     
     // Update AI Insights for this search
-    const aiInsights = generateAIInsights(searchData.candidates || [], searchData);
-    document.getElementById('aiInsightsText').textContent = aiInsights;
+	const aiInsights = generateAIInsights(searchData.candidates || [], searchData);
+	const formattedInsights = aiInsights.replace(/\*\*(.*?)\*\*/g, '<strong class="text-accent-cyan">$1</strong>');
+	document.getElementById('aiInsightsText').innerHTML = formattedInsights;
+	
+	// Generate and populate stats grid for history
+	const statsGrid = generateStatsGrid(searchData.candidates || []);
+	document.getElementById('statsGrid').innerHTML = statsGrid;
     
     // Setup result filters
     setTimeout(() => {
@@ -3335,44 +3353,140 @@ function extractJobTitleFromQuery(queryString) {
 
 // Generate and display AI insights summary for the search
 function generateAIInsights(candidates, searchQuery) {
-	console.log('generateAIInsights called with:', searchQuery);
-    console.log('searchQuery properties:', Object.keys(searchQuery));
-    console.log('jobTitle value:', searchQuery.jobTitle);
-    console.log('location value:', searchQuery.location);
-    console.log('searchQuery value:', searchQuery.searchQuery);
-	
+    console.log('generateAIInsights called with:', searchQuery);
+    
     const totalCandidates = candidates.length;
-    const highScoreCandidates = candidates.filter(c => c.aiScore >= 80).length;
-    const locations = [...new Set(candidates.map(c => c.location))];
+    if (totalCandidates === 0) return "No candidates found for this search.";
+    
+    // Score analysis
+    const scores = candidates.map(c => c.aiScore).sort((a, b) => b - a);
+    const minScore = Math.min(...scores);
+    const maxScore = Math.max(...scores);
+    const avgScore = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
+    
+    // Experience analysis
     const experiences = candidates.map(c => {
         const match = c.experience?.match(/(\d+)/);
         return match ? parseInt(match[0]) : 0;
-    });
-    const avgExperience = experiences.length > 0
-        ? Math.round(experiences.reduce((a, b) => a + b, 0) / experiences.length)
-        : 0;
-
-	// FIX: Use the correct property names
+    }).filter(exp => exp > 0);
+    
+    const minExp = experiences.length > 0 ? Math.min(...experiences) : 0;
+    const maxExp = experiences.length > 0 ? Math.max(...experiences) : 0;
+    const avgExp = experiences.length > 0 ? Math.round(experiences.reduce((a, b) => a + b, 0) / experiences.length) : 0;
+    
+    // Priority breakdown
+    const highScoreCandidates = candidates.filter(c => c.aiScore >= 80).length;
+    const mediumScoreCandidates = candidates.filter(c => c.aiScore >= 60 && c.aiScore < 80).length;
+    const lowScoreCandidates = candidates.filter(c => c.aiScore < 60).length;
+    
+    // Verification count
+    const verifiedCount = candidates.filter(c => c.verificationStatus === 'Verified').length;
+    
+    // Locations
+    const locations = [...new Set(candidates.map(c => c.location))];
+    
+    // Use the correct property names
     const jobTitle = extractJobTitleFromQuery(searchQuery.searchQuery) || searchQuery.jobTitle || 'the position';
     const location = searchQuery.location || 'the specified location';
 
-    let insights = `Found ${totalCandidates} candidates matching "${jobTitle}" in ${location}. `;
+    // Build enhanced insights
+    let insights = `Found **${totalCandidates} candidates** matching "${jobTitle}" in ${location}. `;
+    
+    // Score and experience distribution
+    insights += `**Score Range:** ${minScore}-${maxScore} (Avg: ${avgScore}) • `;
+    if (experiences.length > 0) {
+        insights += `**Experience:** ${minExp}-${maxExp} years (Avg: ${avgExp}) • `;
+    }
+    
+    // Priority breakdown
     if (highScoreCandidates > 0) {
-        insights += `${highScoreCandidates} candidates have high compatibility scores (80+). `;
+        insights += `**${highScoreCandidates} High Priority** (80+) • `;
     }
-    if (avgExperience > 0) {
-        insights += `Average experience level is ${avgExperience} years. `;
+    if (mediumScoreCandidates > 0) {
+        insights += `**${mediumScoreCandidates} Medium Priority** (60-79) • `;
     }
-    if (locations.length > 1) {
-        insights += `Candidates are spread across ${locations.length} locations. `;
+    if (lowScoreCandidates > 0) {
+        insights += `**${lowScoreCandidates} Low Priority** (<60) • `;
     }
-    const verifiedCount = candidates.filter(c => c.verificationStatus === 'Verified').length;
+    
+    // Verification and location info
     if (verifiedCount > 0) {
-        insights += `${verifiedCount} profiles are verified. `;
+        insights += `**${verifiedCount} verified profiles** • `;
     }
-    insights += `Best matches are ready for immediate contact.`;
+    
+    if (locations.length > 1) {
+        insights += `Spread across **${locations.length} locations** • `;
+    }
+    
+    insights += `**Top matches ready for immediate contact.**`;
 
     return insights;
+}
+
+// Generate visual stats grid for enhanced display
+function generateStatsGrid(candidates) {
+    if (candidates.length === 0) return '';
+    
+    // Calculate stats
+    const scores = candidates.map(c => c.aiScore);
+    const minScore = Math.min(...scores);
+    const maxScore = Math.max(...scores);
+    const avgScore = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
+    
+    const experiences = candidates.map(c => {
+        const match = c.experience?.match(/(\d+)/);
+        return match ? parseInt(match[0]) : 0;
+    }).filter(exp => exp > 0);
+    
+    const avgExp = experiences.length > 0 ? Math.round(experiences.reduce((a, b) => a + b, 0) / experiences.length) : 0;
+    const highPriority = candidates.filter(c => c.aiScore >= 80).length;
+    const verifiedCount = candidates.filter(c => c.verificationStatus === 'Verified').length;
+    
+    return `
+        <div class="text-center p-3 bg-blue-500/10 rounded-lg border border-blue-500/20">
+            <div class="flex items-center justify-center space-x-1 mb-1">
+                <svg class="w-4 h-4 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span class="text-xs text-blue-400 font-medium">Score Range</span>
+            </div>
+            <div class="text-lg font-bold text-white">${minScore}-${maxScore}</div>
+            <div class="text-xs text-gray-400">Avg: ${avgScore}</div>
+        </div>
+        
+        <div class="text-center p-3 bg-green-500/10 rounded-lg border border-green-500/20">
+            <div class="flex items-center justify-center space-x-1 mb-1">
+                <svg class="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/>
+                </svg>
+                <span class="text-xs text-green-400 font-medium">Experience</span>
+            </div>
+            <div class="text-lg font-bold text-white">${experiences.length > 0 ? Math.min(...experiences) + '-' + Math.max(...experiences) + 'y' : 'N/A'}</div>
+            <div class="text-xs text-gray-400">Avg: ${avgExp}y</div>
+        </div>
+        
+        <div class="text-center p-3 bg-yellow-500/10 rounded-lg border border-yellow-500/20">
+            <div class="flex items-center justify-center space-x-1 mb-1">
+                <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                </svg>
+                <span class="text-xs text-yellow-400 font-medium">High Priority</span>
+            </div>
+            <div class="text-lg font-bold text-white">${highPriority}</div>
+            <div class="text-xs text-gray-400">${Math.round(highPriority/candidates.length*100)}% of total</div>
+        </div>
+        
+        <div class="text-center p-3 bg-purple-500/10 rounded-lg border border-purple-500/20">
+            <div class="flex items-center justify-center space-x-1 mb-1">
+                <svg class="w-4 h-4 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.238.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                <span class="text-xs text-purple-400 font-medium">Verified</span>
+            </div>
+            <div class="text-lg font-bold text-white">${verifiedCount}</div>
+            <div class="text-xs text-gray-400">${Math.round(verifiedCount/candidates.length*100)}% verified</div>
+        </div>
+    `;
 }
 
 // --- Enhanced Loading Animation ---
