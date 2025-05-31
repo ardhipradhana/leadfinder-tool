@@ -1097,6 +1097,8 @@ let currentCandidates = [];
 let progressInterval = null;
 let activeCandidate = null;
 let currentHistoryData = [];
+let isSearching = false;
+let isAnalyzing = false;
 
 // Authentication functions
 function showAuthModal() {
@@ -1165,7 +1167,7 @@ async function checkAuthAndCredits() {
 	                updateCreditsDisplay();
 	                return true;
 	            } else {
-	                alert('User creation failed: ' + insertError.message);
+	                showCustomToast('Account Error', 'User creation failed: ' + insertError.message, 'error');
 	                return false;
 	            }
 	        } else {
@@ -1175,7 +1177,7 @@ async function checkAuthAndCredits() {
 	            return true;
 	        }
 	    } else {
-	        alert('Error fetching profile: ' + error.message);
+	        showCustomToast('Profile Error', 'Error fetching profile: ' + error.message, 'error');
 	        return false;
 	    }
 	}
@@ -1438,28 +1440,37 @@ function getIndustryValue() {
 async function handleSearch(e) {
     e.preventDefault();
 
+    // Check if another operation is in progress
+    if (isSearching || isAnalyzing) {
+        showCustomToast('Please Wait', 'Another operation is in progress', 'info');
+        return;
+    }
+    isSearching = true;
+
     // TEMPORARILY SKIP AUTH CHECK FOR TESTING
     userCredits = 100;
     
     const creditsRequired = 1;
 
     if (userCredits < creditsRequired) {
-        alert(`Insufficient credits. You need ${creditsRequired} credits for this search type.`);
+        showCustomToast('Insufficient Credits', `You need ${creditsRequired} credits for this search type.`, 'error');
+        isSearching = false; // Reset flag on early return
         return;
     }
 
     const formData = new FormData(searchForm);
     const searchParams = {
         jobTitle: formData.get('jobTitle') || document.getElementById('jobTitle').value,
-	    industry: getIndustryValue(), 
-	    location: getLocationValue(), 
-	    experience: formData.get('experience') || document.getElementById('experience').value
+        industry: getIndustryValue(), 
+        location: getLocationValue(), 
+        experience: formData.get('experience') || document.getElementById('experience').value
     };
 
     // Validate required fields
     if (!searchParams.jobTitle) {
         console.log('FAILED: No job title');
-        alert('Please enter a job title or role');
+        showCustomToast('Missing Information', 'Please enter a job title or role', 'error');
+        isSearching = false; // Reset flag on early return
         return;
     }
 
@@ -1470,19 +1481,18 @@ async function handleSearch(e) {
     console.log('Loading state shown');
 
     const loadingPromise = showEnhancedLoading();
-	let timeoutId;
+    let timeoutId;
 
     try {
         console.log('About to make API call...');
-
-	    const controller = new AbortController();
-		timeoutId = setTimeout(() => controller.abort(), 300000); // 5 minutes
+        const controller = new AbortController();
+        timeoutId = setTimeout(() => controller.abort(), 300000); // 5 minutes
         
         // SECURED N8N WEBHOOK CALL
-    	const mockUserId = 'test-user-123'; // Mock user ID for testing
+        const mockUserId = 'test-user-123'; // Mock user ID for testing
         const response = await fetch('https://montpro.app.n8n.cloud/webhook-test/leadfinder-tool', {
             method: 'POST',
-		signal: controller.signal,
+            signal: controller.signal,
             headers: { 
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer leadfinder_secretkey123`,
@@ -1500,28 +1510,34 @@ async function handleSearch(e) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-    	console.log('About to parse JSON response...');
+        console.log('About to parse JSON response...');
         const data = await response.json();
-		console.log('JSON parsed successfully:', data);
+        console.log('JSON parsed successfully:', data);
         await loadingPromise;
-		console.log('Loading animation completed');
+        console.log('Loading animation completed');
 
         if (data.success) {
-		console.log('Data has success=true, processing results...');
+            console.log('Data has success=true, processing results...');
             // Save search to Supabase
             saveToSearchHistory(searchParams, data.results.totalFound, data.results.candidates);
-
             processSearchResults(data);
             loadingState.classList.add('hidden');
             resultsState.classList.remove('hidden');
         }
         clearTimeout(timeoutId);
+        
+        // Reset flag on success
+        isSearching = false;
+        
     } catch (error) {
-	    if (timeoutId) clearTimeout(timeoutId);
-			if (error.name === 'AbortError') {
-	        alert('Search is taking longer than expected. Please try again.');
-	    }
+        if (timeoutId) clearTimeout(timeoutId);
+        if (error.name === 'AbortError') {
+            showCustomToast('Search Timeout', 'Search is taking longer than expected. Please try again.', 'error');
+        }
         console.error('Search failed:', error);
+        
+        // Reset flag on error
+        isSearching = false;
     }
 }
 // --- Results Processing & Candidate Rendering ---
@@ -2537,7 +2553,7 @@ ${(currentCandidates || []).map(c =>
 
 Generated on: ${new Date().toLocaleDateString()}`;
     navigator.clipboard.writeText(textData).then(() => {
-        alert('Results copied to clipboard!');
+        showCustomToast('Copied!', 'Results copied to clipboard!', 'success');
     }).catch(err => {
         console.error('Failed to copy: ', err);
     });
@@ -2682,7 +2698,7 @@ ${candidate.recommendation ? "AI Recommendation:\n" + candidate.recommendation :
         showExportToast("Copied to clipboard!");
         setTimeout(hideExportToast, 1200);
     }).catch(() => {
-        alert("Failed to copy to clipboard.");
+        showCustomToast('Copy Failed', 'Failed to copy to clipboard.', 'error');
     });
 }
 
@@ -2690,7 +2706,7 @@ function handleExport(type) {
     switch (type) {
         case 'pdf':
             // Generate PDF report
-            alert('PDF export functionality will be implemented with jsPDF');
+            showCustomToast('Coming Soon', 'PDF export functionality will be implemented with jsPDF', 'info');
             break;
         case 'csv':
             // Generate CSV download
@@ -2786,6 +2802,44 @@ function getRelativeTime(timestamp) {
     if (diffHours < 24) return `${diffHours} hours ago`;
     return `${diffDays} days ago`;
 }
+
+// Custom toast notification system
+function showCustomToast(title, message, type = 'info', duration = 5000) {
+    const toast = document.getElementById('customToast');
+    const icon = document.getElementById('toastIcon');
+    const titleEl = document.getElementById('toastTitle');
+    const messageEl = document.getElementById('toastMessage');
+    
+    titleEl.textContent = title;
+    messageEl.textContent = message;
+    
+    // Set icon based on type
+    if (type === 'success') {
+        icon.className = 'w-8 h-8 rounded-full flex items-center justify-center bg-green-500/20 text-green-400';
+        icon.innerHTML = '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>';
+    } else if (type === 'error') {
+        icon.className = 'w-8 h-8 rounded-full flex items-center justify-center bg-red-500/20 text-red-400';
+        icon.innerHTML = '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>';
+    } else {
+        icon.className = 'w-8 h-8 rounded-full flex items-center justify-center bg-blue-500/20 text-blue-400';
+        icon.innerHTML = '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>';
+    }
+    
+    toast.classList.remove('hidden');
+    
+    if (duration > 0) {
+        setTimeout(() => {
+            toast.classList.add('hidden');
+        }, duration);
+    }
+}
+
+// Toast close button handler
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('toastClose').addEventListener('click', () => {
+        document.getElementById('customToast').classList.add('hidden');
+    });
+});
 
 // Save a search to local history (still useful as fallback or secondary record)
 // Enhanced history management
@@ -3239,8 +3293,18 @@ function updateLoadingTip(tip) {
 
 // Individual candidate upgrade
 async function upgradeIndividualCandidate(candidateId) {
+    // Check if another operation is in progress
+    if (isSearching || isAnalyzing) {
+        showCustomToast('Please Wait', 'Another operation is in progress', 'info');
+        throw new Error('Operation in progress');
+    }
+    isAnalyzing = true;
+
     const candidate = currentCandidates.find(c => c.id === candidateId);
-    if (!candidate) throw new Error('Candidate not found');
+    if (!candidate) {
+        isAnalyzing = false; // Reset flag on early return
+        throw new Error('Candidate not found');
+    }
     
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 minutes
@@ -3284,58 +3348,75 @@ async function upgradeIndividualCandidate(candidateId) {
         console.log('Raw response text:', responseText);
         
         const data = JSON.parse(responseText);
-	console.log('Parsed response data:', data);
-	
-	// Handle both success (200) and server errors (500) that still return valid data
-	if (!response.ok && response.status !== 500) {
-	    throw new Error(`HTTP error! status: ${response.status}, response: ${responseText}`);
-	}
-	
-	// Handle the standardized response format (direct object, not wrapped in array)
-	if (data && data.success && data.results && data.results.length > 0) {
-	    const result = data.results[0];
-	    console.log('Processing analytics for:', result.candidateName);
-	    
-	    // Update candidate with analytics
-	    const candidateIndex = currentCandidates.findIndex(c => c.id === candidateId);
-	    if (candidateIndex !== -1) {
-	        currentCandidates[candidateIndex] = {
-	            ...currentCandidates[candidateIndex],
-	            careerAnalytics: result.careerAnalytics
-	        };
-	        
-	        // Refresh the UI
-	        updateCandidateCards(currentCandidates);
-	        attachCandidateCardHandlers(currentCandidates);
-	        
-	        // Deduct credits
-	        userCredits -= 5;
-	        updateCreditsDisplay();
-	        
-	        // Save to analytics history
-	        saveToSearchHistory({
-	            jobTitle: 'Individual Predictive Analytics',
-	            candidateName: result.candidateName,
-	            type: 'individual'
-	        }, 1, [currentCandidates[candidateIndex]]);
-	        
-	        alert(`Analytics completed for ${result.candidateName}!`);
-	        console.log('Individual analytics completed successfully');
-	    }
-	} else {
-	    throw new Error(`Analytics failed: ${data.error || 'Unknown error'}`);
-	}
+        console.log('Parsed response data:', data);
+        
+        // Handle both success (200) and server errors (500) that still return valid data
+        if (!response.ok && response.status !== 500) {
+            throw new Error(`HTTP error! status: ${response.status}, response: ${responseText}`);
+        }
+        
+        // Handle the standardized response format (direct object, not wrapped in array)
+        if (data && data.success && data.results && data.results.length > 0) {
+            const result = data.results[0];
+            console.log('Processing analytics for:', result.candidateName);
+            
+            // Update candidate with analytics
+            const candidateIndex = currentCandidates.findIndex(c => c.id === candidateId);
+            if (candidateIndex !== -1) {
+                currentCandidates[candidateIndex] = {
+                    ...currentCandidates[candidateIndex],
+                    careerAnalytics: result.careerAnalytics
+                };
+                
+                // Refresh the UI
+                updateCandidateCards(currentCandidates);
+                attachCandidateCardHandlers(currentCandidates);
+                
+                // Deduct credits
+                userCredits -= 5;
+                updateCreditsDisplay();
+                
+                // Save to analytics history
+                saveToSearchHistory({
+                    jobTitle: 'Individual Predictive Analytics',
+                    candidateName: result.candidateName,
+                    type: 'individual'
+                }, 1, [currentCandidates[candidateIndex]]);
+                
+                showCustomToast('Success', `Analytics completed for ${result.candidateName}!`, 'success');
+                console.log('Individual analytics completed successfully');
+            }
+        } else {
+            throw new Error(`Analytics failed: ${data.error || 'Unknown error'}`);
+        }
+        
+        // Reset flag on success
+        isAnalyzing = false;
+        
     } catch (error) {
         clearTimeout(timeoutId);
         console.error('Individual analytics failed:', error);
+        
+        // Reset flag on error
+        isAnalyzing = false;
         throw error;
     }
 }
 
 // Bulk candidates upgrade  
 async function upgradeBulkCandidates(candidateIds) {
+    // Check if another operation is in progress
+    if (isSearching || isAnalyzing) {
+        showCustomToast('Please Wait', 'Another operation is in progress', 'info');
+        throw new Error('Operation in progress');
+    }
+    isAnalyzing = true;
+
     const candidates = candidateIds.map(id => currentCandidates.find(c => c.id === id)).filter(Boolean);
-    if (candidates.length === 0) throw new Error('No candidates found');
+    if (candidates.length === 0) {
+        isAnalyzing = false; // Reset flag on early return
+        throw new Error('No candidates found');
+    }
     
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 600000); // 10 minutes for bulk
@@ -3379,72 +3460,78 @@ async function upgradeBulkCandidates(candidateIds) {
         console.log('Bulk raw response text:', responseText);
         
         const data = JSON.parse(responseText);
-	console.log('Bulk parsed response data:', data);
-	
-	// Handle both success (200) and server errors (500) that still return valid data
-	if (!response.ok && response.status !== 500) {
-	    throw new Error(`HTTP error! status: ${response.status}, response: ${responseText}`);
-	}
-	
-	// Handle the standardized response format (direct object, not wrapped in array)
-	if (data && data.success && data.results) {
-	    console.log(`Processing ${data.processed} of ${data.total} candidates`);
-	    
-	    let updatedCandidates = [];
-	    
-	    // Process each result
-	    data.results.forEach(result => {
-	        // Find candidate by name (since IDs might not match exactly)
-	        const candidateIndex = currentCandidates.findIndex(c => 
-	            c.name === result.candidateName || c.id === result.candidateId
-	        );
-	        
-	        if (candidateIndex !== -1) {
-	            currentCandidates[candidateIndex] = {
-	                ...currentCandidates[candidateIndex],
-	                careerAnalytics: result.careerAnalytics
-	            };
-	            updatedCandidates.push(currentCandidates[candidateIndex]);
-	            console.log('Updated analytics for:', result.candidateName);
-	        }
-	    });
-	    
-	    if (updatedCandidates.length > 0) {
-	        // Refresh the UI
-	        updateCandidateCards(currentCandidates);
-	        attachCandidateCardHandlers(currentCandidates);
-	        
-	        // Deduct credits (3 per successfully processed candidate)
-	        const creditsUsed = data.processed * 3;
-	        userCredits -= creditsUsed;
-	        updateCreditsDisplay();
-	        
-	        // Save to analytics history
-	        saveToSearchHistory({
-	            jobTitle: 'Bulk Analytics',
-	            candidateCount: data.processed,
-			candidateNames: data.results.map(r => r.candidateName),
-	            type: 'bulk'
-	        }, data.processed, updatedCandidates);
-	        
-	        // Clear selections
-	        document.querySelectorAll('.candidate-checkbox:checked').forEach(cb => cb.checked = false);
-	        updateCompareButton();
-	        
-	        const message = data.processed === data.total 
-	            ? `Analytics completed for all ${data.processed} candidates!`
-	            : `Analytics completed for ${data.processed} of ${data.total} candidates. Credits used: ${creditsUsed}`;
-	        
-	        alert(message);
-	        console.log('Bulk analytics completed. Processed:', data.processed);
-	    }
-	} else {
-	    throw new Error(`Bulk analytics failed: ${data.error || 'Unknown error'}`);
-	}
+        console.log('Bulk parsed response data:', data);
+        
+        // Handle both success (200) and server errors (500) that still return valid data
+        if (!response.ok && response.status !== 500) {
+            throw new Error(`HTTP error! status: ${response.status}, response: ${responseText}`);
+        }
+        
+        // Handle the standardized response format (direct object, not wrapped in array)
+        if (data && data.success && data.results) {
+            console.log(`Processing ${data.processed} of ${data.total} candidates`);
+            
+            let updatedCandidates = [];
+            
+            // Process each result
+            data.results.forEach(result => {
+                // Find candidate by name (since IDs might not match exactly)
+                const candidateIndex = currentCandidates.findIndex(c => 
+                    c.name === result.candidateName || c.id === result.candidateId
+                );
+                
+                if (candidateIndex !== -1) {
+                    currentCandidates[candidateIndex] = {
+                        ...currentCandidates[candidateIndex],
+                        careerAnalytics: result.careerAnalytics
+                    };
+                    updatedCandidates.push(currentCandidates[candidateIndex]);
+                    console.log('Updated analytics for:', result.candidateName);
+                }
+            });
+            
+            if (updatedCandidates.length > 0) {
+                // Refresh the UI
+                updateCandidateCards(currentCandidates);
+                attachCandidateCardHandlers(currentCandidates);
+                
+                // Deduct credits (3 per successfully processed candidate)
+                const creditsUsed = data.processed * 3;
+                userCredits -= creditsUsed;
+                updateCreditsDisplay();
+                
+                // Save to analytics history
+                saveToSearchHistory({
+                    jobTitle: 'Bulk Analytics',
+                    candidateCount: data.processed,
+                    candidateNames: data.results.map(r => r.candidateName),
+                    type: 'bulk'
+                }, data.processed, updatedCandidates);
+                
+                // Clear selections
+                document.querySelectorAll('.candidate-checkbox:checked').forEach(cb => cb.checked = false);
+                updateCompareButton();
+                
+                const message = data.processed === data.total 
+                    ? `Analytics completed for all ${data.processed} candidates!`
+                    : `Analytics completed for ${data.processed} of ${data.total} candidates. Credits used: ${creditsUsed}`;
+                
+                showCustomToast('Bulk Analysis Complete', message, 'success');
+                console.log('Bulk analytics completed. Processed:', data.processed);
+            }
+        } else {
+            throw new Error(`Bulk analytics failed: ${data.error || 'Unknown error'}`);
+        }
+        
+        // Reset flag on success
+        isAnalyzing = false;
         
     } catch (error) {
         clearTimeout(timeoutId);
         console.error('Bulk analytics failed:', error);
+        
+        // Reset flag on error
+        isAnalyzing = false;
         throw error;
     }
 }
@@ -3539,7 +3626,7 @@ setTimeout(() => {
 	    if (activeCandidate && activeCandidate.profileUrl) {
 	        window.open(activeCandidate.profileUrl, '_blank');
 	    } else {
-	        alert('LinkedIn profile URL not available for this candidate');
+	        showCustomToast('Not Available', 'LinkedIn profile URL not available for this candidate', 'info');
 	    }
 	});
 	// Search History modal handler
@@ -3599,53 +3686,61 @@ setTimeout(() => {
 	    const upgradeBtn = e.target.closest('.upgrade-analytics-btn');
 	    
 	    if (upgradeBtn) {
-	        e.stopPropagation(); // Prevent card click
-	        e.preventDefault(); // Prevent any default behavior
-
-		    e.stopImmediatePropagation();
-	        
-	        console.log('Upgrade button clicked!'); // Debug log
-
+		e.stopPropagation(); // Prevent card click
+		e.preventDefault(); // Prevent any default behavior
+		e.stopImmediatePropagation();
+		
+		console.log('Upgrade button clicked!'); // Debug log
+	
 		// TESTING BYPASS - Remove this line when done testing
-	        userCredits = 100;
-	        
-	        const candidateId = upgradeBtn.dataset.candidateId;
-	        const candidate = currentCandidates.find(c => c.id === candidateId);
-	        
-	        console.log('Candidate found:', candidate?.name); // Debug log
-	        
-	        if (!candidate) {
-	            console.error('Candidate not found for ID:', candidateId);
-	            return;
-	        }
-	        
-	        // Check credits (5 credits for individual)
-	        if (userCredits < 5) {
-	            alert('Insufficient credits. You need 5 credits for individual analytics.');
-	            return;
-	        }
-	        
-	        // Confirm purchase
-	        const confirmed = confirm(`Analyze ${candidate.name}'s career potential for 5 credits?`);
-	        if (!confirmed) return;
-	        
-	        // Disable button and show loading
-	        upgradeBtn.disabled = true;
-	        upgradeBtn.textContent = 'Analyzing...';
-	        upgradeBtn.classList.add('opacity-50');
-	        
-	        try {
-	            console.log('Calling upgradeIndividualCandidate...'); // Debug log
-	            await upgradeIndividualCandidate(candidateId);
-	        } catch (error) {
-	            console.error('Individual upgrade failed:', error);
-	            alert('Analysis failed. Please try again.');
-	            
-	            // Re-enable button
-	            upgradeBtn.disabled = false;
-	            upgradeBtn.textContent = '+ Analytics (5 credits)';
-	            upgradeBtn.classList.remove('opacity-50');
-	        }
+		userCredits = 100;
+		
+		const candidateId = upgradeBtn.dataset.candidateId;
+		const candidate = currentCandidates.find(c => c.id === candidateId);
+		
+		console.log('Candidate found:', candidate?.name); // Debug log
+		
+		if (!candidate) {
+		    console.error('Candidate not found for ID:', candidateId);
+		    return;
+		}
+		
+		// Check credits (5 credits for individual)
+		if (userCredits < 5) {
+		    showCustomToast('Insufficient Credits', 'You need 5 credits for individual analytics.', 'error');
+		    return;
+		}
+		
+		// Confirm purchase
+		const confirmed = confirm(`Analyze ${candidate.name}'s career potential for 5 credits?`);
+		if (!confirmed) return;
+		
+		// Disable button and show loading animation
+		upgradeBtn.disabled = true;
+		const originalHTML = upgradeBtn.innerHTML;
+		upgradeBtn.innerHTML = `
+		    <div class="flex items-center space-x-2">
+			<svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+			    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+			</svg>
+			<span>Analyzing...</span>
+		    </div>
+		`;
+		upgradeBtn.classList.add('opacity-75');
+		
+		try {
+		    console.log('Calling upgradeIndividualCandidate...'); // Debug log
+		    await upgradeIndividualCandidate(candidateId);
+		} catch (error) {
+		    console.error('Individual upgrade failed:', error);
+		    showCustomToast('Analysis Failed', 'Please try again.', 'error');
+		    
+		    // Re-enable button on error
+		    upgradeBtn.disabled = false;
+		    upgradeBtn.innerHTML = originalHTML;
+		    upgradeBtn.classList.remove('opacity-75');
+		}
 	    }
 	});
 
@@ -3673,7 +3768,7 @@ setTimeout(() => {
 	    console.log('Candidates without analytics:', candidatesWithoutAnalytics.map(c => c.name)); // Debug log
 	    
 	    if (candidatesWithoutAnalytics.length === 0) {
-	        alert('All selected candidates already have analytics.');
+	        showCustomToast('Already Analyzed', 'All selected candidates already have analytics.', 'info');
 	        return;
 	    }
 	    
@@ -3683,7 +3778,7 @@ setTimeout(() => {
 	    
 	    // Check credits
 	    if (userCredits < totalCredits) {
-	        alert(`Insufficient credits. You need ${totalCredits} credits for bulk analytics.`);
+	        showCustomToast('Insufficient Credits', `You need ${totalCredits} credits for bulk analytics.`, 'error');
 	        return;
 	    }
 	    
@@ -3711,7 +3806,7 @@ setTimeout(() => {
 	        console.log('Bulk upgrade completed successfully'); // Debug log
 	    } catch (error) {
 	        console.error('Bulk upgrade failed:', error);
-	        alert(`Analysis failed: ${error.message}. Please try again.`);
+	        showCustomToast('Analysis Failed', `${error.message}. Please try again.`, 'error');
 	        
 	        // Re-enable button
 	        button.disabled = false;
@@ -3790,5 +3885,25 @@ setTimeout(() => {
 	});
 });
     </script>
+
+	<!-- Add this right before </body> -->
+<div id="customToast" class="fixed top-4 right-4 z-50 hidden">
+    <div class="bg-dark-secondary border border-accent-cyan/30 rounded-xl p-4 shadow-2xl max-w-md">
+        <div class="flex items-center space-x-3">
+            <div id="toastIcon" class="w-8 h-8 rounded-full flex items-center justify-center"></div>
+            <div class="flex-1">
+                <h4 id="toastTitle" class="font-semibold text-white"></h4>
+                <p id="toastMessage" class="text-sm text-gray-300"></p>
+            </div>
+            <button id="toastClose" class="text-gray-400 hover:text-white">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+</div>
+
+</body>
 </body>
 </html>
