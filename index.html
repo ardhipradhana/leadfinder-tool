@@ -506,47 +506,57 @@
 				        </div>
 				
 				        // Update the controls row in your results section
-						<div class="flex flex-row items-center justify-between">
-						    <div class="text-sm text-gray-400">
-						        <span id="selectionCount">0 candidates selected</span> • Use filters above to narrow down candidates
-						    </div>
-						    <div class="flex flex-row items-center gap-2">
-						        <select class="px-3 py-2 bg-dark-primary border border-gray-600 rounded-lg text-white text-sm" id="sortSelect">
-						            <option value="Sort by Score">Sort by Score</option>
-						            <option value="Sort by Experience">Sort by Experience</option>
-						            <option value="Sort by Location">Sort by Location</option>
-						        </select>
-						        
-						        <!-- Bulk Analytics Button -->
-						        <button id="bulkAnalyticsBtn" class="hidden flex items-center justify-center px-3 py-2 w-40 bg-purple-600 hover:bg-purple-700 text-white font-medium text-sm rounded-lg transition-colors">
-						            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-						                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-						            </svg>
-						            <span id="bulkAnalyticsBtnText">Analyze (0)</span>
-						        </button>
-						        
-						        <button id="compareBtn" class="hidden flex items-center justify-center px-3 py-2 w-32 bg-dark-primary border border-purple-500 text-purple-400 hover:bg-purple-500 hover:text-white font-medium text-sm rounded-lg transition-colors">
-						            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-						            </svg>
-						            <span id="compareBtnText">Compare</span>
-						        </button>
-						        
-						        <button id="exportBtn" class="flex items-center justify-center px-3 py-2 w-32 bg-accent-cyan hover:bg-accent-teal text-dark-primary font-medium text-sm rounded-lg transition-colors">
-						            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M8 17l4 4 4-4m-4-5v9"/>
-						            </svg>
-						            <span class="text-xs">Export CSV</span>
-						        </button>
-
-							    <button id="clearAllBtn" class="hidden flex items-center justify-center px-3 py-2 w-28 bg-gray-600 hover:bg-gray-700 text-white font-medium text-sm rounded-lg transition-colors">
-								    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-								    </svg>
-								    <span class="text-xs">Clear All</span>
-								</button>
-						    </div>
-						</div>
+					<div class="flex flex-col space-y-4">
+					    <!-- Selection Status Row -->
+					    <div class="flex items-center justify-between bg-dark-primary rounded-lg p-3">
+					        <div class="text-sm text-gray-400">
+					            <span id="selectionCount">0 candidates selected</span>
+					        </div>
+					        <div class="text-xs text-gray-500">
+					            Use filters above to narrow down candidates
+					        </div>
+					    </div>
+					    
+					    <!-- Action Buttons Row -->
+					    <div class="flex flex-row items-center justify-between">
+					        <select class="px-3 py-2 bg-dark-primary border border-gray-600 rounded-lg text-white text-sm" id="sortSelect">
+					            <option value="Sort by Score">Sort by Score</option>
+					            <option value="Sort by Experience">Sort by Experience</option>
+					            <option value="Sort by Location">Sort by Location</option>
+					        </select>
+					        
+					        <div class="flex flex-row items-center gap-2">
+					            <!-- Bulk Analytics Button -->
+					            <button id="bulkAnalyticsBtn" class="hidden flex items-center justify-center px-3 py-2 w-40 bg-purple-600 hover:bg-purple-700 text-white font-medium text-sm rounded-lg transition-colors">
+					                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+					                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+					                </svg>
+					                <span id="bulkAnalyticsBtnText">Analyze (0)</span>
+					            </button>
+					            
+					            <button id="compareBtn" class="hidden flex items-center justify-center px-3 py-2 w-32 bg-dark-primary border border-purple-500 text-purple-400 hover:bg-purple-500 hover:text-white font-medium text-sm rounded-lg transition-colors">
+					                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+					                </svg>
+					                <span id="compareBtnText">Compare</span>
+					            </button>
+					            
+					            <button id="exportBtn" class="flex items-center justify-center px-3 py-2 w-32 bg-accent-cyan hover:bg-accent-teal text-dark-primary font-medium text-sm rounded-lg transition-colors">
+					                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M8 17l4 4 4-4m-4-5v9"/>
+					                </svg>
+					                <span class="text-xs">Export CSV</span>
+					            </button>
+					
+					            <button id="clearAllBtn" class="hidden flex items-center justify-center px-3 py-2 w-28 bg-gray-600 hover:bg-gray-700 text-white font-medium text-sm rounded-lg transition-colors">
+					                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+					                </svg>
+					                <span class="text-xs">Clear All</span>
+					            </button>
+					        </div>
+					    </div>
+					</div>
 				    </div>
 				    
 				    <!-- Candidate Cards -->
@@ -1562,6 +1572,12 @@ function showHistorySearchResult(searchData) {
         resultsTitle.textContent = 'Search Results';
         resultsDesc.textContent = `Found ${searchData.resultCount} candidates matching "${searchData.jobTitle}" in ${searchData.location}`;
     }
+	// Update candidate cards with saved data - preserve analytics if they exist
+	const candidatesWithAnalytics = (searchData.candidates || []).map(candidate => ({
+		...candidate,
+		// Ensure analytics data is preserved from history
+		careerAnalytics: candidate.careerAnalytics || null
+	}));
     
     // Update candidate cards with saved data
     updateCandidateCards(searchData.candidates || []);
@@ -3408,7 +3424,7 @@ async function upgradeBulkCandidates(candidateIds) {
 	        saveToSearchHistory({
 	            jobTitle: 'Bulk Analytics',
 	            candidateCount: data.processed,
-				candidateNames: data.results.map(r => r.candidateName),
+			candidateNames: data.results.map(r => r.candidateName),
 	            type: 'bulk'
 	        }, data.processed, updatedCandidates);
 	        
@@ -3752,20 +3768,20 @@ setTimeout(() => {
 	    }
 	    
 	    // Analytics history - view results button
-	    if (e.target.classList.contains('view-analytics-btn')) {
-	        e.stopPropagation();
-	        const historyItem = e.target.closest('.analytics-history-item');
-	        const analyticsIndex = parseInt(historyItem.dataset.analyticsIndex);
-	        const analyticsHistory = JSON.parse(localStorage.getItem('leadfinder_analytics_history') || '[]');
-	        const analyticsData = analyticsHistory[analyticsIndex];
-	        
-	        if (analyticsData && analyticsData.candidates) {
-	            showHistorySearchResult(analyticsData);
-	            document.getElementById('historyModal').classList.add('hidden');
-	            document.getElementById('initialState').classList.add('hidden');
-	            document.getElementById('resultsState').classList.remove('hidden');
-	        }
-	    }
+		if (e.target.closest('.analytics-history-item')) {
+		    e.stopPropagation();
+		    const historyItem = e.target.closest('.analytics-history-item');
+		    const analyticsIndex = parseInt(historyItem.dataset.analyticsIndex);
+		    const analyticsHistory = JSON.parse(localStorage.getItem('leadfinder_analytics_history') || '[]');
+		    const analyticsData = analyticsHistory[analyticsIndex];
+		    
+		    if (analyticsData && analyticsData.candidates) {
+		        showHistorySearchResult(analyticsData);
+		        document.getElementById('historyModal').classList.add('hidden');
+		        document.getElementById('initialState').classList.add('hidden');
+		        document.getElementById('resultsState').classList.remove('hidden');
+		    }
+		}
 	});
 
 	// Clear all checkboxes button
