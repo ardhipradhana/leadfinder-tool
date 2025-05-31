@@ -3504,90 +3504,123 @@ setTimeout(() => {
 	    }
 	});
 
-	// Individual upgrade button handler
+	// Individual upgrade button handler - FIXED VERSION
 	document.addEventListener('click', async function(e) {
-		if (e.target.classList.contains('upgrade-analytics-btn')) {
-			e.stopPropagation(); // Prevent card click
-			
-			const candidateId = e.target.dataset.candidateId;
-			const candidate = currentCandidates.find(c => c.id === candidateId);
-			
-			if (!candidate) return;
-			
-			// Check credits (5 credits for individual)
-			if (userCredits < 5) {
-				alert('Insufficient credits. You need 5 credits for individual analytics.');
-				return;
-			}
-			
-			// Confirm purchase
-			const confirmed = confirm(`Analyze ${candidate.name}'s career potential for 5 credits?`);
-			if (!confirmed) return;
-			
-			// Disable button and show loading
-			e.target.disabled = true;
-			e.target.textContent = 'Analyzing...';
-			e.target.classList.add('opacity-50');
-			
-			try {
-				await upgradeIndividualCandidate(candidateId);
-			} catch (error) {
-				console.error('Individual upgrade failed:', error);
-				alert('Analysis failed. Please try again.');
-				
-				// Re-enable button
-				e.target.disabled = false;
-				e.target.textContent = '+ Analytics (5 credits)';
-				e.target.classList.remove('opacity-50');
-			}
-		}
+	    // Check if clicked element or its parent has the upgrade button class
+	    const upgradeBtn = e.target.closest('.upgrade-analytics-btn');
+	    
+	    if (upgradeBtn) {
+	        e.stopPropagation(); // Prevent card click
+	        e.preventDefault(); // Prevent any default behavior
+	        
+	        console.log('Upgrade button clicked!'); // Debug log
+	        
+	        const candidateId = upgradeBtn.dataset.candidateId;
+	        const candidate = currentCandidates.find(c => c.id === candidateId);
+	        
+	        console.log('Candidate found:', candidate?.name); // Debug log
+	        
+	        if (!candidate) {
+	            console.error('Candidate not found for ID:', candidateId);
+	            return;
+	        }
+	        
+	        // Check credits (5 credits for individual)
+	        if (userCredits < 5) {
+	            alert('Insufficient credits. You need 5 credits for individual analytics.');
+	            return;
+	        }
+	        
+	        // Confirm purchase
+	        const confirmed = confirm(`Analyze ${candidate.name}'s career potential for 5 credits?`);
+	        if (!confirmed) return;
+	        
+	        // Disable button and show loading
+	        upgradeBtn.disabled = true;
+	        upgradeBtn.textContent = 'Analyzing...';
+	        upgradeBtn.classList.add('opacity-50');
+	        
+	        try {
+	            console.log('Calling upgradeIndividualCandidate...'); // Debug log
+	            await upgradeIndividualCandidate(candidateId);
+	        } catch (error) {
+	            console.error('Individual upgrade failed:', error);
+	            alert('Analysis failed. Please try again.');
+	            
+	            // Re-enable button
+	            upgradeBtn.disabled = false;
+	            upgradeBtn.textContent = '+ Analytics (5 credits)';
+	            upgradeBtn.classList.remove('opacity-50');
+	        }
+	    }
 	});
-	
-	// Bulk upgrade button handler
-	document.getElementById('bulkAnalyticsBtn').addEventListener('click', async function() {
-		const selectedCheckboxes = document.querySelectorAll('.candidate-checkbox:checked');
-		const selectedIds = Array.from(selectedCheckboxes).map(cb => cb.dataset.candidateId);
-		
-		// Filter to candidates without analytics
-		const candidatesWithoutAnalytics = selectedIds.filter(id => {
-			const candidate = currentCandidates.find(c => c.id === id);
-			return candidate && (!candidate.careerAnalytics || candidate.careerAnalytics === null);
-		}).map(id => currentCandidates.find(c => c.id === id));
-		
-		if (candidatesWithoutAnalytics.length === 0) {
-			alert('All selected candidates already have analytics.');
-			return;
-		}
-		
-		const totalCredits = candidatesWithoutAnalytics.length * 3; // Bulk pricing
-		
-		// Check credits
-		if (userCredits < totalCredits) {
-			alert(`Insufficient credits. You need ${totalCredits} credits for bulk analytics.`);
-			return;
-		}
-		
-		// Confirm purchase
-		const candidateNames = candidatesWithoutAnalytics.map(c => c.name).join(', ');
-		const confirmed = confirm(`Analyze ${candidatesWithoutAnalytics.length} candidates (${candidateNames}) for ${totalCredits} credits?`);
-		if (!confirmed) return;
-		
-		// Disable button and show loading
-		this.disabled = true;
-		this.textContent = 'Analyzing...';
-		this.classList.add('opacity-50');
-		
-		try {
-			await upgradeBulkCandidates(candidatesWithoutAnalytics.map(c => c.id));
-		} catch (error) {
-			console.error('Bulk upgrade failed:', error);
-			alert('Analysis failed. Please try again.');
-			
-			// Re-enable button
-			this.disabled = false;
-			updateCompareButton(); // This will reset the button text
-			this.classList.remove('opacity-50');
-		}
+
+	// Bulk upgrade button handler - FIXED VERSION
+	document.getElementById('bulkAnalyticsBtn').addEventListener('click', async function(e) {
+	    e.stopPropagation(); // Prevent any bubbling
+	    e.preventDefault(); // Prevent default behavior
+	    
+	    console.log('Bulk analytics button clicked!'); // Debug log
+	    
+	    const selectedCheckboxes = document.querySelectorAll('.candidate-checkbox:checked');
+	    const selectedIds = Array.from(selectedCheckboxes).map(cb => cb.dataset.candidateId);
+	    
+	    console.log('Selected candidate IDs:', selectedIds); // Debug log
+	    
+	    // Filter to candidates without analytics
+	    const candidatesWithoutAnalytics = selectedIds.filter(id => {
+	        const candidate = currentCandidates.find(c => c.id === id);
+	        return candidate && (!candidate.careerAnalytics || candidate.careerAnalytics === null);
+	    }).map(id => currentCandidates.find(c => c.id === id));
+	    
+	    console.log('Candidates without analytics:', candidatesWithoutAnalytics.map(c => c.name)); // Debug log
+	    
+	    if (candidatesWithoutAnalytics.length === 0) {
+	        alert('All selected candidates already have analytics.');
+	        return;
+	    }
+	    
+	    const totalCredits = candidatesWithoutAnalytics.length * 3; // Bulk pricing
+	    
+	    console.log('Credits required:', totalCredits, 'Available:', userCredits); // Debug log
+	    
+	    // Check credits
+	    if (userCredits < totalCredits) {
+	        alert(`Insufficient credits. You need ${totalCredits} credits for bulk analytics.`);
+	        return;
+	    }
+	    
+	    // Confirm purchase
+	    const candidateNames = candidatesWithoutAnalytics.map(c => c.name).join(', ');
+	    const confirmed = confirm(`Analyze ${candidatesWithoutAnalytics.length} candidates (${candidateNames}) for ${totalCredits} credits?`);
+	    if (!confirmed) return;
+	    
+	    // Disable button and show loading
+	    const button = this;
+	    button.disabled = true;
+	    const originalText = button.innerHTML;
+	    button.innerHTML = `
+	        <svg class="w-4 h-4 mr-1 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+	            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+	            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+	        </svg>
+	        Analyzing...
+	    `;
+	    button.classList.add('opacity-50');
+	    
+	    try {
+	        console.log('Calling upgradeBulkCandidates...'); // Debug log
+	        await upgradeBulkCandidates(candidatesWithoutAnalytics.map(c => c.id));
+	        console.log('Bulk upgrade completed successfully'); // Debug log
+	    } catch (error) {
+	        console.error('Bulk upgrade failed:', error);
+	        alert(`Analysis failed: ${error.message}. Please try again.`);
+	        
+	        // Re-enable button
+	        button.disabled = false;
+	        button.innerHTML = originalText;
+	        button.classList.remove('opacity-50');
+	    }
 	});
 
 	// Enhanced history item click handlers
