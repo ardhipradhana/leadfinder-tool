@@ -8,6 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -2725,18 +2726,130 @@ function getSelectedCandidates() {
     return currentCandidates.filter(candidate => selectedIds.includes(candidate.id));
 }
 
-// Show comparison modal with selected candidates
-function showComparisonModal(candidates) {
-    const modal = document.getElementById('comparisonModal');
-    const content = document.getElementById('comparisonContent');
+// Generate radar chart for candidate comparison
+function generateRadarChart(candidates) {
+    const ctx = document.getElementById('radarChart').getContext('2d');
+    
+    // Destroy existing chart if it exists
+    if (window.comparisonChart) {
+        window.comparisonChart.destroy();
+    }
+    
+    const labels = [
+        'Role Relevance',
+        'Experience Match', 
+        'Location Fit',
+        'Profile Quality',
+        'Overall Score',
+        'Market Potential'
+    ];
+    
+    const datasets = candidates.map((candidate, index) => {
+        const scores = candidate.scoreBreakdown || {};
+        return {
+            label: candidate.name,
+            data: [
+                scores.roleRelevance || 0,
+                scores.experienceMatch || 0,
+                scores.locationFit || 0,
+                scores.profileQuality || 0,
+                candidate.aiScore || 0,
+                calculateMarketPotential(candidate)
+            ],
+            borderColor: getChartColor(index),
+            backgroundColor: getChartColor(index, 0.2),
+            pointBackgroundColor: getChartColor(index),
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointRadius: 6,
+            borderWidth: 3,
+            fill: true
+        };
+    });
+    
+    window.comparisonChart = new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: labels,
+            datasets: datasets
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: false // We'll use custom legend
+                }
+            },
+            scales: {
+                r: {
+                    angleLines: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    },
+                    pointLabels: {
+                        color: '#9ca3af',
+                        font: {
+                            size: 12,
+                            weight: 'bold'
+                        }
+                    },
+                    ticks: {
+                        color: '#6b7280',
+                        backdropColor: 'transparent',
+                        min: 0,
+                        max: 100,
+                        stepSize: 20
+                    }
+                }
+            },
+            elements: {
+                line: {
+                    tension: 0.1
+                }
+            }
+        }
+    });
+}
 
-    // Set grid columns based on number of candidates
-    const gridCols = candidates.length === 2 ? 'grid-cols-2' : 'grid-cols-3';
-    content.className = `grid gap-6 ${gridCols}`;
+// Get chart colors for different candidates
+function getChartColor(index, alpha = 1) {
+    const colors = [
+        `rgba(0, 212, 170, ${alpha})`,   // Accent cyan
+        `rgba(99, 102, 241, ${alpha})`,  // Indigo
+        `rgba(239, 68, 68, ${alpha})`,   // Red
+        `rgba(245, 158, 11, ${alpha})`,  // Orange
+        `rgba(16, 185, 129, ${alpha})`   // Green
+    ];
+    return colors[index] || colors[0];
+}
 
-    // Generate comparison content
-    content.innerHTML = candidates.map(candidate => `
-        <div class="bg-dark-primary rounded-lg p-6">
+// Calculate market potential score
+function calculateMarketPotential(candidate) {
+    let potential = 50; // Base score
+    
+    // Boost for verification
+    if (candidate.verificationStatus === 'Verified') potential += 15;
+    
+    // Boost for experience level
+    const expMatch = candidate.experience?.match(/(\d+)/);
+    const years = expMatch ? parseInt(expMatch[0]) : 0;
+    if (years >= 5) potential += 20;
+    else if (years >= 2) potential += 10;
+    
+    // Boost for skills
+    if (candidate.currentSkills && candidate.currentSkills.length >= 3) potential += 15;
+    
+    return Math.min(potential, 100);
+}
+
+// Generate individual comparison card
+function generateComparisonCard(candidate, index) {
+    const scoreColor = getChartColor(index);
+    return `
+        <div class="bg-dark-secondary rounded-lg p-6 border-2" style="border-color: ${scoreColor}">
             <!-- Header -->
             <div class="text-center mb-4">
                 <div class="w-16 h-16 bg-gray-600 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -2745,18 +2858,19 @@ function showComparisonModal(candidates) {
                 <h3 class="text-lg font-semibold text-white">${candidate.name}</h3>
                 <p class="text-gray-300 text-sm">${candidate.title}</p>
                 <div class="mt-2">
-                    <div class="w-12 h-12 rounded-full score-circle flex items-center justify-center mx-auto" style="--score-deg: ${candidate.aiScore * 3.6}deg">
+                    <div class="w-12 h-12 rounded-full score-circle flex items-center justify-center mx-auto" style="--score-deg: ${candidate.aiScore * 3.6}deg; --score-color: ${scoreColor}">
                         <div class="w-8 h-8 bg-dark-primary rounded-full flex items-center justify-center">
-                            <span class="text-accent-cyan font-bold text-sm">${candidate.aiScore}</span>
+                            <span class="font-bold text-sm" style="color: ${scoreColor}">${candidate.aiScore}</span>
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- Details -->
-            <div class="space-y-3 text-sm">
+            
+            <!-- Quick Stats -->
+            <div class="space-y-2 text-sm">
                 <div class="flex justify-between">
                     <span class="text-gray-400">Experience:</span>
-                    <span class="text-white text-right">${candidate.experience || 'N/A'}</span>
+                    <span class="text-white">${candidate.experience || 'N/A'}</span>
                 </div>
                 <div class="flex justify-between">
                     <span class="text-gray-400">Location:</span>
@@ -2764,44 +2878,198 @@ function showComparisonModal(candidates) {
                 </div>
                 <div class="flex justify-between">
                     <span class="text-gray-400">Source:</span>
-                    <span class="text-accent-cyan">${candidate.source}</span>
+                    <span style="color: ${scoreColor}">${candidate.source}</span>
                 </div>
                 <div class="flex justify-between">
                     <span class="text-gray-400">Verified:</span>
-                    <span class="text-${candidate.verificationStatus === 'Verified' ? 'accent-cyan' : 'yellow-400'}">${candidate.verificationStatus}</span>
+                    <span class="text-${candidate.verificationStatus === 'Verified' ? 'green-400' : 'yellow-400'}">${candidate.verificationStatus}</span>
                 </div>
             </div>
-            <!-- Score Breakdown -->
-            <div class="mt-4 pt-4 border-t border-gray-600">
-                <h4 class="text-sm font-semibold text-gray-300 mb-3">AI Score Breakdown</h4>
-                <div class="space-y-2">
-                    ${(Object.entries(candidate.scoreBreakdown || {})).map(([key, score]) => `
-                        <div>
-                            <div class="flex justify-between text-xs mb-1">
-                                <span class="text-gray-400">${key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</span>
-                                <span class="text-accent-cyan">${score}%</span>
-                            </div>
-                            <div class="w-full bg-gray-600 rounded-full h-1.5">
-                                <div class="bg-accent-cyan h-1.5 rounded-full" style="width: ${score}%"></div>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-            <!-- Key Strengths -->
-            <div class="mt-4 pt-4 border-t border-gray-600">
-                <h4 class="text-sm font-semibold text-gray-300 mb-2">Key Strengths</h4>
-                <div class="space-y-1">
-                    ${(candidate.strengths || []).slice(0, 3).map(strength => `
-                        <div class="flex items-center space-x-2">
-                            <div class="w-1.5 h-1.5 bg-accent-cyan rounded-full"></div>
-                            <span class="text-gray-300 text-xs">${strength}</span>
-                        </div>
+            
+            <!-- Top Skills -->
+            <div class="mt-4">
+                <h4 class="text-sm font-semibold text-gray-300 mb-2">Top Skills</h4>
+                <div class="flex flex-wrap gap-1">
+                    ${(candidate.currentSkills || []).slice(0, 3).map(skill => `
+                        <span class="px-2 py-1 text-xs rounded-full" style="background-color: ${scoreColor}20; color: ${scoreColor}; border: 1px solid ${scoreColor}40">
+                            ${skill}
+                        </span>
                     `).join('')}
                 </div>
             </div>
         </div>
-    `).join('');
+    `;
+}
+
+// Generate detailed score comparison rows
+function generateScoreComparisonRows(candidates) {
+    const metrics = [
+        { key: 'aiScore', label: 'Overall AI Score', format: 'score' },
+        { key: 'roleRelevance', label: 'Role Relevance', format: 'percentage', path: 'scoreBreakdown' },
+        { key: 'experienceMatch', label: 'Experience Match', format: 'percentage', path: 'scoreBreakdown' },
+        { key: 'locationFit', label: 'Location Fit', format: 'percentage', path: 'scoreBreakdown' },
+        { key: 'profileQuality', label: 'Profile Quality', format: 'percentage', path: 'scoreBreakdown' },
+        { key: 'marketPotential', label: 'Market Potential', format: 'percentage', calculate: true },
+        { key: 'experience', label: 'Years Experience', format: 'years' },
+        { key: 'verificationStatus', label: 'Profile Verified', format: 'boolean' },
+        { key: 'skillCount', label: 'Listed Skills', format: 'count', calculate: true }
+    ];
+
+    return metrics.map(metric => {
+        return `
+            <tr class="border-b border-gray-700/50">
+                <td class="py-3 text-gray-300 font-medium">${metric.label}</td>
+                ${candidates.map((candidate, index) => {
+                    let value = '';
+                    let cellClass = 'text-center py-3';
+                    let displayValue = '';
+
+                    // Get the value based on metric configuration
+                    if (metric.calculate) {
+                        if (metric.key === 'marketPotential') {
+                            value = calculateMarketPotential(candidate);
+                        } else if (metric.key === 'skillCount') {
+                            value = (candidate.currentSkills || []).length;
+                        }
+                    } else if (metric.path) {
+                        value = candidate[metric.path] ? candidate[metric.path][metric.key] : 0;
+                    } else {
+                        value = candidate[metric.key];
+                    }
+
+                    // Format the display value
+                    switch (metric.format) {
+                        case 'score':
+                        case 'percentage':
+                            displayValue = `${value || 0}${metric.format === 'percentage' ? '%' : ''}`;
+                            // Color coding for scores
+                            if (value >= 80) cellClass += ' text-green-400 font-bold';
+                            else if (value >= 60) cellClass += ' text-yellow-400 font-semibold';
+                            else cellClass += ' text-red-400';
+                            break;
+                        case 'years':
+                            const expMatch = value?.match(/(\d+)/);
+                            const years = expMatch ? parseInt(expMatch[0]) : 0;
+                            displayValue = `${years}y`;
+                            if (years >= 5) cellClass += ' text-green-400 font-bold';
+                            else if (years >= 2) cellClass += ' text-yellow-400';
+                            else cellClass += ' text-gray-400';
+                            break;
+                        case 'boolean':
+                            displayValue = value === 'Verified' ? '✓' : '✗';
+                            cellClass += value === 'Verified' ? ' text-green-400 font-bold' : ' text-red-400';
+                            break;
+                        case 'count':
+                            displayValue = value || 0;
+                            if (value >= 3) cellClass += ' text-green-400 font-bold';
+                            else if (value >= 1) cellClass += ' text-yellow-400';
+                            else cellClass += ' text-gray-400';
+                            break;
+                        default:
+                            displayValue = value || 'N/A';
+                            cellClass += ' text-gray-300';
+                    }
+
+                    // Find the best performer for this metric (for highlighting)
+                    const allValues = candidates.map(c => {
+                        if (metric.calculate) {
+                            if (metric.key === 'marketPotential') return calculateMarketPotential(c);
+                            if (metric.key === 'skillCount') return (c.currentSkills || []).length;
+                        } else if (metric.path) {
+                            return c[metric.path] ? c[metric.path][metric.key] : 0;
+                        } else if (metric.format === 'years') {
+                            const match = c[metric.key]?.match(/(\d+)/);
+                            return match ? parseInt(match[0]) : 0;
+                        } else if (metric.format === 'boolean') {
+                            return c[metric.key] === 'Verified' ? 1 : 0;
+                        }
+                        return c[metric.key] || 0;
+                    });
+
+                    const maxValue = Math.max(...allValues.filter(v => typeof v === 'number'));
+                    const currentValue = typeof value === 'number' ? value : 
+                                       metric.format === 'years' ? (value?.match(/(\d+)/) ? parseInt(value.match(/(\d+)/)[0]) : 0) :
+                                       metric.format === 'boolean' ? (value === 'Verified' ? 1 : 0) : 0;
+
+                    // Add crown icon for best performer
+                    if (currentValue === maxValue && maxValue > 0 && candidates.length > 1) {
+                        displayValue = `👑 ${displayValue}`;
+                        cellClass += ' bg-yellow-500/10 rounded';
+                    }
+
+                    return `<td class="${cellClass}">${displayValue}</td>`;
+                }).join('')}
+            </tr>
+        `;
+    }).join('');
+}
+	
+// Show comparison modal with enhanced radar charts
+function showComparisonModal(candidates) {
+    const modal = document.getElementById('comparisonModal');
+    const content = document.getElementById('comparisonContent');
+
+    // Set grid columns based on number of candidates
+    const gridCols = candidates.length === 2 ? 'grid-cols-1' : 'grid-cols-1';
+    content.className = `space-y-6`;
+
+    // Generate comparison content
+    content.innerHTML = `
+        <!-- Radar Chart Comparison -->
+        <div class="bg-dark-primary rounded-lg p-6">
+            <h3 class="text-xl font-bold text-accent-cyan mb-4 flex items-center">
+                <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Skills & Performance Radar
+            </h3>
+            <div class="flex justify-center">
+                <div class="w-full max-w-2xl">
+                    <canvas id="radarChart" width="400" height="400"></canvas>
+                </div>
+            </div>
+            
+            <!-- Legend -->
+            <div class="mt-4 flex flex-wrap justify-center gap-4">
+                ${candidates.map((candidate, index) => `
+                    <div class="flex items-center space-x-2">
+                        <div class="w-4 h-4 rounded-full" style="background-color: ${getChartColor(index)}"></div>
+                        <span class="text-gray-300 text-sm font-medium">${candidate.name}</span>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+
+        <!-- Side-by-Side Comparison Cards -->
+        <div class="grid ${candidates.length === 2 ? 'grid-cols-2' : 'grid-cols-3'} gap-6">
+            ${candidates.map((candidate, index) => generateComparisonCard(candidate, index)).join('')}
+        </div>
+
+        <!-- Detailed Score Breakdown -->
+        <div class="bg-dark-primary rounded-lg p-6">
+            <h3 class="text-xl font-bold text-white mb-4">Detailed Score Analysis</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b border-gray-700">
+                            <th class="text-left text-gray-400 pb-3">Metric</th>
+                            ${candidates.map(candidate => `
+                                <th class="text-center text-gray-400 pb-3">${candidate.name}</th>
+                            `).join('')}
+                        </tr>
+                    </thead>
+                    <tbody class="space-y-2">
+                        ${generateScoreComparisonRows(candidates)}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    `;
+
+    // Generate the radar chart
+    setTimeout(() => {
+        generateRadarChart(candidates);
+    }, 100);
 
     modal.classList.remove('hidden');
 }
