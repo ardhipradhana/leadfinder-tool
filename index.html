@@ -1794,8 +1794,9 @@ function createCandidateCardHTML(candidate) {
 
     const hasAnalytics = candidate.careerAnalytics && candidate.careerAnalytics !== null;
     
-    // Determine priority for border styling
-    const priority = candidate.priority || 'medium';
+    // Determine priority based on AI score for consistent color coding
+	const priority = candidate.aiScore >= 80 ? 'high' : 
+	                candidate.aiScore >= 60 ? 'medium' : 'low';
     
     return `
         <div class="bg-dark-secondary rounded-xl p-6 cursor-pointer candidate-card" 
