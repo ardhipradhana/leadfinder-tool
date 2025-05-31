@@ -1704,9 +1704,7 @@ function createCandidateCardHTML(candidate) {
     // Get top 2-3 current skills for display
     const displaySkills = (candidate.currentSkills || []).slice(0, 3);
 
-	const hasAnalytics = candidate.careerAnalytics && candidate.careerAnalytics !== null;
-	// In the badges section, add this analytics badge:
-	${hasAnalytics ? '<span class="px-2 py-1 bg-green-500/20 text-green-400 border border-green-500/30 text-xs rounded-full font-medium">✓ Analytics Done</span>' : ''}	
+    const hasAnalytics = candidate.careerAnalytics && candidate.careerAnalytics !== null;
     
     return `
         <div class="bg-dark-secondary rounded-xl p-6 hover:bg-dark-tertiary transition-colors cursor-pointer candidate-card" data-candidate-id="${candidate.id}">
@@ -1744,18 +1742,18 @@ function createCandidateCardHTML(candidate) {
                             </div>
                             
                             <!-- Upgrade button (only show if no analytics) -->
-				${!hasAnalytics ? `
-				    <button class="upgrade-analytics-btn group relative px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white text-xs rounded-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl" data-candidate-id="${candidate.id}">
-				        <div class="flex items-center space-x-2">
-				            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-				                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-				            </svg>
-				            <span>Predictive Analytics</span>
-				            <span class="text-xs opacity-80">(5 credits)</span>
-				        </div>
-				        <div class="absolute inset-0 bg-gradient-to-r from-purple-400 to-indigo-400 opacity-0 group-hover:opacity-20 rounded-lg transition-opacity duration-300"></div>
-				    </button>
-				` : ''}
+                            ${!hasAnalytics ? `
+                                <button class="upgrade-analytics-btn group relative px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white text-xs rounded-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl" data-candidate-id="${candidate.id}">
+                                    <div class="flex items-center space-x-2">
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                        <span>Predictive Analytics</span>
+                                        <span class="text-xs opacity-80">(5 credits)</span>
+                                    </div>
+                                    <div class="absolute inset-0 bg-gradient-to-r from-purple-400 to-indigo-400 opacity-0 group-hover:opacity-20 rounded-lg transition-opacity duration-300"></div>
+                                </button>
+                            ` : ''}
                         </div>
                         
                         <p class="text-gray-300 text-sm">${candidate.snippet}</p>
@@ -1779,7 +1777,6 @@ function createCandidateCardHTML(candidate) {
             </div>
         </div>
     `;
-}
 }
 // --- Candidate Modal Logic ---
 
