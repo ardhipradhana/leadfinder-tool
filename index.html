@@ -278,6 +278,13 @@
                     <span>Recent Searches</span>
                     <span class="bg-accent-cyan text-dark-primary px-2 py-1 rounded-full text-xs font-medium">3</span>
                 </button>
+
+				<div class="flex items-center space-x-2 px-3 py-2 rounded-lg bg-gradient-to-r from-yellow-600 to-orange-600">
+				    <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+				        <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
+				    </svg>
+				    <span id="bookmarkCounter" class="text-white font-medium">0 saved</span>
+				</div>
                 
                 <div class="flex items-center space-x-2 px-3 py-2 rounded-lg bg-dark-secondary">
                     <svg class="w-4 h-4 text-accent-cyan" fill="currentColor" viewBox="0 0 20 20">
@@ -1076,6 +1083,21 @@
 	                        <span id="analyticsHistoryCount" class="bg-purple-500 text-white px-2 py-1 rounded-full text-xs font-bold">0</span>
 	                    </div>
 	                </button>
+					<button id="savedCandidatesTab" class="flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors history-tab">
+				        <div class="flex items-center justify-center space-x-2">
+				            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+				                <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
+				            </svg>
+				            <span>Saved Candidates</span>
+				            <span id="savedCandidatesCount" class="bg-yellow-500 text-dark-primary px-2 py-1 rounded-full text-xs font-bold">0</span>
+				        </div>
+				    </button>
+					<!-- Saved Candidates Tab Content -->
+					<div id="savedCandidatesContent" class="history-content hidden">
+					    <div id="savedCandidatesList" class="space-y-4">
+					        <!-- Saved candidates will be populated here -->
+					    </div>
+					</div>
 	            </div>
 	        </div>
 	        
@@ -1884,6 +1906,18 @@ function createCandidateCardHTML(candidate) {
         <div class="bg-dark-secondary rounded-xl p-6 cursor-pointer candidate-card" 
              data-candidate-id="${candidate.id}" 
              data-priority="${priority}">
+
+			<!-- Bookmark Ribbon -->
+	        <div class="bookmark-ribbon">
+	            <button class="bookmark-icon ${isBookmarked(candidate.id) ? 'bookmarked' : 'not-bookmarked'}" 
+	                    data-candidate-id="${candidate.id}"
+	                    title="${isBookmarked(candidate.id) ? 'Remove from saved candidates' : 'Save candidate'}">
+	                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+	                    <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
+	                </svg>
+	            </button>
+	        </div>
+ 
             <div class="flex items-start justify-between">
                 <div class="flex items-start space-x-4 flex-1">
                     <div class="pt-1">
@@ -3746,21 +3780,176 @@ document.getElementById('analyticsHistoryTab').addEventListener('click', functio
     switchHistoryTab('analytics');
 });
 
+// Saved candidates tab switching
+document.getElementById('savedCandidatesTab').addEventListener('click', function() {
+    switchHistoryTab('saved');
+});
+
 function switchHistoryTab(tabType) {
     // Update tab buttons
     document.querySelectorAll('.history-tab').forEach(tab => {
         tab.classList.remove('active');
     });
     
+    // Hide all content
+    document.getElementById('basicSearchContent').classList.add('hidden');
+    document.getElementById('analyticsHistoryContent').classList.add('hidden');
+    document.getElementById('savedCandidatesContent').classList.add('hidden');
+    
     if (tabType === 'basic') {
         document.getElementById('basicSearchTab').classList.add('active');
         document.getElementById('basicSearchContent').classList.remove('hidden');
-        document.getElementById('analyticsHistoryContent').classList.add('hidden');
-    } else {
+    } else if (tabType === 'analytics') {
         document.getElementById('analyticsHistoryTab').classList.add('active');
         document.getElementById('analyticsHistoryContent').classList.remove('hidden');
-        document.getElementById('basicSearchContent').classList.add('hidden');
+    } else if (tabType === 'saved') {
+        document.getElementById('savedCandidatesTab').classList.add('active');
+        document.getElementById('savedCandidatesContent').classList.remove('hidden');
+        renderSavedCandidates(); // Load saved candidates
     }
+}
+
+// Bookmark Management System
+let savedCandidates = JSON.parse(localStorage.getItem('leadfinder_saved_candidates') || '[]');
+
+// Check if candidate is bookmarked
+function isBookmarked(candidateId) {
+    return savedCandidates.some(candidate => candidate.id === candidateId);
+}
+
+// Toggle bookmark status
+function toggleBookmark(candidateId) {
+    const candidate = currentCandidates.find(c => c.id === candidateId);
+    if (!candidate) return;
+    
+    if (isBookmarked(candidateId)) {
+        // Remove bookmark
+        savedCandidates = savedCandidates.filter(c => c.id !== candidateId);
+        showCustomToast('Removed', `${candidate.name} removed from saved candidates`, 'info');
+    } else {
+        // Add bookmark (check limit)
+        if (savedCandidates.length >= 50) {
+            showCustomToast('Limit Reached', 'Maximum 50 candidates can be saved. Remove some candidates first.', 'error');
+            return;
+        }
+        
+        // Add timestamp for when it was saved
+        const candidateWithTimestamp = {
+            ...candidate,
+            savedAt: new Date().toISOString()
+        };
+        
+        savedCandidates.unshift(candidateWithTimestamp); // Add to beginning
+        showCustomToast('Saved', `${candidate.name} added to saved candidates`, 'success');
+    }
+    
+    // Update localStorage
+    localStorage.setItem('leadfinder_saved_candidates', JSON.stringify(savedCandidates));
+    
+    // Update UI
+    updateBookmarkCounter();
+    updateBookmarkIcons();
+    updateHistoryTabCounts();
+}
+
+// Update bookmark counter in header
+function updateBookmarkCounter() {
+    const counter = document.getElementById('bookmarkCounter');
+    const count = savedCandidates.length;
+    if (counter) {
+        counter.textContent = count === 0 ? '0 saved' : 
+                             count === 1 ? '1 saved' : 
+                             `${count} saved`;
+    }
+}
+
+// Update bookmark icons on current page
+function updateBookmarkIcons() {
+    document.querySelectorAll('.bookmark-icon').forEach(icon => {
+        const candidateId = icon.dataset.candidateId;
+        const bookmarked = isBookmarked(candidateId);
+        
+        icon.className = `bookmark-icon ${bookmarked ? 'bookmarked' : 'not-bookmarked'}`;
+        icon.title = bookmarked ? 'Remove from saved candidates' : 'Save candidate';
+    });
+}
+
+// Get saved candidates for display
+function getSavedCandidates() {
+    return savedCandidates.sort((a, b) => new Date(b.savedAt) - new Date(a.savedAt));
+}
+
+// Remove candidate from saved list
+function removeSavedCandidate(candidateId) {
+    savedCandidates = savedCandidates.filter(c => c.id !== candidateId);
+    localStorage.setItem('leadfinder_saved_candidates', JSON.stringify(savedCandidates));
+    
+    updateBookmarkCounter();
+    updateBookmarkIcons();
+    updateHistoryTabCounts();
+    renderSavedCandidates(); // Refresh the saved candidates view
+}
+
+// Render saved candidates in the modal
+function renderSavedCandidates() {
+    const container = document.getElementById('savedCandidatesList');
+    const candidates = getSavedCandidates();
+    
+    if (candidates.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-8 text-gray-400">
+                <svg class="w-12 h-12 mx-auto mb-4 opacity-50" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
+                </svg>
+                <p>No saved candidates yet</p>
+                <p class="text-sm mt-2">Bookmark candidates from search results to save them here</p>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = candidates.map((candidate, index) => `
+        <div class="bg-dark-primary rounded-lg p-4 hover:bg-dark-tertiary transition-colors">
+            <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center">
+                        <span class="text-white font-semibold text-sm">${candidate.name.split(' ').map(n => n[0]).join('').substring(0, 2)}</span>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-white">${candidate.name}</h3>
+                        <p class="text-sm text-gray-300">${candidate.title}</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <div class="text-center">
+                        <div class="text-lg font-bold text-accent-cyan">${candidate.aiScore}</div>
+                        <div class="text-xs text-gray-400">AI Score</div>
+                    </div>
+                    <span class="text-sm text-gray-400">${getRelativeTime(candidate.savedAt)}</span>
+                    <button class="text-red-400 hover:text-red-300 p-1" onclick="removeSavedCandidate('${candidate.id}')" title="Remove from saved">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="flex items-center justify-between">
+                <span class="text-sm text-gray-400">${candidate.location} • ${candidate.experience || 'Experienced'}</span>
+                <button class="px-3 py-1 bg-accent-cyan/20 hover:bg-accent-cyan text-accent-cyan hover:text-dark-primary rounded-lg text-xs font-semibold view-saved-candidate" data-candidate='${JSON.stringify(candidate).replace(/'/g, "&apos;")}'>
+                    View Details
+                </button>
+            </div>
+        </div>
+    `).join('');
+
+    // Add click handlers for viewing saved candidate details
+    container.querySelectorAll('.view-saved-candidate').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const candidateData = JSON.parse(this.dataset.candidate.replace(/&apos;/g, "'"));
+            showCandidateModal(candidateData);
+            document.getElementById('historyModal').classList.add('hidden');
+        });
+    });
 }
 
 function updateHistoryTabCounts() {
@@ -3769,6 +3958,7 @@ function updateHistoryTabCounts() {
     
     document.getElementById('basicSearchCount').textContent = basicHistory.length;
     document.getElementById('analyticsHistoryCount').textContent = analyticsHistory.length;
+    document.getElementById('savedCandidatesCount').textContent = savedCandidates.length;
     
     // Update main search history button count
     const totalCount = basicHistory.length + analyticsHistory.length;
@@ -4526,6 +4716,11 @@ document.addEventListener('keydown', (e) => {
 (async () => {
     await updateSearchHistoryUI();
     document.getElementById('jobTitle').focus();
+
+	// Initialize bookmark system
+    updateBookmarkCounter();
+    updateHistoryTabCounts();
+	
 })();
 const searchBtn = document.getElementById('searchBtn');
 searchBtn.addEventListener('mouseenter', () => {
@@ -4706,6 +4901,17 @@ setTimeout(() => {
 	    }
 	});
 
+	// Bookmark toggle event handler
+	document.addEventListener('click', function(e) {
+	    // Bookmark icon clicks
+	    if (e.target.closest('.bookmark-icon')) {
+	        e.stopPropagation(); // Prevent card click
+	        const bookmarkIcon = e.target.closest('.bookmark-icon');
+	        const candidateId = bookmarkIcon.dataset.candidateId;
+	        toggleBookmark(candidateId);
+	    }
+	});
+
 	// Bulk upgrade button handler - FIXED VERSION
 	document.getElementById('bulkAnalyticsBtn').addEventListener('click', async function(e) {
 	    e.stopPropagation(); // Prevent any bubbling
@@ -4848,7 +5054,8 @@ setTimeout(() => {
 
 	// Clear all filters button
 	document.getElementById('clearAllFiltersBtn').addEventListener('click', clearAllFilters);
-});
+	});
+	
     </script>
 
 	<!-- Add this right before </body> -->
