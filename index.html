@@ -2099,72 +2099,72 @@ function updateModalCareerAnalytics(candidate) {
         
         if (sections) {
             analyticsContainer.innerHTML = `
-                <!-- Executive Summary -->
-                <div class="mb-6 p-4 bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-purple-500/30 rounded-lg">
-                    <div class="flex items-center space-x-2 mb-3">
-                        <div class="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center">
-                            <span class="text-lg">🏆</span>
-                        </div>
-                        <h4 class="text-lg font-bold text-purple-400">Executive Summary</h4>
-                    </div>
-                    <p class="text-gray-300 leading-relaxed">${sections.executiveSummary}</p>
-                </div>
-
-                <!-- Current Strengths -->
-                <div class="mb-6 p-4 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/30 rounded-lg">
-                    <div class="flex items-center space-x-2 mb-3">
-                        <div class="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
-                            <span class="text-lg">💪</span>
-                        </div>
-                        <h4 class="text-lg font-bold text-green-400">Current Strengths</h4>
-                    </div>
-                    <div class="text-gray-300 leading-relaxed whitespace-pre-line">${sections.currentStrengths}</div>
-                </div>
-
-                <!-- Career Trajectory -->
-                <div class="mb-6 p-4 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-500/30 rounded-lg">
-                    <div class="flex items-center space-x-2 mb-3">
-                        <div class="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
-                            <span class="text-lg">📈</span>
-                        </div>
-                        <h4 class="text-lg font-bold text-blue-400">Career Trajectory & Compensation</h4>
-                    </div>
-                    <div class="text-gray-300 leading-relaxed whitespace-pre-line">${sections.careerTrajectory}</div>
-                </div>
-
-                <!-- Growth Potential -->
-                <div class="mb-6 p-4 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-lg">
-                    <div class="flex items-center space-x-2 mb-3">
-                        <div class="w-8 h-8 bg-yellow-500/20 rounded-lg flex items-center justify-center">
-                            <span class="text-lg">🎯</span>
-                        </div>
-                        <h4 class="text-lg font-bold text-yellow-400">Growth Potential & Development</h4>
-                    </div>
-                    <div class="text-gray-300 leading-relaxed whitespace-pre-line">${sections.growthPotential}</div>
-                </div>
-
-                <!-- Risk Assessment -->
-                <div class="mb-6 p-4 bg-gradient-to-r from-red-500/10 to-pink-500/10 border border-red-500/30 rounded-lg">
-                    <div class="flex items-center space-x-2 mb-3">
-                        <div class="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center">
-                            <span class="text-lg">🔍</span>
-                        </div>
-                        <h4 class="text-lg font-bold text-red-400">Risk Assessment</h4>
-                    </div>
-                    <div class="text-gray-300 leading-relaxed whitespace-pre-line">${sections.riskAssessment}</div>
-                </div>
-
-                <!-- Hiring Recommendation -->
-                <div class="p-4 bg-gradient-to-r from-accent-cyan/10 to-accent-teal/10 border border-accent-cyan/30 rounded-lg">
-                    <div class="flex items-center space-x-2 mb-3">
-                        <div class="w-8 h-8 bg-accent-cyan/20 rounded-lg flex items-center justify-center">
-                            <span class="text-lg">💡</span>
-                        </div>
-                        <h4 class="text-lg font-bold text-accent-cyan">Hiring Recommendation</h4>
-                    </div>
-                    <p class="text-gray-300 leading-relaxed">${sections.hiringRecommendation}</p>
-                </div>
-            `;
+	    <!-- Executive Summary -->
+	    <div class="mb-4 p-4 bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-purple-500/30 rounded-lg">
+	        <div class="flex items-center space-x-2 mb-2">
+	            <div class="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center">
+	                <span class="text-lg">🏆</span>
+	            </div>
+	            <h4 class="text-lg font-bold text-purple-400">Executive Summary</h4>
+	        </div>
+	        <p class="text-gray-300 leading-relaxed mb-0">${sections.executiveSummary}</p>
+	    </div>
+	
+	    <!-- Current Strengths -->
+	    <div class="mb-4 p-4 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/30 rounded-lg">
+	        <div class="flex items-center space-x-2 mb-2">
+	            <div class="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
+	                <span class="text-lg">💪</span>
+	            </div>
+	            <h4 class="text-lg font-bold text-green-400">Current Strengths</h4>
+	        </div>
+	        <div class="text-gray-300 leading-relaxed whitespace-pre-line mb-0">${sections.currentStrengths}</div>
+	    </div>
+	
+	    <!-- Career Trajectory -->
+	    <div class="mb-4 p-4 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-500/30 rounded-lg">
+	        <div class="flex items-center space-x-2 mb-2">
+	            <div class="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+	                <span class="text-lg">📈</span>
+	            </div>
+	            <h4 class="text-lg font-bold text-blue-400">Career Trajectory & Compensation</h4>
+	        </div>
+	        <div class="text-gray-300 leading-relaxed whitespace-pre-line mb-0">${sections.careerTrajectory}</div>
+	    </div>
+	
+	    <!-- Growth Potential -->
+	    <div class="mb-4 p-4 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-lg">
+	        <div class="flex items-center space-x-2 mb-2">
+	            <div class="w-8 h-8 bg-yellow-500/20 rounded-lg flex items-center justify-center">
+	                <span class="text-lg">🎯</span>
+	            </div>
+	            <h4 class="text-lg font-bold text-yellow-400">Growth Potential & Development</h4>
+	        </div>
+	        <div class="text-gray-300 leading-relaxed whitespace-pre-line mb-0">${sections.growthPotential}</div>
+	    </div>
+	
+	    <!-- Risk Assessment -->
+	    <div class="mb-4 p-4 bg-gradient-to-r from-red-500/10 to-pink-500/10 border border-red-500/30 rounded-lg">
+	        <div class="flex items-center space-x-2 mb-2">
+	            <div class="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center">
+	                <span class="text-lg">🔍</span>
+	            </div>
+	            <h4 class="text-lg font-bold text-red-400">Risk Assessment</h4>
+	        </div>
+	        <div class="text-gray-300 leading-relaxed whitespace-pre-line mb-0">${sections.riskAssessment}</div>
+	    </div>
+	
+	    <!-- Hiring Recommendation -->
+	    <div class="p-4 bg-gradient-to-r from-accent-cyan/10 to-accent-teal/10 border border-accent-cyan/30 rounded-lg">
+	        <div class="flex items-center space-x-2 mb-2">
+	            <div class="w-8 h-8 bg-accent-cyan/20 rounded-lg flex items-center justify-center">
+	                <span class="text-lg">💡</span>
+	            </div>
+	            <h4 class="text-lg font-bold text-accent-cyan">Hiring Recommendation</h4>
+	        </div>
+	        <p class="text-gray-300 leading-relaxed mb-0">${sections.hiringRecommendation}</p>
+	    </div>
+	`;
         } else {
             // Fallback to original display
             analyticsContainer.textContent = analyticsText;
