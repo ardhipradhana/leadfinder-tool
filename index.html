@@ -255,6 +255,13 @@
 		    font-weight: bold;
 		}
 
+	    	.bookmark-ribbon {
+		    position: absolute;
+		    top: 12px;
+		    right: 12px;
+		    z-index: 10;
+		}
+
     </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen">
@@ -279,12 +286,12 @@
                     <span class="bg-accent-cyan text-dark-primary px-2 py-1 rounded-full text-xs font-medium">3</span>
                 </button>
 
-				<div class="flex items-center space-x-2 px-3 py-2 rounded-lg bg-gradient-to-r from-yellow-600 to-orange-600">
+			    <button id="savedCandidatesBtn" class="bookmarks-tab flex items-center space-x-2 px-3 py-2 rounded-lg bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl">
 				    <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
-				        <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
+					<path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
 				    </svg>
-				    <span id="bookmarkCounter" class="text-white font-medium">0 saved</span>
-				</div>
+				    <span id="savedCandidatesHeaderText" class="text-white font-medium">0 saved</span>
+				</button>
                 
                 <div class="flex items-center space-x-2 px-3 py-2 rounded-lg bg-dark-secondary">
                     <svg class="w-4 h-4 text-accent-cyan" fill="currentColor" viewBox="0 0 20 20">
@@ -1789,6 +1796,9 @@ function updateCandidateCards(candidates) {
     
     // Re-attach click handlers
     attachCandidateCardHandlers(candidates);
+
+	// Update bookmark icons to show correct state
+	updateBookmarkIcons();
 }
 
 // Generate priority badge based on AI score
@@ -3852,15 +3862,16 @@ function toggleBookmark(candidateId) {
     updateHistoryTabCounts();
 }
 
-// Update bookmark counter in header
+// Update bookmark counter (now updates the gold button)
 function updateBookmarkCounter() {
-    const counter = document.getElementById('bookmarkCounter');
+    const headerText = document.getElementById('savedCandidatesHeaderText');
     const count = savedCandidates.length;
-    if (counter) {
-        counter.textContent = count === 0 ? '0 saved' : 
-                             count === 1 ? '1 saved' : 
-                             `${count} saved`;
+    if (headerText) {
+        headerText.textContent = count === 0 ? '0 saved' : 
+                                 count === 1 ? '1 saved' : 
+                                 `${count} saved`;
     }
+    console.log('Bookmarks updated:', savedCandidates.length);
 }
 
 // Update bookmark icons on current page
@@ -4906,6 +4917,7 @@ setTimeout(() => {
 	    // Bookmark icon clicks
 	    if (e.target.closest('.bookmark-icon')) {
 	        e.stopPropagation(); // Prevent card click
+		    e.preventDefault(); // Prevent any default behavior
 	        const bookmarkIcon = e.target.closest('.bookmark-icon');
 	        const candidateId = bookmarkIcon.dataset.candidateId;
 	        toggleBookmark(candidateId);
@@ -5054,6 +5066,13 @@ setTimeout(() => {
 
 	// Clear all filters button
 	document.getElementById('clearAllFiltersBtn').addEventListener('click', clearAllFilters);
+	});
+
+	// Saved candidates button click handler
+	document.getElementById('savedCandidatesBtn').addEventListener('click', function() {
+	    // Open history modal and switch to saved candidates tab
+	    document.getElementById('historyModal').classList.remove('hidden');
+	    switchHistoryTab('saved');
 	});
 	
     </script>
