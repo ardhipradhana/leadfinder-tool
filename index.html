@@ -2108,20 +2108,33 @@ function cleanAndFormatSection(text) {
 function formatSubSection(text, sectionType) {
     if (!text) return '';
     
-    // Split text into paragraphs
     const paragraphs = text.split('\n\n');
     
-    // Find the paragraph that contains our section type
-    for (let paragraph of paragraphs) {
-        if (paragraph.includes(sectionType)) {
-            // Remove the header line and return the content
-            const lines = paragraph.split('\n');
-            const contentLines = lines.slice(1); // Skip the header line
-            return contentLines.join('<br>').trim();
-        }
+    if (sectionType === 'Market Intelligence') {
+        // Return first paragraph (Market Intelligence content)
+        return paragraphs[0] ? paragraphs[0].replace(/\n/g, '<br>') : '';
+    } else if (sectionType === 'Peer Benchmarking') {
+        // Return second paragraph (Peer Benchmarking content)
+        return paragraphs[1] ? paragraphs[1].replace(/\n/g, '<br>') : '';
+    } else if (sectionType === 'Career Trajectory') {
+        // Return first paragraph (Career Trajectory content)
+        return paragraphs[0] ? paragraphs[0].replace(/\n/g, '<br>') : '';
+    } else if (sectionType === 'Compensation') {
+        // Return second paragraph (Compensation content)
+        return paragraphs[1] ? paragraphs[1].replace(/\n/g, '<br>') : '';
+    } else if (sectionType === 'Strategic Development') {
+        // Return first paragraph (Strategic Development content)
+        const lines = text.split('\n');
+        const strategicLines = lines.slice(0, 3); // First 3 lines are Strategic Development
+        return strategicLines.join('<br>');
+    } else if (sectionType === 'Acceleration') {
+        // Return the bullet points (Acceleration Strategies)
+        const lines = text.split('\n');
+        const accelerationLines = lines.filter(line => line.startsWith('- '));
+        return accelerationLines.join('<br>');
     }
     
-    return '';
+    return text.replace(/\n/g, '<br>');
 }
 
 // Update career analytics section in modal
