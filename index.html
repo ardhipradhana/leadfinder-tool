@@ -3264,46 +3264,40 @@ async function upgradeIndividualCandidate(candidateId) {
 	    throw new Error(`HTTP error! status: ${response.status}, response: ${responseText}`);
 	}
 	
-	// Handle the standardized response format
-	if (Array.isArray(data) && data.length > 0) {
-	    const responseData = data[0]; // Get the first (and only) response object
+	// Handle the standardized response format (direct object, not wrapped in array)
+	if (data && data.success && data.results && data.results.length > 0) {
+	    const result = data.results[0];
+	    console.log('Processing analytics for:', result.candidateName);
 	    
-	    if (responseData.success && responseData.results && responseData.results.length > 0) {
-	        const result = responseData.results[0];
-	        console.log('Processing analytics for:', result.candidateName);
+	    // Update candidate with analytics
+	    const candidateIndex = currentCandidates.findIndex(c => c.id === candidateId);
+	    if (candidateIndex !== -1) {
+	        currentCandidates[candidateIndex] = {
+	            ...currentCandidates[candidateIndex],
+	            careerAnalytics: result.careerAnalytics
+	        };
 	        
-	        // Update candidate with analytics
-	        const candidateIndex = currentCandidates.findIndex(c => c.id === candidateId);
-	        if (candidateIndex !== -1) {
-	            currentCandidates[candidateIndex] = {
-	                ...currentCandidates[candidateIndex],
-	                careerAnalytics: result.careerAnalytics
-	            };
-	            
-	            // Refresh the UI
-	            updateCandidateCards(currentCandidates);
-	            attachCandidateCardHandlers(currentCandidates);
-	            
-	            // Deduct credits
-	            userCredits -= 5;
-	            updateCreditsDisplay();
-	            
-	            // Save to analytics history
-	            saveToSearchHistory({
-	                jobTitle: 'Individual Analytics',
-	                candidateName: result.candidateName,
-	                type: 'individual'
-	            }, 1, [currentCandidates[candidateIndex]]);
-	            
-	            alert(`Analytics completed for ${result.candidateName}!`);
-	            console.log('Individual analytics completed successfully');
-	        }
-	    } else {
-	        throw new Error(`Analytics failed: ${responseData.error || 'Unknown error'}`);
+	        // Refresh the UI
+	        updateCandidateCards(currentCandidates);
+	        attachCandidateCardHandlers(currentCandidates);
+	        
+	        // Deduct credits
+	        userCredits -= 5;
+	        updateCreditsDisplay();
+	        
+	        // Save to analytics history
+	        saveToSearchHistory({
+	            jobTitle: 'Individual Analytics',
+	            candidateName: result.candidateName,
+	            type: 'individual'
+	        }, 1, [currentCandidates[candidateIndex]]);
+	        
+	        alert(`Analytics completed for ${result.candidateName}!`);
+	        console.log('Individual analytics completed successfully');
 	    }
 	} else {
-    throw new Error('Invalid response format from analytics service');
-} 
+	    throw new Error(`Analytics failed: ${data.error || 'Unknown error'}`);
+	}
     } catch (error) {
         clearTimeout(timeoutId);
         console.error('Individual analytics failed:', error);
@@ -3365,65 +3359,59 @@ async function upgradeBulkCandidates(candidateIds) {
 	    throw new Error(`HTTP error! status: ${response.status}, response: ${responseText}`);
 	}
 	
-	// Handle the standardized response format
-	if (Array.isArray(data) && data.length > 0) {
-	    const responseData = data[0]; // Get the first (and only) response object
+	// Handle the standardized response format (direct object, not wrapped in array)
+	if (data && data.success && data.results) {
+	    console.log(`Processing ${data.processed} of ${data.total} candidates`);
 	    
-	    if (responseData.success && responseData.results) {
-	        console.log(`Processing ${responseData.processed} of ${responseData.total} candidates`);
+	    let updatedCandidates = [];
+	    
+	    // Process each result
+	    data.results.forEach(result => {
+	        // Find candidate by name (since IDs might not match exactly)
+	        const candidateIndex = currentCandidates.findIndex(c => 
+	            c.name === result.candidateName || c.id === result.candidateId
+	        );
 	        
-	        let updatedCandidates = [];
-	        
-	        // Process each result
-	        responseData.results.forEach(result => {
-	            // Find candidate by name (since IDs might not match exactly)
-	            const candidateIndex = currentCandidates.findIndex(c => 
-	                c.name === result.candidateName || c.id === result.candidateId
-	            );
-	            
-	            if (candidateIndex !== -1) {
-	                currentCandidates[candidateIndex] = {
-	                    ...currentCandidates[candidateIndex],
-	                    careerAnalytics: result.careerAnalytics
-	                };
-	                updatedCandidates.push(currentCandidates[candidateIndex]);
-	                console.log('Updated analytics for:', result.candidateName);
-	            }
-	        });
-	        
-	        if (updatedCandidates.length > 0) {
-	            // Refresh the UI
-	            updateCandidateCards(currentCandidates);
-	            attachCandidateCardHandlers(currentCandidates);
-	            
-	            // Deduct credits (3 per successfully processed candidate)
-	            const creditsUsed = responseData.processed * 3;
-	            userCredits -= creditsUsed;
-	            updateCreditsDisplay();
-	            
-	            // Save to analytics history
-	            saveToSearchHistory({
-	                jobTitle: 'Bulk Analytics',
-	                candidateCount: responseData.processed,
-	                type: 'bulk'
-	            }, responseData.processed, updatedCandidates);
-	            
-	            // Clear selections
-	            document.querySelectorAll('.candidate-checkbox:checked').forEach(cb => cb.checked = false);
-	            updateCompareButton();
-	            
-	            const message = responseData.processed === responseData.total 
-	                ? `Analytics completed for all ${responseData.processed} candidates!`
-	                : `Analytics completed for ${responseData.processed} of ${responseData.total} candidates. Credits used: ${creditsUsed}`;
-	            
-	            alert(message);
-	            console.log('Bulk analytics completed. Processed:', responseData.processed);
+	        if (candidateIndex !== -1) {
+	            currentCandidates[candidateIndex] = {
+	                ...currentCandidates[candidateIndex],
+	                careerAnalytics: result.careerAnalytics
+	            };
+	            updatedCandidates.push(currentCandidates[candidateIndex]);
+	            console.log('Updated analytics for:', result.candidateName);
 	        }
-	    } else {
-	        throw new Error(`Bulk analytics failed: ${responseData.error || 'Unknown error'}`);
+	    });
+	    
+	    if (updatedCandidates.length > 0) {
+	        // Refresh the UI
+	        updateCandidateCards(currentCandidates);
+	        attachCandidateCardHandlers(currentCandidates);
+	        
+	        // Deduct credits (3 per successfully processed candidate)
+	        const creditsUsed = data.processed * 3;
+	        userCredits -= creditsUsed;
+	        updateCreditsDisplay();
+	        
+	        // Save to analytics history
+	        saveToSearchHistory({
+	            jobTitle: 'Bulk Analytics',
+	            candidateCount: data.processed,
+	            type: 'bulk'
+	        }, data.processed, updatedCandidates);
+	        
+	        // Clear selections
+	        document.querySelectorAll('.candidate-checkbox:checked').forEach(cb => cb.checked = false);
+	        updateCompareButton();
+	        
+	        const message = data.processed === data.total 
+	            ? `Analytics completed for all ${data.processed} candidates!`
+	            : `Analytics completed for ${data.processed} of ${data.total} candidates. Credits used: ${creditsUsed}`;
+	        
+	        alert(message);
+	        console.log('Bulk analytics completed. Processed:', data.processed);
 	    }
 	} else {
-	    throw new Error('Invalid response format from bulk analytics service');
+	    throw new Error(`Bulk analytics failed: ${data.error || 'Unknown error'}`);
 	}
         
     } catch (error) {
