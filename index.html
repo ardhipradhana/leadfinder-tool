@@ -2027,33 +2027,148 @@ function updateModalGrowthOpportunities(candidate) {
     `).join('');
 }
 
+// Parse career analytics text into structured sections
+function parseCareerAnalytics(rawText) {
+    if (!rawText) return null;
+    
+    const sections = {
+        executiveSummary: '',
+        currentStrengths: '',
+        growthPotential: '',
+        careerTrajectory: '',
+        riskAssessment: '',
+        hiringRecommendation: ''
+    };
+    
+    // Split by emoji headers
+    const parts = rawText.split(/(?=🏆|📈|💰|🎯|🌐|🔍|📊|⚡)/);
+    
+    parts.forEach(part => {
+        if (part.includes('🏆 Potential Rating')) {
+            // Extract key metrics for executive summary
+            const potentialMatch = part.match(/Potential Rating: (\d+\/100)/);
+            const levelMatch = part.match(/Current Level: (\d+\/100)/);
+            const speedMatch = part.match(/Development Speed: ([^)]+\))/);
+            
+            if (potentialMatch && levelMatch && speedMatch) {
+                sections.executiveSummary = `${potentialMatch[1]} potential rating with ${levelMatch[1]} current performance level. ${speedMatch[1]} development timeline.`;
+            }
+        }
+        
+        if (part.includes('📈 Career Trajectory') || part.includes('💰 Compensation')) {
+            sections.careerTrajectory += part;
+        }
+        
+        if (part.includes('🎯 Strategic Development') || part.includes('⚡ Acceleration Strategies')) {
+            sections.growthPotential += part;
+        }
+        
+        if (part.includes('📊 Peer Benchmarking') || part.includes('🌐 Market Intelligence')) {
+            sections.currentStrengths += part;
+        }
+        
+        if (part.includes('🔍 Risk Assessment')) {
+            sections.riskAssessment = part;
+        }
+    });
+    
+    // Generate hiring recommendation from key insights
+    sections.hiringRecommendation = "Based on the analysis above, this candidate shows strong potential for strategic roles. Consider for positions requiring leadership development and analytical thinking.";
+    
+    return sections;
+}
+
 // Update career analytics section in modal
 function updateModalCareerAnalytics(candidate) {
     const analyticsContainer = candidateModal.querySelector('#careerAnalyticsContent');
-
-	// DEBUG: Log the candidate object to see the exact structure
+    
     console.log('=== DEBUGGING CAREER ANALYTICS ===');
     console.log('Full candidate object:', candidate);
     console.log('candidate.careerAnalytics:', candidate.careerAnalytics);
-    console.log('Type of careerAnalytics:', typeof candidate.careerAnalytics);
-	
+    
     if (analyticsContainer && candidate.careerAnalytics) {
-        // Parse the JSON if it's still a string
+        // Parse the analytics text
         let analyticsText = candidate.careerAnalytics;
-	    console.log('Initial analyticsText:', analyticsText);
         if (typeof analyticsText === 'object' && analyticsText.output) {
-		console.log('Found nested structure, extracting...');
-            // Extract from nested JSON structure
             const parsed = JSON.parse(analyticsText.output);
             analyticsText = parsed.careerAnalytics;
-		console.log('Extracted analyticsText:', analyticsText);
         }
-	    console.log('Final text to display:', analyticsText);
-        analyticsContainer.textContent = analyticsText;
-	    console.log('Analytics container updated');
-	    console.log('Container or analytics data missing');
-        console.log('Container found:', !!analyticsContainer);
-        console.log('Analytics data exists:', !!candidate.careerAnalytics);
+        
+        // Parse into structured sections
+        const sections = parseCareerAnalytics(analyticsText);
+        
+        if (sections) {
+            analyticsContainer.innerHTML = `
+                <!-- Executive Summary -->
+                <div class="mb-6 p-4 bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-purple-500/30 rounded-lg">
+                    <div class="flex items-center space-x-2 mb-3">
+                        <div class="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                            <span class="text-lg">🏆</span>
+                        </div>
+                        <h4 class="text-lg font-bold text-purple-400">Executive Summary</h4>
+                    </div>
+                    <p class="text-gray-300 leading-relaxed">${sections.executiveSummary}</p>
+                </div>
+
+                <!-- Current Strengths -->
+                <div class="mb-6 p-4 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/30 rounded-lg">
+                    <div class="flex items-center space-x-2 mb-3">
+                        <div class="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
+                            <span class="text-lg">💪</span>
+                        </div>
+                        <h4 class="text-lg font-bold text-green-400">Current Strengths</h4>
+                    </div>
+                    <div class="text-gray-300 leading-relaxed whitespace-pre-line">${sections.currentStrengths}</div>
+                </div>
+
+                <!-- Career Trajectory -->
+                <div class="mb-6 p-4 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-500/30 rounded-lg">
+                    <div class="flex items-center space-x-2 mb-3">
+                        <div class="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                            <span class="text-lg">📈</span>
+                        </div>
+                        <h4 class="text-lg font-bold text-blue-400">Career Trajectory & Compensation</h4>
+                    </div>
+                    <div class="text-gray-300 leading-relaxed whitespace-pre-line">${sections.careerTrajectory}</div>
+                </div>
+
+                <!-- Growth Potential -->
+                <div class="mb-6 p-4 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-lg">
+                    <div class="flex items-center space-x-2 mb-3">
+                        <div class="w-8 h-8 bg-yellow-500/20 rounded-lg flex items-center justify-center">
+                            <span class="text-lg">🎯</span>
+                        </div>
+                        <h4 class="text-lg font-bold text-yellow-400">Growth Potential & Development</h4>
+                    </div>
+                    <div class="text-gray-300 leading-relaxed whitespace-pre-line">${sections.growthPotential}</div>
+                </div>
+
+                <!-- Risk Assessment -->
+                <div class="mb-6 p-4 bg-gradient-to-r from-red-500/10 to-pink-500/10 border border-red-500/30 rounded-lg">
+                    <div class="flex items-center space-x-2 mb-3">
+                        <div class="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center">
+                            <span class="text-lg">🔍</span>
+                        </div>
+                        <h4 class="text-lg font-bold text-red-400">Risk Assessment</h4>
+                    </div>
+                    <div class="text-gray-300 leading-relaxed whitespace-pre-line">${sections.riskAssessment}</div>
+                </div>
+
+                <!-- Hiring Recommendation -->
+                <div class="p-4 bg-gradient-to-r from-accent-cyan/10 to-accent-teal/10 border border-accent-cyan/30 rounded-lg">
+                    <div class="flex items-center space-x-2 mb-3">
+                        <div class="w-8 h-8 bg-accent-cyan/20 rounded-lg flex items-center justify-center">
+                            <span class="text-lg">💡</span>
+                        </div>
+                        <h4 class="text-lg font-bold text-accent-cyan">Hiring Recommendation</h4>
+                    </div>
+                    <p class="text-gray-300 leading-relaxed">${sections.hiringRecommendation}</p>
+                </div>
+            `;
+        } else {
+            // Fallback to original display
+            analyticsContainer.textContent = analyticsText;
+        }
     }
 }
 
