@@ -2087,18 +2087,20 @@ function parseCareerAnalytics(rawText) {
 
 // Helper function to clean and format sections
 function cleanAndFormatSection(text) {
+    if (!text) return '';
+    
     return text
-        // Remove emoji headers
-        .replace(/🏆.*?\n/g, '')
-        .replace(/📈.*?\n/g, '')
-        .replace(/💰.*?\n/g, '')
-        .replace(/🎯.*?\n/g, '')
-        .replace(/🌐.*?\n/g, '')
-        .replace(/🔍.*?\n/g, '')
-        .replace(/📊.*?\n/g, '')
-        .replace(/⚡.*?\n/g, '')
-        // Clean up extra whitespace
-        .replace(/\n\n+/g, '\n\n')
+        // Remove only the emoji header lines (lines that start with emoji and end with newline)
+        .replace(/^🏆.*?\n/gm, '')
+        .replace(/^📈.*?\n/gm, '')
+        .replace(/^💰.*?\n/gm, '')
+        .replace(/^🎯.*?\n/gm, '')
+        .replace(/^🌐.*?\n/gm, '')
+        .replace(/^🔍.*?\n/gm, '')
+        .replace(/^📊.*?\n/gm, '')
+        .replace(/^⚡.*?\n/gm, '')
+        // Clean up extra whitespace but preserve content
+        .replace(/\n\n\n+/g, '\n\n')
         .trim();
 }
 
@@ -2148,7 +2150,10 @@ function updateModalCareerAnalytics(candidate) {
         if (sections) {
 		console.log('=== APPLYING NEW HTML ===');
 		console.log('Current Strengths raw text:', sections.currentStrengths);
+		
             analyticsContainer.innerHTML = `
+	    console.log('Current Strengths raw text:', sections.currentStrengths);
+		console.log('Career Trajectory raw text:', sections.careerTrajectory);
 	    <!-- Executive Summary -->
 	    <div class="mb-5 p-5 bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-purple-500/30 rounded-lg">
 	        <div class="flex items-center space-x-3 mb-3">
