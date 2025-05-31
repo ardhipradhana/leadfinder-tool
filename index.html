@@ -2814,14 +2814,14 @@ function generateRadarChart(candidates) {
     });
 }
 
-// Get chart colors for different candidates
+// Get chart colors for different candidates (no red = bad association)
 function getChartColor(index, alpha = 1) {
     const colors = [
-        `rgba(0, 212, 170, ${alpha})`,   // Accent cyan
-        `rgba(99, 102, 241, ${alpha})`,  // Indigo
-        `rgba(239, 68, 68, ${alpha})`,   // Red
-        `rgba(245, 158, 11, ${alpha})`,  // Orange
-        `rgba(16, 185, 129, ${alpha})`   // Green
+        `rgba(0, 212, 170, ${alpha})`,   // Accent cyan (teal)
+        `rgba(99, 102, 241, ${alpha})`,  // Indigo (purple-blue)
+        `rgba(245, 158, 11, ${alpha})`,  // Orange (warm)
+        `rgba(16, 185, 129, ${alpha})`,  // Green (emerald)
+        `rgba(168, 85, 247, ${alpha})`   // Purple (violet)
     ];
     return colors[index] || colors[0];
 }
@@ -2944,8 +2944,8 @@ function generateScoreComparisonRows(candidates) {
                             displayValue = `${value || 0}${metric.format === 'percentage' ? '%' : ''}`;
                             // Color coding for scores
                             if (value >= 80) cellClass += ' text-green-400 font-bold';
-                            else if (value >= 60) cellClass += ' text-yellow-400 font-semibold';
-                            else cellClass += ' text-red-400';
+							else if (value >= 60) cellClass += ' text-yellow-400 font-semibold';
+							else cellClass += ' text-gray-400'; 
                             break;
                         case 'years':
                             const expMatch = value?.match(/(\d+)/);
