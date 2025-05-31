@@ -2096,6 +2096,7 @@ function updateModalCareerAnalytics(candidate) {
         
         // Parse into structured sections
         const sections = parseCareerAnalytics(analyticsText);
+	    console.log('Parsed sections:', sections);
         
         if (sections) {
             analyticsContainer.innerHTML = `
