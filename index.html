@@ -257,8 +257,8 @@
 
 	    	.bookmark-ribbon {
 		    position: absolute;
-		    top: 12px;
-		    right: 12px;
+		    top: 8px;
+		    right: 8px;
 		    z-index: 10;
 		}
 
@@ -1538,8 +1538,12 @@ if (sampleBtn) {
 
 // Candidate card modal opening by card click (delegated)
 document.addEventListener('click', (e) => {
-    if (e.target.closest('.candidate-card')) {
-        candidateModal.classList.remove('hidden');
+    if (e.target.closest('.candidate-card') && !e.target.closest('.bookmark-icon')) {
+        const candidateId = e.target.closest('.candidate-card').getAttribute('data-candidate-id');
+        const candidate = currentCandidates.find(c => c.id === candidateId);
+        if (candidate) {
+            showCandidateModal(candidate);
+        }
     }
 });
 
@@ -3963,6 +3967,65 @@ function renderSavedCandidates() {
     });
 }
 
+// Show saved candidates in main results view (like search results)
+function showSavedCandidatesInMainView() {
+    const savedCands = getSavedCandidates();
+    
+    if (savedCands.length === 0) {
+        // Show empty state
+        document.getElementById('initialState').classList.add('hidden');
+        document.getElementById('loadingState').classList.add('hidden');
+        document.getElementById('resultsState').classList.remove('hidden');
+        
+        // Update title
+        const resultsTitle = document.querySelector('#resultsState h3');
+        const resultsDesc = document.querySelector('#resultsState p');
+        if (resultsTitle) resultsTitle.textContent = 'Saved Candidates';
+        if (resultsDesc) resultsDesc.textContent = 'No saved candidates yet. Bookmark candidates from search results.';
+        
+        document.getElementById('candidateCardsContainer').innerHTML = `
+            <div class="text-center py-8 text-gray-400">
+                <svg class="w-12 h-12 mx-auto mb-4 opacity-50" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
+                </svg>
+                <p>No saved candidates yet</p>
+                <p class="text-sm mt-2">Bookmark candidates from search results to save them here</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Show saved candidates in main view
+    currentCandidates = savedCands; // Set global candidates
+    
+    // Update results description
+    const resultsTitle = document.querySelector('#resultsState h3');
+    const resultsDesc = document.querySelector('#resultsState p');
+    if (resultsTitle) resultsTitle.textContent = 'Saved Candidates';
+    if (resultsDesc) resultsDesc.textContent = `${savedCands.length} saved candidates ready for review`;
+    
+    // Update AI insights for saved candidates
+    const aiInsights = `Viewing **${savedCands.length} saved candidates** from your bookmarks. These are your top picks selected across multiple searches. **All features available:** filtering, comparison, analytics, and export.`;
+    document.getElementById('aiInsightsText').innerHTML = aiInsights;
+    
+    // Generate and populate stats grid for saved candidates
+    const statsGrid = generateStatsGrid(savedCands);
+    document.getElementById('statsGrid').innerHTML = statsGrid;
+    
+    // Show results view
+    document.getElementById('initialState').classList.add('hidden');
+    document.getElementById('loadingState').classList.add('hidden');
+    document.getElementById('resultsState').classList.remove('hidden');
+    
+    // Update candidate cards
+    updateCandidateCards(savedCands);
+    
+    // Setup filters for saved candidates
+    setTimeout(() => {
+        setupResultFilters();
+    }, 100);
+}
+	
 function updateHistoryTabCounts() {
     const basicHistory = JSON.parse(localStorage.getItem('leadfinder_basic_history') || '[]');
     const analyticsHistory = JSON.parse(localStorage.getItem('leadfinder_analytics_history') || '[]');
@@ -4917,10 +4980,19 @@ setTimeout(() => {
 	    // Bookmark icon clicks
 	    if (e.target.closest('.bookmark-icon')) {
 	        e.stopPropagation(); // Prevent card click
-		    e.preventDefault(); // Prevent any default behavior
+	        e.preventDefault(); // Prevent any default behavior
+	        e.stopImmediatePropagation(); // Stop all event propagation
+	        
 	        const bookmarkIcon = e.target.closest('.bookmark-icon');
 	        const candidateId = bookmarkIcon.dataset.candidateId;
+	        
+	        // Toggle bookmark
 	        toggleBookmark(candidateId);
+	        
+	        // Force immediate visual update
+	        setTimeout(() => {
+	            updateBookmarkIcons();
+	        }, 50);
 	    }
 	});
 
@@ -5070,9 +5142,8 @@ setTimeout(() => {
 
 	// Saved candidates button click handler
 	document.getElementById('savedCandidatesBtn').addEventListener('click', function() {
-	    // Open history modal and switch to saved candidates tab
-	    document.getElementById('historyModal').classList.remove('hidden');
-	    switchHistoryTab('saved');
+	    // Show saved candidates directly in main results area
+	    showSavedCandidatesInMainView();
 	});
 	
     </script>
