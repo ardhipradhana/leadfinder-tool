@@ -3260,52 +3260,43 @@ async function upgradeIndividualCandidate(candidateId) {
             throw new Error(`HTTP error! status: ${response.status}, response: ${responseText}`);
         }
         
-        const data = JSON.parse(responseText);
-        console.log('Parsed response data:', data);
-        
-        // Parse the nested JSON structure from backend
-        let updatedCandidate = { ...candidate };
-        
-        if (data.output) {
-            try {
-                // Parse the nested JSON string
-                const parsedOutput = JSON.parse(data.output);
-                console.log('Parsed output:', parsedOutput);
-                
-                // Add the career analytics to the candidate
-                updatedCandidate.careerAnalytics = parsedOutput.careerAnalytics;
-                
-                // Update candidate in the array
-                const candidateIndex = currentCandidates.findIndex(c => c.id === candidateId);
-                if (candidateIndex !== -1) {
-                    currentCandidates[candidateIndex] = updatedCandidate;
-                    
-                    // Refresh the UI
-                    updateCandidateCards(currentCandidates);
-                    attachCandidateCardHandlers(currentCandidates);
-                    
-                    // Deduct credits
-                    userCredits -= 5;
-                    updateCreditsDisplay();
-                    
-                    // Save to analytics history
-                    saveToSearchHistory({
-                        jobTitle: 'Individual Analytics',
-                        candidateName: candidate.name,
-                        type: 'individual'
-                    }, 1, [updatedCandidate]);
-                    
-                    alert(`Analytics completed for ${candidate.name}!`);
-                    console.log('Individual analytics completed successfully');
-                }
-            } catch (parseError) {
-                console.error('Failed to parse nested output:', parseError);
-                throw new Error('Invalid response format from analytics service');
-            }
-        } else {
-            throw new Error('No analytics data received from service');
-        }
-        
+	const data = JSON.parse(responseText);
+	console.log('Parsed response data:', data);
+	
+	// Handle the new array format from backend
+	let updatedCandidate = { ...candidate };
+	
+	if (Array.isArray(data) && data.length > 0 && data[0].careerAnalytics) {
+	    // Extract career analytics from the first array element
+	    updatedCandidate.careerAnalytics = data[0].careerAnalytics;
+	    console.log('Career analytics extracted:', updatedCandidate.careerAnalytics.substring(0, 100) + '...');
+	    
+	    // Update candidate in the array
+	    const candidateIndex = currentCandidates.findIndex(c => c.id === candidateId);
+	    if (candidateIndex !== -1) {
+	        currentCandidates[candidateIndex] = updatedCandidate;
+	        
+	        // Refresh the UI
+	        updateCandidateCards(currentCandidates);
+	        attachCandidateCardHandlers(currentCandidates);
+	        
+	        // Deduct credits
+	        userCredits -= 5;
+	        updateCreditsDisplay();
+	        
+	        // Save to analytics history
+	        saveToSearchHistory({
+	            jobTitle: 'Individual Analytics',
+	            candidateName: candidate.name,
+	            type: 'individual'
+	        }, 1, [updatedCandidate]);
+	        
+	        alert(`Analytics completed for ${candidate.name}!`);
+	        console.log('Individual analytics completed successfully');
+	    }
+	} else {
+	    throw new Error('No analytics data received from service - invalid format');
+	}        
     } catch (error) {
         clearTimeout(timeoutId);
         console.error('Individual analytics failed:', error);
