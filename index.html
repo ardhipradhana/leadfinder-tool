@@ -3837,11 +3837,6 @@ document.getElementById('analyticsHistoryTab').addEventListener('click', functio
     switchHistoryTab('analytics');
 });
 
-// Saved candidates tab switching
-document.getElementById('savedCandidatesTab').addEventListener('click', function() {
-    switchHistoryTab('saved');
-});
-
 function switchHistoryTab(tabType) {
     // Update tab buttons
     document.querySelectorAll('.history-tab').forEach(tab => {
@@ -3851,7 +3846,6 @@ function switchHistoryTab(tabType) {
     // Hide all content
     document.getElementById('basicSearchContent').classList.add('hidden');
     document.getElementById('analyticsHistoryContent').classList.add('hidden');
-    document.getElementById('savedCandidatesContent').classList.add('hidden');
     
     if (tabType === 'basic') {
         document.getElementById('basicSearchTab').classList.add('active');
@@ -3859,10 +3853,6 @@ function switchHistoryTab(tabType) {
     } else if (tabType === 'analytics') {
         document.getElementById('analyticsHistoryTab').classList.add('active');
         document.getElementById('analyticsHistoryContent').classList.remove('hidden');
-    } else if (tabType === 'saved') {
-        document.getElementById('savedCandidatesTab').classList.add('active');
-        document.getElementById('savedCandidatesContent').classList.remove('hidden');
-        renderSavedCandidates(); // Load saved candidates
     }
 }
 
