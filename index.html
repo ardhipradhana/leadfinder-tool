@@ -2031,7 +2031,7 @@ function createCandidateCardHTML(candidate) {
                 </div>
                 
                 <!-- AI Score Circle -->
-                <div class="flex flex-col items-center ml-6">
+                <div class="flex flex-col items-center ml-4">
                     <div class="relative w-18 h-18 mb-2">
                         <div class="w-18 h-18 rounded-full enhanced-score-circle flex items-center justify-center" style="--score-deg: ${scorePercentage}deg; --score-color: ${getScoreColor(candidate.aiScore)}">
                             <div class="w-14 h-14 bg-dark-secondary rounded-full flex items-center justify-center shadow-inner">
@@ -2050,7 +2050,12 @@ function createCandidateCardHTML(candidate) {
 // Attach click handlers to each candidate card (for details modal)
 function attachCandidateCardHandlers(candidates) {
     document.querySelectorAll('.candidate-card').forEach((card, index) => {
-        card.addEventListener('click', () => {
+        card.addEventListener('click', (e) => {
+            // Don't open modal if clicking bookmark elements
+            if (e.target.closest('.bookmark-icon') || e.target.closest('.bookmark-ribbon')) {
+                return;
+            }
+            
             const candidateId = card.getAttribute('data-candidate-id');
             const candidate = candidates.find(c => c.id === candidateId);
             if (candidate) {
@@ -2058,6 +2063,7 @@ function attachCandidateCardHandlers(candidates) {
             }
         });
     });
+	
 	// ADD THIS: Attach checkbox event listeners
     document.querySelectorAll('.candidate-checkbox').forEach(checkbox => {
         checkbox.addEventListener('change', function(e) {
