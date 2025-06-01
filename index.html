@@ -1117,15 +1117,6 @@
 	                        <span id="analyticsHistoryCount" class="bg-purple-500 text-white px-2 py-1 rounded-full text-xs font-bold">0</span>
 	                    </div>
 	                </button>
-				    <button id="savedCandidatesTab" class="flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors history-tab">
-					    <div class="flex items-center justify-center space-x-2">
-					        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-					            <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
-					        </svg>
-					        <span>Saved Candidates</span>
-					        <span id="savedCandidatesCount" class="bg-yellow-500 text-dark-primary px-2 py-1 rounded-full text-xs font-bold">0</span>
-					    </div>
-					</button>
 	            </div>
 	        </div>
 	        
@@ -1723,6 +1714,13 @@ async function handleSearch(e) {
 
 // Process backend results and update UI
 function processSearchResults(data) {
+	// Make candidate IDs unique by adding timestamp
+    const searchTimestamp = Date.now();
+    data.results.candidates = data.results.candidates.map((candidate, index) => ({
+        ...candidate,
+        id: `${candidate.id}_${searchTimestamp}`,
+        originalId: candidate.id // Keep original for reference
+    }));
     // Store candidates globally for modal access
     currentCandidates = data.results.candidates;
     // Update results description
@@ -1765,6 +1763,14 @@ function processSearchResults(data) {
 
 function showHistorySearchResult(searchData) {
     console.log('Showing history search result for:', searchData);
+
+	// Make candidate IDs unique for history results too
+    const searchTimestamp = Date.now();
+    const candidatesWithUniqueIds = (searchData.candidates || []).map((candidate, index) => ({
+        ...candidate,
+        id: `${candidate.originalId || candidate.id}_${searchTimestamp}`,
+        originalId: candidate.originalId || candidate.id
+    }));
     
     // Update results description with correct search data
     const resultsTitle = document.querySelector('#resultsState h3');
@@ -1781,9 +1787,11 @@ function showHistorySearchResult(searchData) {
 	}));
     
     // Update candidate cards with saved data
+	updateCandidateCards(candidatesWithUniqueIds);
     updateCandidateCards(searchData.candidates || []);
     
     // Update the global candidate state for filtering
+	currentCandidates = candidatesWithUniqueIds;
     currentCandidates = searchData.candidates || [];
     attachCandidateCardHandlers(currentCandidates);
     
