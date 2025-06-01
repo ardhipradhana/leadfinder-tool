@@ -271,6 +271,24 @@
 		    color: #6b7280; /* Gray color */
 		}
 
+	    	.bookmark-icon {
+		    cursor: pointer;
+		    padding: 4px;
+		    border-radius: 4px;
+		    transition: all 0.2s ease;
+		    position: relative;
+		    z-index: 15; /* Higher than card */
+		}
+		
+		.bookmark-icon:hover {
+		    background-color: rgba(0, 0, 0, 0.3);
+		    transform: scale(1.2);
+		}
+		
+		.candidate-card .bookmark-ribbon {
+		    pointer-events: auto; /* Ensure it can receive clicks */
+		}
+
     </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen">
