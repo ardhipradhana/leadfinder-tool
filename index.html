@@ -4898,11 +4898,16 @@ setTimeout(() => {
 	    // Load and render both history types
 	    const basicHistory = JSON.parse(localStorage.getItem('leadfinder_basic_history') || '[]');
 	    const analyticsHistory = JSON.parse(localStorage.getItem('leadfinder_analytics_history') || '[]');
+
+		console.log('Basic history:', basicHistory); // DEBUG
+	    console.log('Analytics history:', analyticsHistory); // DEBUG
+	    console.log('About to call render functions'); // DEBUG
 	    
 	    updateHistoryTabCounts();
 	    renderBasicSearchHistory(basicHistory);
 	    renderAnalyticsHistory(analyticsHistory);
-    
+
+		console.log('Modal should open now'); // DEBUG
 	    document.getElementById('historyModal').classList.remove('hidden');
 	});
 	// Close history modal handlers
