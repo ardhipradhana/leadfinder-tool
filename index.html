@@ -1565,7 +1565,9 @@ if (sampleBtn) {
 
 // Candidate card modal opening by card click (delegated)
 document.addEventListener('click', (e) => {
-    if (e.target.closest('.candidate-card') && !e.target.closest('.bookmark-icon')) {
+    if (e.target.closest('.candidate-card') && 
+        !e.target.closest('.bookmark-icon') && 
+        !e.target.closest('.bookmark-ribbon')) {
         const candidateId = e.target.closest('.candidate-card').getAttribute('data-candidate-id');
         const candidate = currentCandidates.find(c => c.id === candidateId);
         if (candidate) {
