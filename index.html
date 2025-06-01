@@ -5138,14 +5138,13 @@ setTimeout(() => {
 
 	// Clear all filters button
 	document.getElementById('clearAllFiltersBtn').addEventListener('click', clearAllFilters);
-	});
 
-	// Saved candidates button click handler
+	// Saved candidates button click handler - FIXED
 	document.getElementById('savedCandidatesBtn').addEventListener('click', function() {
-	    // Show saved candidates directly in main results area
+	    // Show saved candidates directly in main results area (replaces current results)
 	    showSavedCandidatesInMainView();
 	});
-	
+	});
     </script>
 
 	<!-- Add this right before </body> -->
