@@ -4895,7 +4895,14 @@ setTimeout(() => {
 	});
 	// Search History modal handler
 	document.getElementById('searchHistoryBtn').addEventListener('click', function() {
-	    updateSearchHistoryUI();
+	    // Load and render both history types
+	    const basicHistory = JSON.parse(localStorage.getItem('leadfinder_basic_history') || '[]');
+	    const analyticsHistory = JSON.parse(localStorage.getItem('leadfinder_analytics_history') || '[]');
+	    
+	    updateHistoryTabCounts();
+	    renderBasicSearchHistory(basicHistory);
+	    renderAnalyticsHistory(analyticsHistory);
+    
 	    document.getElementById('historyModal').classList.remove('hidden');
 	});
 	// Close history modal handlers
