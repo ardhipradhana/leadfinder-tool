@@ -4222,9 +4222,11 @@ function generateAIInsights(candidates, searchQuery) {
     
     // Experience analysis
     const experiences = candidates.map(c => {
-        const match = c.experience?.match(/(\d+)/);
-        return match ? parseInt(match[0]) : 0;
-    }).filter(exp => exp > 0);
+	    const match = c.experience?.match(/(\d+)/);
+	    const years = match ? parseInt(match[0]) : 0;
+	    // Filter out unrealistic values (more than 50 years experience)
+	    return years > 0 && years <= 50 ? years : 0;
+	}).filter(exp => exp > 0);
     
     const minExp = experiences.length > 0 ? Math.min(...experiences) : 0;
     const maxExp = experiences.length > 0 ? Math.max(...experiences) : 0;
