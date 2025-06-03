@@ -1660,7 +1660,7 @@ async function handleSearch(e) {
         
         // SECURED N8N WEBHOOK CALL
         const mockUserId = 'test-user-123'; // Mock user ID for testing
-        const response = await fetch('https://montpro.app.n8n.cloud/webhook-test/leadfinder-tool', {
+        const response = await fetch('https://montpro.app.n8n.cloud/webhook/leadfinder-tool', {
             method: 'POST',
             signal: controller.signal,
             headers: { 
@@ -4574,7 +4574,7 @@ async function upgradeIndividualCandidate(candidateId) {
         type: 'individual'
     };
     
-    const requestUrl = 'https://montpro.app.n8n.cloud/webhook-test/leadfinder-individual-analytics';
+    const requestUrl = 'https://montpro.app.n8n.cloud/webhook/leadfinder-individual-analytics';
     
     // DETAILED DEBUG LOGGING
     console.log('=== INDIVIDUAL ANALYTICS REQUEST DEBUG ===');
@@ -4686,7 +4686,7 @@ async function upgradeBulkCandidates(candidateIds) {
         type: 'bulk'
     };
     
-    const requestUrl = 'https://montpro.app.n8n.cloud/webhook-test/leadfinder-bulk-analytics';
+    const requestUrl = 'https://montpro.app.n8n.cloud/webhook/leadfinder-bulk-analytics';
     
     // DETAILED DEBUG LOGGING
     console.log('=== BULK ANALYTICS REQUEST DEBUG ===');
