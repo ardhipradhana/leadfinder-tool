@@ -1614,7 +1614,7 @@ async function checkAuthAndCredits() {
         .single();
 
     const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Query timeout')), 5000)
+        setTimeout(() => reject(new Error('Query timeout')), 15000)
     );
 
     try {
@@ -1678,7 +1678,7 @@ async function checkAuthAndCredits() {
         // Fallback - set credits manually for now
         userCredits = 3;
         updateCreditsDisplay();
-        showCustomToast('Profile Warning', 'Using cached profile data', 'info');
+        showCustomToast('Profile Warning', 'Using cached profile data', 'info', 3000);
         return true;
     }
 }
