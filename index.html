@@ -1697,18 +1697,33 @@ async function checkAuthAndCredits() {
 }
 	
 async function deductCredit(amount = 1) {
-	if (userCredits < amount) return false;
+	console.log('=== DEDUCT CREDIT DEBUG ===');
+	console.log('Amount to deduct:', amount);
+	console.log('Current userCredits before:', userCredits);
+	
+	if (userCredits < amount) {
+		console.log('Not enough credits!');
+		return false;
+	}
+	
 	const newCredits = userCredits - amount;
+	console.log('Calculated newCredits:', newCredits);
+	
 	const { error } = await supabaseClient
 		.from('leadfinder_users')
 		.update({ credits: newCredits, updated_at: new Date().toISOString() })
 		.eq('id', currentUser.id);
+		
 	if (!error) {
+		console.log('Database update successful');
 		userCredits = newCredits;
+		console.log('Frontend userCredits after:', userCredits);
 		updateCreditsDisplay();
 		return true;
+	} else {
+		console.log('Database error:', error);
+		return false;
 	}
-	return false;
 }
 	
 async function signInWithMagicLink() {
