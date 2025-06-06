@@ -1727,47 +1727,6 @@ document.getElementById('googleAuthBtn').addEventListener('click', signInWithGoo
 document.getElementById('closeAuthModal').addEventListener('click', hideAuthModal);
        
 let searchHistory = JSON.parse(localStorage.getItem('leadfinder_history') || '[]');
-
-// Save search to Supabase
-async function saveSearchToSupabase(searchParams, results) {
-    if (!currentUser) return;
-    const { error } = await supabaseClient
-        .from('search_history')
-        .insert({
-            user_id: currentUser.id,
-            search_params: searchParams,
-            results: results,
-            credits_used: 1
-        });
-    if (error) {
-        console.error('Failed to save search:', error);
-    }
-}
-
-// Load search history from Supabase instead of localStorage
-async function loadSearchHistory() {
-    if (!currentUser) return [];
-    const { data, error } = await supabaseClient
-        .from('search_history')
-        .select('*')
-        .eq('id', currentUser.id)
-        .order('created_at', { ascending: false })
-        .limit(10);
-    if (error) {
-        console.error('Failed to load search history:', error);
-        return [];
-    }
-    return data.map(item => ({
-        id: item.id,
-        jobTitle: item.search_params.jobTitle,
-        industry: item.search_params.industry,
-        location: item.search_params.location,
-        experience: item.search_params.experience,
-        resultCount: item.results.totalFound || 0,
-        candidates: item.results.candidates || [],
-        timestamp: item.created_at
-    }));
-}
 		        
 // DOM elements
 console.log('Step 4: Looking for DOM elements...');
