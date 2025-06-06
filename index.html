@@ -5654,23 +5654,17 @@ setTimeout(() => {
 
 	// Bulk upgrade button handler - FIXED VERSION
 	document.getElementById('bulkAnalyticsBtn').addEventListener('click', async function(e) {
-	    e.stopPropagation(); // Prevent any bubbling
-	    e.preventDefault(); // Prevent default behavior
-	    
-	    console.log('Bulk analytics button clicked!'); // Debug log
+	    e.stopPropagation();
+	    e.preventDefault();
 	    
 	    const selectedCheckboxes = document.querySelectorAll('.candidate-checkbox:checked');
 	    const selectedIds = Array.from(selectedCheckboxes).map(cb => cb.dataset.candidateId);
-	    
-	    console.log('Selected candidate IDs:', selectedIds); // Debug log
 	    
 	    // Filter to candidates without analytics
 	    const candidatesWithoutAnalytics = selectedIds.filter(id => {
 	        const candidate = currentCandidates.find(c => c.id === id);
 	        return candidate && (!candidate.careerAnalytics || candidate.careerAnalytics === null);
 	    }).map(id => currentCandidates.find(c => c.id === id));
-	    
-	    console.log('Candidates without analytics:', candidatesWithoutAnalytics.map(c => c.name)); // Debug log
 	    
 	    if (candidatesWithoutAnalytics.length === 0) {
 	        showCustomToast('Already Analyzed', 'All selected candidates already have analytics.', 'info');
@@ -5679,17 +5673,25 @@ setTimeout(() => {
 	    
 	    const totalCredits = candidatesWithoutAnalytics.length * 3; // Bulk pricing
 	    
-	    console.log('Credits required:', totalCredits, 'Available:', userCredits); // Debug log
-	    
 	    // Check credits
 	    if (userCredits < totalCredits) {
 	        showCustomToast('Insufficient Credits', `You need ${totalCredits} credits for bulk analytics.`, 'error');
 	        return;
 	    }
 	    
-	    // Confirm purchase
-	    const candidateNames = candidatesWithoutAnalytics.map(c => c.name).join(', ');
-	    const confirmed = confirm(`Analyze ${candidatesWithoutAnalytics.length} candidates (${candidateNames}) for ${totalCredits} credits?`);
+	    // Prepare confirmation message
+	    const candidateNames = candidatesWithoutAnalytics.slice(0, 3).map(c => c.name).join(', ');
+	    const remainingCount = candidatesWithoutAnalytics.length - 3;
+	    const namesDisplay = remainingCount > 0 ? `${candidateNames} and ${remainingCount} others` : candidateNames;
+	    
+	    const message = `Analyze career potential for ${candidatesWithoutAnalytics.length} candidates (${namesDisplay}) for ${totalCredits} credits?`;
+	    
+	    // Show custom confirmation
+	    const confirmed = await showConfirmModal(
+	        'Bulk Career Analysis',
+	        message
+	    );
+	    
 	    if (!confirmed) return;
 	    
 	    // Disable button and show loading
@@ -5706,9 +5708,7 @@ setTimeout(() => {
 	    button.classList.add('opacity-50');
 	    
 	    try {
-	        console.log('Calling upgradeBulkCandidates...'); // Debug log
 	        await upgradeBulkCandidates(candidatesWithoutAnalytics.map(c => c.id));
-	        console.log('Bulk upgrade completed successfully'); // Debug log
 	    } catch (error) {
 	        console.error('Bulk upgrade failed:', error);
 	        showCustomToast('Analysis Failed', `${error.message}. Please try again.`, 'error');
