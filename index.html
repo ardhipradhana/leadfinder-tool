@@ -1696,14 +1696,15 @@ async function checkAuthAndCredits() {
     }
 }
 	
-async function deductCredit() {
-	if (userCredits <= 0) return false;
+async function deductCredit(amount = 1) {
+	if (userCredits < amount) return false;
+	const newCredits = userCredits - amount;
 	const { error } = await supabaseClient
 		.from('leadfinder_users')
-		.update({ credits: userCredits - 1, updated_at: new Date().toISOString() })
+		.update({ credits: newCredits, updated_at: new Date().toISOString() })
 		.eq('id', currentUser.id);
 	if (!error) {
-		userCredits -= 1;
+		userCredits = newCredits;
 		updateCreditsDisplay();
 		return true;
 	}
@@ -2022,17 +2023,24 @@ async function handleSearch(e) {
 async function logCreditTransaction(amount, type, description) {
     if (!currentUser) return;
     
-    const { error } = await supabaseClient
-        .from('credit_transactions')
-        .insert({
-            user_id: currentUser.id,
-            amount: amount,
-            transaction_type: type,
-            description: description
-        });
-        
-    if (error) {
-        console.error('Failed to log transaction:', error);
+    try {
+        const { error } = await supabaseClient
+            .from('credit_transactions')
+            .insert({
+                user_id: currentUser.id,
+                amount: amount,
+                transaction_type: type,
+                description: description,
+                created_at: new Date().toISOString()
+            });
+            
+        if (error) {
+            console.error('Failed to log transaction:', error);
+        } else {
+            console.log('Transaction logged:', type, amount, 'credits');
+        }
+    } catch (error) {
+        console.error('Transaction logging error:', error);
     }
 }
 	
@@ -4958,9 +4966,12 @@ async function upgradeIndividualCandidate(candidateId) {
                 updateCandidateCards(currentCandidates);
                 attachCandidateCardHandlers(currentCandidates);
                 
-                // Deduct credits
-                userCredits -= 5;
-                updateCreditsDisplay();
+                // Deduct credits on success (5 for individual)
+		const creditDeducted = await deductCredit(5); // Pass 5 as parameter
+		if (creditDeducted) {
+		    await logCreditTransaction(-5, 'individual_analytics', `Individual Analytics: ${result.candidateName}`);
+		    console.log('5 credits deducted successfully');
+		}
                 
                 // Save to analytics history
                 saveToSearchHistory({
@@ -5082,9 +5093,12 @@ async function upgradeBulkCandidates(candidateIds) {
                 attachCandidateCardHandlers(currentCandidates);
                 
                 // Deduct credits (3 per successfully processed candidate)
-                const creditsUsed = data.processed * 3;
-                userCredits -= creditsUsed;
-                updateCreditsDisplay();
+		const creditsUsed = data.processed * 3;
+		const creditDeducted = await deductCredit(creditsUsed);
+		if (creditDeducted) {
+		    await logCreditTransaction(-creditsUsed, 'bulk_analytics', `Bulk Analytics: ${data.processed} candidates analyzed`);
+		    console.log(`${creditsUsed} credits deducted successfully`);
+		}
                 
                 // Save to analytics history
                 saveToSearchHistory({
@@ -5824,9 +5838,12 @@ setTimeout(() => {
 	            try {
 	                await generateOutreachMessages(activeCandidate);
 	                
-	                // Deduct credits on success
-	                userCredits -= 2;
-	                updateCreditsDisplay();
+	                // Deduct credits on success (2 for message generation)
+			const creditDeducted = await deductCredit(2);
+			if (creditDeducted) {
+			    await logCreditTransaction(-2, 'message_generation', `Outreach Messages: ${activeCandidate.name}`);
+			    console.log('2 credits deducted successfully');
+			}
 	                
 	                showCustomToast('Success', 'Messages generated successfully!', 'success');
 	            } catch (error) {
