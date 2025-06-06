@@ -1622,19 +1622,12 @@ async function checkAuthAndCredits() {
         console.log('Fetching profile for user:', currentUser.id);
         console.log('About to run Supabase query...');
 
-        // Add timeout protection
-        const queryPromise = supabaseClient
-            .from('leadfinder_users')
-            .select('credits')
-            .eq('id', currentUser.id)
-            .single();
-
-        const timeoutPromise = new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Query timeout')), 15000)
-        );
-
         try {
-            const { data: profile, error } = await Promise.race([queryPromise, timeoutPromise]);
+	    const { data: profile, error } = await supabaseClient
+	        .from('leadfinder_users')
+	        .select('credits')
+	        .eq('id', currentUser.id)
+	        .single();
             console.log('Supabase query completed');
             console.log('Profile fetch result:', { profile, error });
 
