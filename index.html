@@ -5154,6 +5154,17 @@ function populateMessages(messages) {
     document.getElementById('emailShortMessage').innerHTML = messages.emailShort || 'Failed to generate message';
     document.getElementById('emailElaborateMessage').innerHTML = messages.emailElaborate || 'Failed to generate message';
     
+    // SAVE MESSAGES TO CANDIDATE DATA
+    if (activeCandidate) {
+        activeCandidate.outreachMessages = messages;
+        
+        // Also update in currentCandidates array
+        const candidateIndex = currentCandidates.findIndex(c => c.id === activeCandidate.id);
+        if (candidateIndex !== -1) {
+            currentCandidates[candidateIndex].outreachMessages = messages;
+        }
+    }
+    
     // Re-enable generate button
     const generateBtn = document.getElementById('generateNewMessages');
     generateBtn.disabled = false;
@@ -5597,6 +5608,24 @@ setTimeout(() => {
 	    }
 	});
 
+	// When popup opens, check for existing messages
+	document.addEventListener('click', (e) => {
+	    if (e.target.closest('#generateOutreachBtn')) {
+	        const popup = document.getElementById('aiOutreachPopup');
+	        popup.classList.remove('hidden');
+	        
+	        // Initialize LinkedIn tab as active
+	        document.getElementById('linkedinTab').classList.add('active');
+	        document.getElementById('linkedinMessages').classList.add('active');
+	        
+	        // LOAD EXISTING MESSAGES IF AVAILABLE
+	        if (activeCandidate && activeCandidate.outreachMessages) {
+	            populateMessages(activeCandidate.outreachMessages);
+	        }
+	        // If no messages exist, the HTML already shows "Generating message..." by default
+	    }
+	});
+	
 	// Tab switching functionality
 	document.addEventListener('click', (e) => {
 	    // Platform tab switching
