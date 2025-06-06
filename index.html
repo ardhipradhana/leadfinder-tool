@@ -1546,8 +1546,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 const SUPABASE_URL = 'https://brawqzylfyuotgxqmtox.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJyYXdxenlsZnl1b3RneHFtdG94Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg1MTU0NTUsImV4cCI6MjA2NDA5MTQ1NX0.P4qazlzBHk66eItqBRK-6k2ll2I1d754ke5_r_hNxos';
 const WEBHOOK_SECRET = 'leadfinder_secretkey123';
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-	console.log('Step 2: Supabase initialized');
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: {
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: true
+    }
+});
 
 let currentUser = null;
 let userCredits = 0;
