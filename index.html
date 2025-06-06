@@ -1744,13 +1744,22 @@ async function signInWithGoogle() {
 	}
 }
 
+let authInitialized = false;
+
 supabaseClient.auth.onAuthStateChange(async (event, session) => {
     console.log('Auth state change:', event);
+    
     if (event === 'SIGNED_IN' && session) {
         currentUser = session.user;
         hideAuthModal();
-        await checkAuthAndCredits();
+        
+        // Only check credits once per session
+        if (!authInitialized) {
+            authInitialized = true;
+            await checkAuthAndCredits();
+        }
     } else if (event === 'SIGNED_OUT') {
+        authInitialized = false;
         currentUser = null;
         userCredits = 0;
         updateCreditsDisplay();
@@ -1760,16 +1769,6 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
 
 // --- 4. Main session check on page load ---
 console.log('Step 4: Skipping Supabase session check for now...');
-// Check authentication on page load
-(async () => {
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    if (session) {
-        currentUser = session.user;
-        await checkAuthAndCredits();
-    } else {
-        showAuthModal();
-    }
-})();
 console.log('Step 6: Auth handling completed');
 
 console.log('Step 7: Moving to DOM elements...');
