@@ -5331,6 +5331,22 @@ setTimeout(() => {
 	    // Show saved candidates directly in main results area (replaces current results)
 	    showSavedCandidatesInMainView();
 	});
+
+	// Test AI Outreach Popup
+	document.addEventListener('click', (e) => {
+	    if (e.target.closest('#generateOutreachBtn')) {
+	        console.log('Generate button clicked!');
+	        const popup = document.getElementById('aiOutreachPopup');
+	        popup.classList.remove('hidden');
+	    }
+	    
+	    if (e.target.closest('#closeOutreachPopup') || e.target.closest('#closeOutreachPopupBtn')) {
+	        console.log('Close button clicked!');
+	        const popup = document.getElementById('aiOutreachPopup');
+	        popup.classList.add('hidden');
+	    }
+	});
+	
 	});
     </script>
 
