@@ -1206,7 +1206,7 @@
 				    <div class="absolute inset-0 bg-black bg-opacity-30"></div>
 				    
 				    <!-- Popup Container -->
-				    <div class="absolute bottom-8 right-4 w-96 h-[500px] bg-dark-secondary rounded-xl border border-accent-cyan/30 shadow-2xl flex flex-col z-10">
+				    <div class="absolute bottom-8 right-8 w-[600px] h-[500px] bg-dark-secondary rounded-xl border border-accent-cyan/30 shadow-2xl flex flex-col z-10">
 					<!-- Header -->
 					<div class="flex items-center justify-between p-4 border-b border-gray-700">
 					    <h3 class="text-lg font-semibold text-white flex items-center">
@@ -1242,6 +1242,19 @@
 						    <span>Email</span>
 						</div>
 					    </button>
+					</div>
+
+					<!-- Purpose Selection -->
+					<div class="p-4 pb-2 border-b border-gray-700/50">
+					    <label class="block text-sm font-medium text-gray-300 mb-2">Outreach Purpose:</label>
+					    <select id="outreachPurpose" class="w-full px-3 py-2 bg-dark-primary border border-gray-600 rounded-lg text-white text-sm focus:border-accent-cyan focus:outline-none">
+					        <option value="opportunity">Present job opportunity</option>
+					        <option value="connect">Connect on LinkedIn</option>
+					        <option value="consultation">Schedule consultation call</option>
+					        <option value="custom">Custom purpose...</option>
+					    </select>
+					    <input type="text" id="customPurpose" placeholder="Enter your custom purpose..." 
+					           class="w-full px-3 py-2 bg-dark-primary border border-gray-600 rounded-lg text-white text-sm placeholder-gray-400 focus:border-accent-cyan focus:outline-none mt-2 hidden">
 					</div>
 					
 					<!-- Messages Content Area -->
@@ -5057,6 +5070,123 @@ async function upgradeBulkCandidates(candidateIds) {
     }
 }
 
+// Generate outreach messages
+async function generateOutreachMessages(candidateData) {
+    const purpose = document.getElementById('outreachPurpose').value;
+    const customPurpose = document.getElementById('customPurpose').value;
+    
+    const requestData = {
+        candidate: {
+            name: candidateData.name,
+            title: candidateData.title,
+            experience: candidateData.experience,
+            location: candidateData.location
+        },
+        purpose: purpose === 'custom' ? customPurpose : purpose,
+        currentJobRole: "Restaurant Manager", // TODO: Get from search context
+        currentCompanyName: "Your Company", // TODO: Get from user profile
+        userId: "test-user-123"
+    };
+    
+    try {
+        // Show loading state
+        showMessageLoading();
+        
+        const response = await fetch('https://montpro.app.n8n.cloud/webhook/leadfinder-outreach', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer leadfinder_secretkey123',
+                'X-User-ID': 'test-user-123'
+            },
+            body: JSON.stringify(requestData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            populateMessages(data.messages);
+        } else {
+            throw new Error(data.error || 'Failed to generate messages');
+        }
+        
+    } catch (error) {
+        console.error('Message generation failed:', error);
+        showMessageError();
+    }
+}
+
+// Show loading state for messages
+function showMessageLoading() {
+    const messageIds = [
+        'linkedinShortMessage',
+        'linkedinElaborateMessage', 
+        'emailShortMessage',
+        'emailElaborateMessage'
+    ];
+    
+    messageIds.forEach(id => {
+        const element = document.getElementById(id);
+        element.innerHTML = `
+            <div class="flex items-center space-x-2 message-loading">
+                <svg class="w-4 h-4 animate-spin text-accent-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                </svg>
+                <span class="text-gray-400">Generating personalized message...</span>
+            </div>
+        `;
+    });
+    
+    // Disable generate button
+    const generateBtn = document.getElementById('generateNewMessages');
+    generateBtn.disabled = true;
+    generateBtn.classList.add('opacity-50');
+}
+
+// Populate messages with API response
+function populateMessages(messages) {
+    // LinkedIn messages
+    document.getElementById('linkedinShortMessage').innerHTML = messages.linkedinShort || 'Failed to generate message';
+    document.getElementById('linkedinElaborateMessage').innerHTML = messages.linkedinElaborate || 'Failed to generate message';
+    
+    // Email messages  
+    document.getElementById('emailShortMessage').innerHTML = messages.emailShort || 'Failed to generate message';
+    document.getElementById('emailElaborateMessage').innerHTML = messages.emailElaborate || 'Failed to generate message';
+    
+    // Re-enable generate button
+    const generateBtn = document.getElementById('generateNewMessages');
+    generateBtn.disabled = false;
+    generateBtn.classList.remove('opacity-50');
+}
+
+// Show error state
+function showMessageError() {
+    const messageIds = [
+        'linkedinShortMessage',
+        'linkedinElaborateMessage',
+        'emailShortMessage', 
+        'emailElaborateMessage'
+    ];
+    
+    messageIds.forEach(id => {
+        const element = document.getElementById(id);
+        element.innerHTML = `
+            <div class="flex items-center space-x-2 text-red-400">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                </svg>
+                <span>Failed to generate message. Please try again.</span>
+            </div>
+        `;
+    });
+    
+    // Re-enable generate button
+    const generateBtn = document.getElementById('generateNewMessages');
+    generateBtn.disabled = false;
+    generateBtn.classList.remove('opacity-50');
+}
+
 // --- Utility: Modal/Keyboard Shortcuts & Startup
 
 // Close modals when clicking outside
@@ -5505,6 +5635,105 @@ setTimeout(() => {
 	        // Initialize LinkedIn tab as active
 	        document.getElementById('linkedinTab').classList.add('active');
 	        document.getElementById('linkedinMessages').classList.add('active');
+	    }
+	});
+
+	// Purpose selector functionality
+	document.addEventListener('change', (e) => {
+	    if (e.target.id === 'outreachPurpose') {
+	        const customInput = document.getElementById('customPurpose');
+	        if (e.target.value === 'custom') {
+	            customInput.classList.remove('hidden');
+	            customInput.focus();
+	        } else {
+	            customInput.classList.add('hidden');
+	            customInput.value = '';
+	        }
+	    }
+	});
+
+	// Copy message functionality
+	document.addEventListener('click', (e) => {
+	    if (e.target.closest('.copy-message-btn')) {
+	        const button = e.target.closest('.copy-message-btn');
+	        const messageType = button.dataset.messageType;
+	        
+	        let messageText = '';
+	        
+	        // Get the message text based on type
+	        switch(messageType) {
+	            case 'linkedin-short':
+	                messageText = document.getElementById('linkedinShortMessage').textContent;
+	                break;
+	            case 'linkedin-elaborate':
+	                messageText = document.getElementById('linkedinElaborateMessage').textContent;
+	                break;
+	            case 'email-short':
+	                messageText = document.getElementById('emailShortMessage').textContent;
+	                break;
+	            case 'email-elaborate':
+	                messageText = document.getElementById('emailElaborateMessage').textContent;
+	                break;
+	        }
+	        
+	        // Copy to clipboard
+	        if (messageText && messageText !== 'Generating message...' && !messageText.includes('Failed to generate')) {
+	            navigator.clipboard.writeText(messageText).then(() => {
+	                // Show success feedback
+	                const originalText = button.innerHTML;
+	                button.innerHTML = '✓ Copied';
+	                button.classList.add('bg-green-500', 'text-white');
+	                button.classList.remove('bg-accent-cyan/20', 'text-accent-cyan');
+	                
+	                setTimeout(() => {
+	                    button.innerHTML = originalText;
+	                    button.classList.remove('bg-green-500', 'text-white');
+	                    button.classList.add('bg-accent-cyan/20', 'text-accent-cyan');
+	                }, 2000);
+	            }).catch(() => {
+	                showCustomToast('Copy Failed', 'Failed to copy message to clipboard', 'error');
+	            });
+	        } else {
+	            showCustomToast('Cannot Copy', 'No message available to copy', 'error');
+	        }
+	    }
+	});
+	
+	// Generate messages button click
+	document.addEventListener('click', async (e) => {
+	    if (e.target.closest('#generateNewMessages')) {
+	        // Check credits (2 credits required)
+	        if (userCredits < 2) {
+	            showCustomToast('Insufficient Credits', 'You need 2 credits to generate messages', 'error');
+	            return;
+	        }
+	        
+	        // Validate purpose
+	        const purpose = document.getElementById('outreachPurpose').value;
+	        const customPurpose = document.getElementById('customPurpose').value;
+	        
+	        if (purpose === 'custom' && !customPurpose.trim()) {
+	            showCustomToast('Missing Purpose', 'Please enter your custom purpose', 'error');
+	            document.getElementById('customPurpose').focus();
+	            return;
+	        }
+	        
+	        // Generate messages with current candidate data
+	        if (activeCandidate) {
+	            try {
+	                await generateOutreachMessages(activeCandidate);
+	                
+	                // Deduct credits on success
+	                userCredits -= 2;
+	                updateCreditsDisplay();
+	                
+	                showCustomToast('Success', 'Messages generated successfully!', 'success');
+	            } catch (error) {
+	                showCustomToast('Generation Failed', 'Please try again', 'error');
+	            }
+	        } else {
+	            showCustomToast('Error', 'No candidate selected', 'error');
+	        }
 	    }
 	});
 	
