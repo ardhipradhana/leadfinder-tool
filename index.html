@@ -5703,10 +5703,10 @@ setTimeout(() => {
 	document.addEventListener('click', async (e) => {
 	    if (e.target.closest('#generateNewMessages')) {
 	        // Check credits (2 credits required)
-	        if (userCredits < 2) {
-	            showCustomToast('Insufficient Credits', 'You need 2 credits to generate messages', 'error');
-	            return;
-	        }
+	        // if (userCredits < 2) {
+	        //     showCustomToast('Insufficient Credits', 'You need 2 credits to generate messages', 'error');
+	        //     return;
+	        // }
 	        
 	        // Validate purpose
 	        const purpose = document.getElementById('outreachPurpose').value;
