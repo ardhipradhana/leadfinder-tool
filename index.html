@@ -5219,6 +5219,20 @@ function showMessageError() {
     generateBtn.classList.remove('opacity-50');
 }
 
+// Reset message boxes to default state
+function resetMessageBoxes() {
+    const messageIds = [
+        'linkedinShortMessage',
+        'linkedinElaborateMessage',
+        'emailShortMessage',
+        'emailElaborateMessage'
+    ];
+    
+    messageIds.forEach(id => {
+        document.getElementById(id).innerHTML = 'Click "Generate Messages" to create personalized outreach content...';
+    });
+}
+	
 // --- Utility: Modal/Keyboard Shortcuts & Startup
 
 // Close modals when clicking outside
@@ -5632,18 +5646,20 @@ setTimeout(() => {
 	// When popup opens, check for existing messages
 	document.addEventListener('click', (e) => {
 	    if (e.target.closest('#generateOutreachBtn')) {
-	        const popup = document.getElementById('aiOutreachPopup');
-	        popup.classList.remove('hidden');
-	        
-	        // Initialize LinkedIn tab as active
-	        document.getElementById('linkedinTab').classList.add('active');
-	        document.getElementById('linkedinMessages').classList.add('active');
-	        
-	        // LOAD EXISTING MESSAGES IF AVAILABLE
-	        if (activeCandidate && activeCandidate.outreachMessages) {
-	            populateMessages(activeCandidate.outreachMessages);
-	        }
-	        // If no messages exist, the HTML already shows "Generating message..." by default
+		const popup = document.getElementById('aiOutreachPopup');
+		popup.classList.remove('hidden');
+		
+		// Initialize LinkedIn tab as active
+		document.getElementById('linkedinTab').classList.add('active');
+		document.getElementById('linkedinMessages').classList.add('active');
+		
+		// CHECK IF CURRENT CANDIDATE HAS MESSAGES
+		if (activeCandidate && activeCandidate.outreachMessages) {
+		    populateMessages(activeCandidate.outreachMessages);
+		} else {
+		    // RESET TO DEFAULT STATE FOR NEW CANDIDATE
+		    resetMessageBoxes();
+		}
 	    }
 	});
 	
