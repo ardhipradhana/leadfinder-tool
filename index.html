@@ -5484,9 +5484,6 @@ setTimeout(() => {
 		e.stopImmediatePropagation();
 		
 		console.log('Upgrade button clicked!'); // Debug log
-	
-		// TESTING BYPASS - Remove this line when done testing
-		userCredits = 100;
 		
 		const candidateId = upgradeBtn.dataset.candidateId;
 		const candidate = currentCandidates.find(c => c.id === candidateId);
@@ -5564,9 +5561,6 @@ setTimeout(() => {
 	    e.preventDefault(); // Prevent default behavior
 	    
 	    console.log('Bulk analytics button clicked!'); // Debug log
-
-		// TESTING BYPASS - Remove this line when done testing
-		userCredits = 100;
 	    
 	    const selectedCheckboxes = document.querySelectorAll('.candidate-checkbox:checked');
 	    const selectedIds = Array.from(selectedCheckboxes).map(cb => cb.dataset.candidateId);
