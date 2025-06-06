@@ -1741,16 +1741,18 @@ async function signInWithGoogle() {
 }
 
 supabaseClient.auth.onAuthStateChange(async (event, session) => {
-	if (event === 'SIGNED_IN') {
-		currentUser = session.user;
-		hideAuthModal();
-		await checkAuthAndCredits();
-		updateCreditsDisplay();
-	} else if (event === 'SIGNED_OUT') {
-		currentUser = null;
-		userCredits = 0;
-		updateCreditsDisplay();
-	}
+    console.log('Auth state change:', event);
+    if (event === 'SIGNED_IN' && session) {
+        currentUser = session.user;
+        hideAuthModal();
+        await checkAuthAndCredits();
+        // Remove this line: updateCreditsDisplay(); (checkAuthAndCredits already does this)
+    } else if (event === 'SIGNED_OUT') {
+        currentUser = null;
+        userCredits = 0;
+        updateCreditsDisplay();
+        showAuthModal();
+    }
 });
 
 // --- 4. Main session check on page load ---
