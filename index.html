@@ -5111,10 +5111,26 @@ async function upgradeBulkCandidates(candidateIds) {
 		    console.log('Result candidate name:', result.candidateName);
 		    console.log('Result candidate ID:', result.candidateId);
 		    
-                // Find candidate by name (since IDs might not match exactly)
-                const candidateIndex = currentCandidates.findIndex(c => 
-                    c.name === result.candidateName || c.id === result.candidateId
-                );
+                const candidateIndex = currentCandidates.findIndex(c => {
+		    // Try exact name match first (most reliable)
+		    if (c.name === result.candidateName) return true;
+		    
+		    // Try exact ID match  
+		    if (c.id === result.candidateId) return true;
+		    
+		    // Try partial name match (case insensitive)
+		    if (c.name.toLowerCase().includes(result.candidateName.toLowerCase()) || 
+		        result.candidateName.toLowerCase().includes(c.name.toLowerCase())) {
+		        return true;
+		    }
+		    
+		    return false;
+		});
+		
+		console.log(`Matching "${result.candidateName}" → Found index: ${candidateIndex}`);
+		if (candidateIndex !== -1) {
+		    console.log(`Matched to: ${currentCandidates[candidateIndex].name}`);
+		}
 
 	    	console.log('Found candidate at index:', candidateIndex);
                 if (candidateIndex !== -1) {
