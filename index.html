@@ -5080,12 +5080,20 @@ async function upgradeBulkCandidates(candidateIds) {
             
             // Process each result
             data.results.forEach(result => {
+
+	    console.log(`=== Processing result ${index + 1} ===`);
+	    console.log('Result candidate name:', result.candidateName);
+	    console.log('Result candidate ID:', result.candidateId);
+		    
                 // Find candidate by name (since IDs might not match exactly)
                 const candidateIndex = currentCandidates.findIndex(c => 
                     c.name === result.candidateName || c.id === result.candidateId
                 );
-                
+
+	    	console.log('Found candidate at index:', candidateIndex);
                 if (candidateIndex !== -1) {
+		console.log('Matched candidate name:', currentCandidates[candidateIndex].name);
+	        console.log('Analytics being assigned to:', currentCandidates[candidateIndex].name);
                     currentCandidates[candidateIndex] = {
                         ...currentCandidates[candidateIndex],
                         careerAnalytics: result.careerAnalytics
