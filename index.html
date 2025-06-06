@@ -2438,8 +2438,14 @@ function createCandidateCardHTML(candidate) {
 function attachCandidateCardHandlers(candidates) {
     document.querySelectorAll('.candidate-card').forEach((card, index) => {
         card.addEventListener('click', (e) => {
-            // Don't open modal if clicking bookmark elements
-            if (e.target.closest('.bookmark-icon') || e.target.closest('.bookmark-ribbon')) {
+            // Don't open modal if we're upgrading a candidate
+            if (window.upgradingCandidate) return;
+            
+            // Don't open modal if clicking bookmark elements or upgrade button
+            if (e.target.closest('.bookmark-icon') || 
+                e.target.closest('.bookmark-ribbon') ||
+                e.target.closest('.upgrade-analytics-btn') ||
+                e.target.closest('.candidate-checkbox')) {
                 return;
             }
             
