@@ -5582,12 +5582,12 @@ setTimeout(() => {
 	    const upgradeBtn = e.target.closest('.upgrade-analytics-btn');
 	    
 	    if (upgradeBtn) {
+	        // Set flag IMMEDIATELY to prevent modal opening
+	        window.upgradingCandidate = true;
+	        
 	        e.stopPropagation();
 	        e.preventDefault();
 	        e.stopImmediatePropagation();
-	        
-	        // Set a flag to prevent modal opening
-	        window.upgradingCandidate = true;
 	        
 	        const candidateId = upgradeBtn.dataset.candidateId;
 	        const candidate = currentCandidates.find(c => c.id === candidateId);
