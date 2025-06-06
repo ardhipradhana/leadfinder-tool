@@ -2898,6 +2898,10 @@ function updateModalCareerAnalytics(candidate) {
             // Fallback to original display
             analyticsContainer.textContent = analyticsText;
         }
+	    } else if (analyticsContainer) {
+	        // Clear analytics section if no analytics available
+	        analyticsContainer.innerHTML = '<p class="text-gray-400">No career analytics available for this candidate.</p>';
+	    }
     }
 }
 
