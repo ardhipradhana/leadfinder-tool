@@ -1600,7 +1600,7 @@ async function checkAuthAndCredits() {
 	const { data: profile, error } = await supabaseClient
 		.from('leadfinder_users')
 		.select('credits')
-		.eq('user_id', currentUser.id)
+		.eq('id', currentUser.id)
 		.single();
 
 	if (error) {
@@ -1656,7 +1656,7 @@ async function deductCredit() {
 	const { error } = await supabaseClient
 		.from('leadfinder_users')
 		.update({ credits: userCredits - 1, updated_at: new Date().toISOString() })
-		.eq('user_id', currentUser.id);
+		.eq('id', currentUser.id);
 	if (!error) {
 		userCredits -= 1;
 		updateCreditsDisplay();
@@ -1750,7 +1750,7 @@ async function loadSearchHistory() {
     const { data, error } = await supabaseClient
         .from('search_history')
         .select('*')
-        .eq('user_id', currentUser.id)
+        .eq('id', currentUser.id)
         .order('created_at', { ascending: false })
         .limit(10);
     if (error) {
