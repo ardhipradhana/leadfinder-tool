@@ -1888,6 +1888,9 @@ if (sampleBtn) {
 
 // Candidate card modal opening by card click (delegated)
 document.addEventListener('click', (e) => {
+    // Don't open modal if we're upgrading a candidate
+    if (window.upgradingCandidate) return;
+    
     if (e.target.closest('.candidate-card') && 
         !e.target.closest('.bookmark-icon') && 
         !e.target.closest('.bookmark-ribbon') &&
@@ -1900,7 +1903,7 @@ document.addEventListener('click', (e) => {
         }
     }
 });
-
+	
 // Export button for main list
 document.getElementById('exportBtn').addEventListener('click', async () => {
     showExportToast("Exporting CSV...");
@@ -5583,17 +5586,22 @@ setTimeout(() => {
 	        e.preventDefault();
 	        e.stopImmediatePropagation();
 	        
+	        // Set a flag to prevent modal opening
+	        window.upgradingCandidate = true;
+	        
 	        const candidateId = upgradeBtn.dataset.candidateId;
 	        const candidate = currentCandidates.find(c => c.id === candidateId);
 	        
 	        if (!candidate) {
 	            console.error('Candidate not found for ID:', candidateId);
+	            window.upgradingCandidate = false;
 	            return;
 	        }
 	        
 	        // Check credits (5 credits for individual)
 	        if (userCredits < 5) {
 	            showCustomToast('Insufficient Credits', 'You need 5 credits for individual analytics.', 'error');
+	            window.upgradingCandidate = false;
 	            return;
 	        }
 	        
@@ -5603,15 +5611,10 @@ setTimeout(() => {
 	            `Analyze ${candidate.name}'s career potential and growth trajectory for 5 credits?`
 	        );
 	        
-	        if (!confirmed) return;
-
-		    // ADD THIS: Block any further event propagation after confirmation
-			setTimeout(() => {
-				document.body.style.pointerEvents = 'none';
-				setTimeout(() => {
-					document.body.style.pointerEvents = 'auto';
-				}, 100);
-			}, 0);
+	        if (!confirmed) {
+	            window.upgradingCandidate = false;
+	            return;
+	        }
 	        
 	        // Disable button and show loading
 	        upgradeBtn.disabled = true;
@@ -5637,6 +5640,8 @@ setTimeout(() => {
 	            upgradeBtn.disabled = false;
 	            upgradeBtn.innerHTML = originalHTML;
 	            upgradeBtn.classList.remove('opacity-75');
+	        } finally {
+	            window.upgradingCandidate = false;
 	        }
 	    }
 	});
