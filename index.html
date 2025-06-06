@@ -2177,6 +2177,18 @@ function updateResultsDescription(params) {
 
 // Update the candidate cards in the UI
 function updateCandidateCards(candidates) {
+	console.log('=== UPDATE CANDIDATE CARDS DEBUG ===');
+    console.log('Total candidates to render:', candidates.length);
+
+	// Debug: Check which candidates have analytics
+    candidates.forEach((candidate, index) => {
+        if (candidate.careerAnalytics) {
+            console.log(`Candidate ${index} (${candidate.name}) HAS analytics`);
+        } else {
+            console.log(`Candidate ${index} (${candidate.name}) NO analytics`);
+        }
+    });
+	
     const cardsContainer = document.getElementById('candidateCardsContainer');
     if (!cardsContainer) {
         console.error('Cards container not found');
