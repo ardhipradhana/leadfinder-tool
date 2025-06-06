@@ -4927,6 +4927,12 @@ function updateLoadingTip(tip) {
 
 // Individual candidate upgrade
 async function upgradeIndividualCandidate(candidateId) {
+
+	console.log('=== INDIVIDUAL ANALYTICS DEBUG ===');
+    console.log('Target candidate ID:', candidateId);
+    
+    const candidate = currentCandidates.find(c => c.id === candidateId);
+    console.log('Found candidate:', candidate ? candidate.name : 'NOT FOUND');
     // Check if another operation is in progress
     if (isSearching || isAnalyzing) {
         showCustomToast('Please Wait', 'Another operation is in progress', 'info');
@@ -4992,15 +4998,28 @@ async function upgradeIndividualCandidate(candidateId) {
         // Handle the standardized response format (direct object, not wrapped in array)
         if (data && data.success && data.results && data.results.length > 0) {
             const result = data.results[0];
-            console.log('Processing analytics for:', result.candidateName);
+            console.log('=== INDIVIDUAL ANALYTICS RESULT ===');
+	    console.log('Processing analytics for:', result.candidateName);
+	    console.log('Target candidate ID was:', candidateId);
             
             // Update candidate with analytics
             const candidateIndex = currentCandidates.findIndex(c => c.id === candidateId);
+		 console.log('Found candidate at index:', candidateIndex);
             if (candidateIndex !== -1) {
+		    console.log('Before update - candidate name:', currentCandidates[candidateIndex].name);
+        console.log('Assigning analytics to:', currentCandidates[candidateIndex].name);
                 currentCandidates[candidateIndex] = {
                     ...currentCandidates[candidateIndex],
                     careerAnalytics: result.careerAnalytics
                 };
+
+		    console.log('After update - has analytics:', !!currentCandidates[candidateIndex].careerAnalytics);
+		    // Check if other candidates got contaminated
+		        currentCandidates.forEach((c, i) => {
+		            if (i !== candidateIndex && c.careerAnalytics) {
+		                console.log(`🚨 CONTAMINATION: Candidate ${i} (${c.name}) has analytics but shouldn't!`);
+		            }
+		        });
                 
                 // Refresh the UI
                 updateCandidateCards(currentCandidates);
