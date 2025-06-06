@@ -1592,8 +1592,17 @@ function showAuthMessage(message, type) {
 	setTimeout(() => { messageEl.classList.add('hidden'); }, 5000);
 }
 
+let isCheckingCredits = false;
+
 async function checkAuthAndCredits() {
+	if (isCheckingCredits) {
+	        console.log('checkAuthAndCredits already running, skipping...');
+	        return;
+	    }
+	    
+	    isCheckingCredits = true;
     console.log('=== checkAuthAndCredits() called ===');
+	console.trace('Called from:');
     console.log('currentUser at start:', currentUser);
     
     if (!currentUser) {
@@ -1685,6 +1694,8 @@ async function checkAuthAndCredits() {
         updateCreditsDisplay();
         showCustomToast('Profile Warning', 'Using cached profile data', 'info', 3000);
         return true;
+    } finally {
+        isCheckingCredits = false;
     }
 }
 
