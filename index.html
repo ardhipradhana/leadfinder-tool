@@ -1605,40 +1605,40 @@ async function checkAuthAndCredits() {
 
 	if (error) {
 	    if (error.code === 'PGRST116') {
-	        // Try to insert, but handle duplicate user gracefully
-	        const { data: newProfile, error: insertError } = await supabaseClient
-	            .from('leadfinder_users')
-	            .insert({
-	                user_id: currentUser.id,
-	                email: currentUser.email,
-	                credits: 10
-	            })
-	            .select()
-	            .single();
-	        if (insertError) {
-	            // If user already exists, just fetch their existing profile
-	            if (insertError.code === '23505') { // duplicate key error
-	                const { data: existingProfile } = await supabaseClient
-	                    .from('leadfinder_users')
-	                    .select('credits')
-	                    .eq('user_id', currentUser.id)
-	                    .single();
-	                userCredits = existingProfile?.credits || 0;
-	                updateCreditsDisplay();
-	                return true;
-	            } else {
-	                showCustomToast('Account Error', 'User creation failed: ' + insertError.message, 'error');
-	                return false;
-	            }
-	        } else {
-	            // Success: new user created
-	            userCredits = newProfile.credits || 10;
-	            updateCreditsDisplay();
-	            return true;
-	        }
+		console.log('Profile not found, creating new profile...');
+		console.log('User data for creation:', {
+		    id: currentUser.id,
+		    email: currentUser.email,
+		    full_name: currentUser.user_metadata?.full_name || currentUser.email
+		});
+		
+		// Try to insert, but handle duplicate user gracefully
+		const { data: newProfile, error: insertError } = await supabaseClient
+		    .from('leadfinder_users')
+		    .insert({
+			id: currentUser.id,
+			email: currentUser.email,
+			full_name: currentUser.user_metadata?.full_name || currentUser.email,
+			credits: 3
+		    })
+		    .select()
+		    .single();
+		    
+		console.log('Insert result:', { newProfile, insertError });
+		
+		if (insertError) {
+		    console.error('Insert error details:', insertError);
+		    showCustomToast('Account Error', 'User creation failed: ' + insertError.message, 'error');
+		    return false;
+		} else {
+		    userCredits = newProfile.credits || 3;
+		    updateCreditsDisplay();
+		    return true;
+		}
 	    } else {
-	        showCustomToast('Profile Error', 'Error fetching profile: ' + error.message, 'error');
-	        return false;
+		console.error('Profile fetch error:', error);
+		showCustomToast('Profile Error', 'Error fetching profile: ' + error.message, 'error');
+		return false;
 	    }
 	}
 
