@@ -2000,7 +2000,7 @@ async function handleSearch(e) {
             
             // DEDUCT CREDIT AND LOG TRANSACTION (with error handling)
 		try {
-		    const creditDeducted = await deductCredit();
+		    const creditDeducted = await deductCredit(1);
 		    if (creditDeducted) {
 		        await logCreditTransaction(-1, 'search', `Search: ${searchParams.jobTitle} in ${searchParams.location}`);
 		        console.log('Credit deducted successfully');
