@@ -2763,11 +2763,9 @@ function formatSubSection(text, sectionType) {
 
 // Update career analytics section in modal
 function updateModalCareerAnalytics(candidate) {
-	console.log('=== FUNCTION CALLED ===');
-    const analyticsContainer = candidateModal.querySelector('#careerAnalyticsContent');
-    
+    console.log('=== FUNCTION CALLED ===');
     console.log('=== DEBUGGING CAREER ANALYTICS ===');
-	console.log('Function called for candidate:', candidate?.name || 'UNDEFINED');
+    console.log('Function called for candidate:', candidate?.name || 'UNDEFINED');
     console.log('activeCandidate is:', activeCandidate?.name || 'UNDEFINED');
     
     // VALIDATION: Only process if this is the active candidate
@@ -2775,9 +2773,10 @@ function updateModalCareerAnalytics(candidate) {
         console.log('❌ SKIPPING: Not the active candidate or invalid data');
         return;
     }
-	console.log('✅ PROCEEDING: Valid candidate match');
-
-	const analyticsContainer = candidateModal.querySelector('#careerAnalyticsContent');
+    
+    console.log('✅ PROCEEDING: Valid candidate match');
+    
+    const analyticsContainer = candidateModal.querySelector('#careerAnalyticsContent');
     console.log('Full candidate object:', candidate);
     console.log('candidate.careerAnalytics:', candidate.careerAnalytics);
     
@@ -2791,112 +2790,111 @@ function updateModalCareerAnalytics(candidate) {
         
         // Parse into structured sections
         const sections = parseCareerAnalytics(analyticsText);
-	    console.log('Parsed sections:', sections);
-	    console.log('Parsed sections:', sections);
-		console.log('Parsed sections details:', JSON.stringify(sections, null, 2));
+        console.log('Parsed sections:', sections);
+        console.log('Parsed sections details:', JSON.stringify(sections, null, 2));
         
         if (sections) {
-		console.log('=== APPLYING NEW HTML ===');
-		console.log('Current Strengths raw text:', sections.currentStrengths);
-		
+            console.log('=== APPLYING NEW HTML ===');
+            console.log('Current Strengths raw text:', sections.currentStrengths);
+            
             analyticsContainer.innerHTML = `
-	    <!-- Executive Summary -->
-	    <div class="mb-5 p-5 bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-purple-500/30 rounded-lg">
-	        <div class="flex items-center space-x-3 mb-3">
-	            <div class="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center">
-	                <span class="text-lg">🏆</span>
-	            </div>
-	            <h4 class="text-lg font-bold text-purple-400">Executive Summary</h4>
-	        </div>
-	        <p class="text-gray-300 leading-relaxed text-base">${sections.executiveSummary}</p>
-	    </div>
-	
-	    <!-- Current Strengths -->
-	    <div class="mb-5 p-5 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/30 rounded-lg">
-	        <div class="flex items-center space-x-3 mb-4">
-	            <div class="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
-	                <span class="text-lg">💪</span>
-	            </div>
-	            <h4 class="text-lg font-bold text-green-400">Current Strengths</h4>
-	        </div>
-	        <div class="space-y-4">
-	            <div>
-	                <h5 class="font-semibold text-green-300 mb-2">Market Intelligence & Positioning</h5>
-	                <div class="pl-4 border-l-2 border-green-500/30 text-gray-300 leading-relaxed">${formatSubSection(sections.currentStrengths, 'Market Intelligence')}</div>
-	            </div>
-	            <div>
-	                <h5 class="font-semibold text-green-300 mb-2">Peer Benchmarking</h5>
-	                <div class="pl-4 border-l-2 border-green-500/30 text-gray-300 leading-relaxed">${formatSubSection(sections.currentStrengths, 'Peer Benchmarking')}</div>
-	            </div>
-	        </div>
-	    </div>
-	
-	    <!-- Career Trajectory -->
-	    <div class="mb-5 p-5 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-500/30 rounded-lg">
-	        <div class="flex items-center space-x-3 mb-4">
-	            <div class="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
-	                <span class="text-lg">📈</span>
-	            </div>
-	            <h4 class="text-lg font-bold text-blue-400">Career Trajectory & Compensation</h4>
-	        </div>
-	        <div class="space-y-4">
-	            <div>
-	                <h5 class="font-semibold text-blue-300 mb-2">Career Trajectory Forecast</h5>
-	                <div class="pl-4 border-l-2 border-blue-500/30 text-gray-300 leading-relaxed">${formatSubSection(sections.careerTrajectory, 'Career Trajectory')}</div>
-	            </div>
-	            <div>
-	                <h5 class="font-semibold text-blue-300 mb-2">Compensation Progression Analysis</h5>
-	                <div class="pl-4 border-l-2 border-blue-500/30 text-gray-300 leading-relaxed">${formatSubSection(sections.careerTrajectory, 'Compensation')}</div>
-	            </div>
-	        </div>
-	    </div>
-	
-	    <!-- Growth Potential -->
-	    <div class="mb-5 p-5 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-lg">
-	        <div class="flex items-center space-x-3 mb-4">
-	            <div class="w-8 h-8 bg-yellow-500/20 rounded-lg flex items-center justify-center">
-	                <span class="text-lg">🎯</span>
-	            </div>
-	            <h4 class="text-lg font-bold text-yellow-400">Growth Potential & Development</h4>
-	        </div>
-	        <div class="space-y-4">
-	            <div>
-	                <h5 class="font-semibold text-yellow-300 mb-2">Strategic Development Roadmap</h5>
-	                <div class="pl-4 border-l-2 border-yellow-500/30 text-gray-300 leading-relaxed">${formatSubSection(sections.growthPotential, 'Strategic Development')}</div>
-	            </div>
-	            <div>
-	                <h5 class="font-semibold text-yellow-300 mb-2">Acceleration Strategies</h5>
-	                <div class="pl-4 border-l-2 border-yellow-500/30 text-gray-300 leading-relaxed">${formatSubSection(sections.growthPotential, 'Acceleration')}</div>
-	            </div>
-	        </div>
-	    </div>
-	
-	    <!-- Risk Assessment -->
-	    <div class="mb-5 p-5 bg-gradient-to-r from-red-500/10 to-pink-500/10 border border-red-500/30 rounded-lg">
-	        <div class="flex items-center space-x-3 mb-3">
-	            <div class="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center">
-	                <span class="text-lg">🔍</span>
-	            </div>
-	            <h4 class="text-lg font-bold text-red-400">Risk Assessment</h4>
-	        </div>
-	        <div class="text-gray-300 leading-relaxed">${sections.riskAssessment}</div>
-	    </div>
-	
-	    <!-- Hiring Recommendation -->
-	    <div class="p-5 bg-gradient-to-r from-accent-cyan/10 to-accent-teal/10 border border-accent-cyan/30 rounded-lg">
-	        <div class="flex items-center space-x-3 mb-3">
-	            <div class="w-8 h-8 bg-accent-cyan/20 rounded-lg flex items-center justify-center">
-	                <span class="text-lg">💡</span>
-	            </div>
-	            <h4 class="text-lg font-bold text-accent-cyan">Hiring Recommendation</h4>
-	        </div>
-	        <p class="text-gray-300 leading-relaxed text-base">${sections.hiringRecommendation}</p>
-	    </div>
-	`;
-		console.log('=== HTML APPLIED ===');
-   		console.log('Container after update:', analyticsContainer.innerHTML.substring(0, 200));
+        <!-- Executive Summary -->
+        <div class="mb-5 p-5 bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-purple-500/30 rounded-lg">
+            <div class="flex items-center space-x-3 mb-3">
+                <div class="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                    <span class="text-lg">🏆</span>
+                </div>
+                <h4 class="text-lg font-bold text-purple-400">Executive Summary</h4>
+            </div>
+            <p class="text-gray-300 leading-relaxed text-base">${sections.executiveSummary}</p>
+        </div>
+
+        <!-- Current Strengths -->
+        <div class="mb-5 p-5 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/30 rounded-lg">
+            <div class="flex items-center space-x-3 mb-4">
+                <div class="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
+                    <span class="text-lg">💪</span>
+                </div>
+                <h4 class="text-lg font-bold text-green-400">Current Strengths</h4>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <h5 class="font-semibold text-green-300 mb-2">Market Intelligence & Positioning</h5>
+                    <div class="pl-4 border-l-2 border-green-500/30 text-gray-300 leading-relaxed">${formatSubSection(sections.currentStrengths, 'Market Intelligence')}</div>
+                </div>
+                <div>
+                    <h5 class="font-semibold text-green-300 mb-2">Peer Benchmarking</h5>
+                    <div class="pl-4 border-l-2 border-green-500/30 text-gray-300 leading-relaxed">${formatSubSection(sections.currentStrengths, 'Peer Benchmarking')}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Career Trajectory -->
+        <div class="mb-5 p-5 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-500/30 rounded-lg">
+            <div class="flex items-center space-x-3 mb-4">
+                <div class="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                    <span class="text-lg">📈</span>
+                </div>
+                <h4 class="text-lg font-bold text-blue-400">Career Trajectory & Compensation</h4>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <h5 class="font-semibold text-blue-300 mb-2">Career Trajectory Forecast</h5>
+                    <div class="pl-4 border-l-2 border-blue-500/30 text-gray-300 leading-relaxed">${formatSubSection(sections.careerTrajectory, 'Career Trajectory')}</div>
+                </div>
+                <div>
+                    <h5 class="font-semibold text-blue-300 mb-2">Compensation Progression Analysis</h5>
+                    <div class="pl-4 border-l-2 border-blue-500/30 text-gray-300 leading-relaxed">${formatSubSection(sections.careerTrajectory, 'Compensation')}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Growth Potential -->
+        <div class="mb-5 p-5 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-lg">
+            <div class="flex items-center space-x-3 mb-4">
+                <div class="w-8 h-8 bg-yellow-500/20 rounded-lg flex items-center justify-center">
+                    <span class="text-lg">🎯</span>
+                </div>
+                <h4 class="text-lg font-bold text-yellow-400">Growth Potential & Development</h4>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <h5 class="font-semibold text-yellow-300 mb-2">Strategic Development Roadmap</h5>
+                    <div class="pl-4 border-l-2 border-yellow-500/30 text-gray-300 leading-relaxed">${formatSubSection(sections.growthPotential, 'Strategic Development')}</div>
+                </div>
+                <div>
+                    <h5 class="font-semibold text-yellow-300 mb-2">Acceleration Strategies</h5>
+                    <div class="pl-4 border-l-2 border-yellow-500/30 text-gray-300 leading-relaxed">${formatSubSection(sections.growthPotential, 'Acceleration')}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Risk Assessment -->
+        <div class="mb-5 p-5 bg-gradient-to-r from-red-500/10 to-pink-500/10 border border-red-500/30 rounded-lg">
+            <div class="flex items-center space-x-3 mb-3">
+                <div class="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center">
+                    <span class="text-lg">🔍</span>
+                </div>
+                <h4 class="text-lg font-bold text-red-400">Risk Assessment</h4>
+            </div>
+            <div class="text-gray-300 leading-relaxed">${sections.riskAssessment}</div>
+        </div>
+
+        <!-- Hiring Recommendation -->
+        <div class="p-5 bg-gradient-to-r from-accent-cyan/10 to-accent-teal/10 border border-accent-cyan/30 rounded-lg">
+            <div class="flex items-center space-x-3 mb-3">
+                <div class="w-8 h-8 bg-accent-cyan/20 rounded-lg flex items-center justify-center">
+                    <span class="text-lg">💡</span>
+                </div>
+                <h4 class="text-lg font-bold text-accent-cyan">Hiring Recommendation</h4>
+            </div>
+            <p class="text-gray-300 leading-relaxed text-base">${sections.hiringRecommendation}</p>
+        </div>
+    `;
+            console.log('=== HTML APPLIED ===');
+            console.log('Container after update:', analyticsContainer.innerHTML.substring(0, 200));
         } else {
-		console.log('=== USING FALLBACK ===');
+            console.log('=== USING FALLBACK ===');
             // Fallback to original display
             analyticsContainer.textContent = analyticsText;
         }
