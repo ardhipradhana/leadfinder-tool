@@ -1595,110 +1595,114 @@ function showAuthMessage(message, type) {
 let isCheckingCredits = false;
 
 async function checkAuthAndCredits() {
-	if (isCheckingCredits) {
-	        console.log('checkAuthAndCredits already running, skipping...');
-	        return;
-	    }
-	    
-	    isCheckingCredits = true;
-    console.log('=== checkAuthAndCredits() called ===');
-	console.trace('Called from:');
-    console.log('currentUser at start:', currentUser);
-    
-    if (!currentUser) {
-        console.log('No currentUser, getting from auth...');
-        const { data: { user } } = await supabaseClient.auth.getUser();
-        if (!user) {
-            console.log('No user found, showing auth modal');
-            showAuthModal();
-            return false;
-        }
-        currentUser = user;
-        console.log('Got user from auth:', currentUser.id);
+    if (isCheckingCredits) {
+        console.log('checkAuthAndCredits already running, skipping...');
+        return;
     }
-
-    console.log('Fetching profile for user:', currentUser.id);
-    console.log('About to run Supabase query...');
-
-    // Add timeout protection
-    const queryPromise = supabaseClient
-        .from('leadfinder_users')
-        .select('credits')
-        .eq('id', currentUser.id)
-        .single();
-
-    const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Query timeout')), 15000)
-    );
-
+    
+    isCheckingCredits = true;
+    console.log('=== checkAuthAndCredits() called ===');
+    console.trace('Called from:');
+    
     try {
-        const { data: profile, error } = await Promise.race([queryPromise, timeoutPromise]);
-        console.log('Supabase query completed');
-        console.log('Profile fetch result:', { profile, error });
-
-        if (error) {
-            console.log('Error fetching profile:', error);
-            if (error.code === 'PGRST116') {
-                console.log('Profile not found, creating new profile...');
-                console.log('User data for creation:', {
-                    id: currentUser.id,
-                    email: currentUser.email,
-                    full_name: currentUser.user_metadata?.full_name || currentUser.email
-                });
-                
-                const { data: newProfile, error: insertError } = await supabaseClient
-                    .from('leadfinder_users')
-                    .insert({
-                        id: currentUser.id,
-                        email: currentUser.email,
-                        full_name: currentUser.user_metadata?.full_name || currentUser.email,
-                        credits: 3
-                    })
-                    .select()
-                    .single();
-                    
-                console.log('Insert result:', { newProfile, insertError });
-                
-                if (insertError) {
-                    console.error('Insert error details:', insertError);
-                    showCustomToast('Account Error', 'User creation failed: ' + insertError.message, 'error');
-                    return false;
-                } else {
-                    userCredits = newProfile.credits || 3;
-                    updateCreditsDisplay();
-                    return true;
-                }
-            } else {
-                console.error('Profile fetch error:', error);
-                showCustomToast('Profile Error', 'Error fetching profile: ' + error.message, 'error');
+        console.log('currentUser at start:', currentUser);
+        
+        if (!currentUser) {
+            console.log('No currentUser, getting from auth...');
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (!user) {
+                console.log('No user found, showing auth modal');
+                showAuthModal();
                 return false;
             }
+            currentUser = user;
+            console.log('Got user from auth:', currentUser.id);
         }
 
-        if (profile) {
-            console.log('Profile found! Credits from DB:', profile.credits);
-            userCredits = profile.credits || 0;
-            console.log('userCredits set to:', userCredits);
+        console.log('Fetching profile for user:', currentUser.id);
+        console.log('About to run Supabase query...');
+
+        // Add timeout protection
+        const queryPromise = supabaseClient
+            .from('leadfinder_users')
+            .select('credits')
+            .eq('id', currentUser.id)
+            .single();
+
+        const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Query timeout')), 15000)
+        );
+
+        try {
+            const { data: profile, error } = await Promise.race([queryPromise, timeoutPromise]);
+            console.log('Supabase query completed');
+            console.log('Profile fetch result:', { profile, error });
+
+            if (error) {
+                console.log('Error fetching profile:', error);
+                if (error.code === 'PGRST116') {
+                    console.log('Profile not found, creating new profile...');
+                    console.log('User data for creation:', {
+                        id: currentUser.id,
+                        email: currentUser.email,
+                        full_name: currentUser.user_metadata?.full_name || currentUser.email
+                    });
+                    
+                    const { data: newProfile, error: insertError } = await supabaseClient
+                        .from('leadfinder_users')
+                        .insert({
+                            id: currentUser.id,
+                            email: currentUser.email,
+                            full_name: currentUser.user_metadata?.full_name || currentUser.email,
+                            credits: 3
+                        })
+                        .select()
+                        .single();
+                        
+                    console.log('Insert result:', { newProfile, insertError });
+                    
+                    if (insertError) {
+                        console.error('Insert error details:', insertError);
+                        showCustomToast('Account Error', 'User creation failed: ' + insertError.message, 'error');
+                        return false;
+                    } else {
+                        userCredits = newProfile.credits || 3;
+                        updateCreditsDisplay();
+                        return true;
+                    }
+                } else {
+                    console.error('Profile fetch error:', error);
+                    showCustomToast('Profile Error', 'Error fetching profile: ' + error.message, 'error');
+                    return false;
+                }
+            }
+
+            if (profile) {
+                console.log('Profile found! Credits from DB:', profile.credits);
+                userCredits = profile.credits || 0;
+                console.log('userCredits set to:', userCredits);
+                updateCreditsDisplay();
+                console.log('Credits display updated');
+                return userCredits > 0;
+            }
+
+            console.log('No profile found');
+            return false;
+
+        } catch (timeoutError) {
+            console.log('Query failed or timed out:', timeoutError);
+            // Fallback - set credits manually for now
+            userCredits = 3;
             updateCreditsDisplay();
-            console.log('Credits display updated');
-            return userCredits > 0;
+            showCustomToast('Profile Warning', 'Using cached profile data', 'info', 3000);
+            return true;
         }
 
-        console.log('No profile found');
-        return false;
-
-    } catch (timeoutError) {
-        console.log('Query failed or timed out:', timeoutError);
-        // Fallback - set credits manually for now
-        userCredits = 3;
-        updateCreditsDisplay();
-        showCustomToast('Profile Warning', 'Using cached profile data', 'info', 3000);
-        return true;
     } finally {
         isCheckingCredits = false;
     }
 }
-
+	
 async function deductCredit() {
 	if (userCredits <= 0) return false;
 	const { error } = await supabaseClient
@@ -1742,11 +1746,10 @@ async function signInWithGoogle() {
 
 supabaseClient.auth.onAuthStateChange(async (event, session) => {
     console.log('Auth state change:', event);
-    if (event === 'SIGNED_IN' && session) {
+    if (event === 'SIGNED_IN' && session && !isCheckingCredits) {
         currentUser = session.user;
         hideAuthModal();
         await checkAuthAndCredits();
-        // Remove this line: updateCreditsDisplay(); (checkAuthAndCredits already does this)
     } else if (event === 'SIGNED_OUT') {
         currentUser = null;
         userCredits = 0;
