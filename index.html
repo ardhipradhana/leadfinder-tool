@@ -5466,6 +5466,47 @@ setTimeout(() => {
 	        popup.classList.add('hidden');
 	    }
 	});
+
+	// Tab switching functionality
+	document.addEventListener('click', (e) => {
+	    // Platform tab switching
+	    if (e.target.closest('.platform-tab')) {
+	        const clickedTab = e.target.closest('.platform-tab');
+	        
+	        // Remove active class from all tabs
+	        document.querySelectorAll('.platform-tab').forEach(tab => {
+	            tab.classList.remove('active');
+	        });
+	        
+	        // Add active class to clicked tab
+	        clickedTab.classList.add('active');
+	        
+	        // Hide all message content
+	        document.querySelectorAll('.message-content').forEach(content => {
+	            content.classList.remove('active');
+	        });
+	        
+	        // Show corresponding content
+	        if (clickedTab.id === 'linkedinTab') {
+	            document.getElementById('linkedinMessages').classList.add('active');
+	        } else if (clickedTab.id === 'emailTab') {
+	            document.getElementById('emailMessages').classList.add('active');
+	        }
+	    }
+	});
+	
+	// Initialize default tab when popup opens
+	document.addEventListener('click', (e) => {
+	    if (e.target.closest('#generateOutreachBtn')) {
+	        // Show popup (existing code)
+	        const popup = document.getElementById('aiOutreachPopup');
+	        popup.classList.remove('hidden');
+	        
+	        // Initialize LinkedIn tab as active
+	        document.getElementById('linkedinTab').classList.add('active');
+	        document.getElementById('linkedinMessages').classList.add('active');
+	    }
+	});
 	
 	});
     </script>
