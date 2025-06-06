@@ -1746,7 +1746,7 @@ async function signInWithGoogle() {
 
 supabaseClient.auth.onAuthStateChange(async (event, session) => {
     console.log('Auth state change:', event);
-    if (event === 'SIGNED_IN' && session && !isCheckingCredits) {
+    if (event === 'SIGNED_IN' && session) {
         currentUser = session.user;
         hideAuthModal();
         await checkAuthAndCredits();
