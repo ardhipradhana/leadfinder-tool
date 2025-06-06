@@ -1604,6 +1604,8 @@ async function checkAuthAndCredits() {
     }
 
     console.log('Fetching profile for user:', currentUser.id);
+
+	console.log('About to run Supabase query...');
     const { data: profile, error } = await supabaseClient
         .from('leadfinder_users')
         .select('credits')
