@@ -2767,6 +2767,17 @@ function updateModalCareerAnalytics(candidate) {
     const analyticsContainer = candidateModal.querySelector('#careerAnalyticsContent');
     
     console.log('=== DEBUGGING CAREER ANALYTICS ===');
+	console.log('Function called for candidate:', candidate?.name || 'UNDEFINED');
+    console.log('activeCandidate is:', activeCandidate?.name || 'UNDEFINED');
+    
+    // VALIDATION: Only process if this is the active candidate
+    if (!candidate || !activeCandidate || candidate.id !== activeCandidate.id) {
+        console.log('❌ SKIPPING: Not the active candidate or invalid data');
+        return;
+    }
+	console.log('✅ PROCEEDING: Valid candidate match');
+
+	const analyticsContainer = candidateModal.querySelector('#careerAnalyticsContent');
     console.log('Full candidate object:', candidate);
     console.log('candidate.careerAnalytics:', candidate.careerAnalytics);
     
