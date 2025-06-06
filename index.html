@@ -5597,11 +5597,19 @@ setTimeout(() => {
 	        
 	        // Show custom confirmation
 	        const confirmed = await showConfirmModal(
-	            'Analyze Career Potential',
+	            'Career Predictive Analytics',
 	            `Analyze ${candidate.name}'s career potential and growth trajectory for 5 credits?`
 	        );
 	        
 	        if (!confirmed) return;
+
+		    // ADD THIS: Block any further event propagation after confirmation
+			setTimeout(() => {
+				document.body.style.pointerEvents = 'none';
+				setTimeout(() => {
+					document.body.style.pointerEvents = 'auto';
+				}, 100);
+			}, 0);
 	        
 	        // Disable button and show loading
 	        upgradeBtn.disabled = true;
@@ -5684,7 +5692,7 @@ setTimeout(() => {
 	    const remainingCount = candidatesWithoutAnalytics.length - 3;
 	    const namesDisplay = remainingCount > 0 ? `${candidateNames} and ${remainingCount} others` : candidateNames;
 	    
-	    const message = `Analyze career potential for ${candidatesWithoutAnalytics.length} candidates (${namesDisplay}) for ${totalCredits} credits?`;
+	    const message = `Run career predictive analytics for ${candidatesWithoutAnalytics.length} candidates (${namesDisplay}) for ${totalCredits} credits?`;
 	    
 	    // Show custom confirmation
 	    const confirmed = await showConfirmModal(
