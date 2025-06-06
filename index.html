@@ -2764,19 +2764,9 @@ function formatSubSection(text, sectionType) {
 // Update career analytics section in modal
 function updateModalCareerAnalytics(candidate) {
     console.log('=== FUNCTION CALLED ===');
-    console.log('=== DEBUGGING CAREER ANALYTICS ===');
-    console.log('Function called for candidate:', candidate?.name || 'UNDEFINED');
-    console.log('activeCandidate is:', activeCandidate?.name || 'UNDEFINED');
-    
-    // VALIDATION: Only process if this is the active candidate
-    if (!candidate || !activeCandidate || candidate.id !== activeCandidate.id) {
-        console.log('❌ SKIPPING: Not the active candidate or invalid data');
-        return;
-    }
-    
-    console.log('✅ PROCEEDING: Valid candidate match');
-    
     const analyticsContainer = candidateModal.querySelector('#careerAnalyticsContent');
+    
+    console.log('=== DEBUGGING CAREER ANALYTICS ===');
     console.log('Full candidate object:', candidate);
     console.log('candidate.careerAnalytics:', candidate.careerAnalytics);
     
@@ -2898,10 +2888,9 @@ function updateModalCareerAnalytics(candidate) {
             // Fallback to original display
             analyticsContainer.textContent = analyticsText;
         }
-	    } else if (analyticsContainer) {
-	        // Clear analytics section if no analytics available
-	        analyticsContainer.innerHTML = '<p class="text-gray-400">No career analytics available for this candidate.</p>';
-	    }
+    } else if (analyticsContainer) {
+        // Clear analytics section if no analytics available
+        analyticsContainer.innerHTML = '<p class="text-gray-400">No career analytics available for this candidate.</p>';
     }
 }
 
