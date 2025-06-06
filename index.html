@@ -1890,7 +1890,9 @@ if (sampleBtn) {
 document.addEventListener('click', (e) => {
     if (e.target.closest('.candidate-card') && 
         !e.target.closest('.bookmark-icon') && 
-        !e.target.closest('.bookmark-ribbon')) {
+        !e.target.closest('.bookmark-ribbon') &&
+        !e.target.closest('.upgrade-analytics-btn') &&
+        !e.target.closest('.candidate-checkbox')) {
         const candidateId = e.target.closest('.candidate-card').getAttribute('data-candidate-id');
         const candidate = currentCandidates.find(c => c.id === candidateId);
         if (candidate) {
