@@ -1191,12 +1191,12 @@
 				        </svg>
 				        <span>Copy to Clipboard</span>
 				    </button>
-					<button id="generateOutreachBtn" class="flex items-center justify-center px-4 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-medium rounded-lg transition-colors shadow-lg hover:shadow-xl">
-					    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+					<button id="generateOutreachBtn" class="flex items-center justify-center px-3 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-medium rounded-lg transition-colors shadow-lg hover:shadow-xl">
+					    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
 					        <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
 					        <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
 					    </svg>
-					    <span>Generate Message</span>
+					    <span class="text-sm">Generate Message</span>
 					</button>
 				</div>
 
@@ -5800,6 +5800,18 @@ setTimeout(() => {
 	        } else {
 	            showCustomToast('Error', 'No candidate selected', 'error');
 	        }
+	    }
+	});
+
+	// Close popup when clicking outside
+	document.addEventListener('click', (e) => {
+	    const popup = document.getElementById('aiOutreachPopup');
+	    const popupContent = popup.querySelector('.absolute.bottom-8');
+	    
+	    if (!popup.classList.contains('hidden') && 
+	        !popupContent.contains(e.target) && 
+	        !e.target.closest('#generateOutreachBtn')) {
+	        popup.classList.add('hidden');
 	    }
 	});
 	
