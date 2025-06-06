@@ -1976,12 +1976,16 @@ async function handleSearch(e) {
         if (data.success) {
             console.log('Data has success=true, processing results...');
             
-            // DEDUCT CREDIT AND LOG TRANSACTION
-            const creditDeducted = await deductCredit();
-            if (creditDeducted) {
-                await logCreditTransaction(-1, 'search', `Search: ${searchParams.jobTitle} in ${searchParams.location}`);
-                console.log('Credit deducted successfully');
-            }
+            // DEDUCT CREDIT AND LOG TRANSACTION (with error handling)
+		try {
+		    const creditDeducted = await deductCredit();
+		    if (creditDeducted) {
+		        await logCreditTransaction(-1, 'search', `Search: ${searchParams.jobTitle} in ${searchParams.location}`);
+		        console.log('Credit deducted successfully');
+		    }
+		} catch (creditError) {
+		    console.log('Credit deduction failed, continuing with search:', creditError);
+		}
             
             saveToSearchHistory(searchParams, data.results.totalFound, data.results.candidates);
             processSearchResults(data);
@@ -1998,6 +2002,24 @@ async function handleSearch(e) {
         }
         console.error('Search failed:', error);
         isSearching = false;
+    }
+}
+
+// Log credit transaction
+async function logCreditTransaction(amount, type, description) {
+    if (!currentUser) return;
+    
+    const { error } = await supabaseClient
+        .from('credit_transactions')
+        .insert({
+            user_id: currentUser.id,
+            amount: amount,
+            transaction_type: type,
+            description: description
+        });
+        
+    if (error) {
+        console.error('Failed to log transaction:', error);
     }
 }
 	
