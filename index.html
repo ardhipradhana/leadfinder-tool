@@ -2307,6 +2307,11 @@ function getSourceBadge(source) {
 
 // Render 1 candidate card as HTML
 function createCandidateCardHTML(candidate) {
+	console.log(`=== RENDERING CARD FOR: ${candidate.name} ===`);
+	    console.log('Has analytics:', !!candidate.careerAnalytics);
+	    if (candidate.careerAnalytics) {
+	        console.log('Analytics preview:', candidate.careerAnalytics.substring(0, 100) + '...');
+	    }
     const scorePercentage = (candidate.aiScore * 3.6); // For speedometer UI
     
     // Extract hiring difficulty level for CSS class
@@ -2354,7 +2359,7 @@ function createCandidateCardHTML(candidate) {
                                 <div class="flex items-center space-x-3 mb-2">
                                     <h4 class="text-xl font-bold text-white truncate">${candidate.name}</h4>
                                     ${getSourceBadge(candidate.source)}
-                                    ${hasAnalytics ? '<span class="px-2 py-1 bg-purple-500/20 text-purple-400 border border-purple-500/30 text-xs rounded-full font-medium">Analytics</span>' : ''}
+                                    ${hasAnalytics ? '<span class="px-2 py-1 bg-purple-500/20 text-purple-400 border border-purple-500/30 text-xs rounded-full font-medium">Analytics</span>' : '<!-- No Analytics -->'}
                                 </div>
                                 
                                 <p class="text-lg font-semibold text-gray-200 mb-1">${candidate.title}</p>
