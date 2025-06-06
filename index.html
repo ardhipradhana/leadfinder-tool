@@ -1739,6 +1739,7 @@ async function signInWithGoogle() {
 }
 
 let authInitialized = false;
+let authTimeout = null;
 
 supabaseClient.auth.onAuthStateChange(async (event, session) => {
     console.log('Auth state change:', event);
@@ -1747,12 +1748,19 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
         currentUser = session.user;
         hideAuthModal();
         
-        // Only check credits once per session
+        // Only check credits once per session with debouncing
         if (!authInitialized) {
-            authInitialized = true;
-            await checkAuthAndCredits();
+            // Clear any pending timeout
+            clearTimeout(authTimeout);
+            
+            // Set a short delay to let auth settle
+            authTimeout = setTimeout(async () => {
+                authInitialized = true;
+                await checkAuthAndCredits();
+            }, 100);
         }
     } else if (event === 'SIGNED_OUT') {
+        clearTimeout(authTimeout);
         authInitialized = false;
         currentUser = null;
         userCredits = 0;
