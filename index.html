@@ -1206,7 +1206,7 @@
 				    <div class="absolute inset-0 bg-black bg-opacity-30"></div>
 				    
 				    <!-- Popup Container -->
-				    <div class="absolute bottom-8 right-8 w-[900px] h-[600px] bg-dark-secondary rounded-xl border border-accent-cyan/30 shadow-2xl flex flex-col z-10">
+				    <div class="absolute bottom-8 right-8 w-[800px] max-h-[650px] bg-dark-secondary rounded-xl border border-accent-cyan/30 shadow-2xl flex flex-col z-10 overflow-hidden">
 					<!-- Header -->
 					<div class="flex items-center justify-between p-4 border-b border-gray-700">
 					    <h3 class="text-lg font-semibold text-white flex items-center">
@@ -1264,9 +1264,18 @@
 					           class="w-full px-3 py-2 bg-dark-primary border border-gray-600 rounded-lg text-white text-sm placeholder-gray-400 focus:border-accent-cyan focus:outline-none">
 					    <p class="text-xs text-gray-400 mt-1">Leave blank to keep your company confidential in outreach</p>
 					</div>
+
+				    <!-- Language Selection -->
+					<div class="px-4 pb-4">
+					    <label class="block text-sm font-medium text-gray-300 mb-2">Message Language:</label>
+					    <select id="messageLanguage" class="w-full px-3 py-2 bg-dark-primary border border-gray-600 rounded-lg text-white text-sm focus:border-accent-cyan focus:outline-none">
+					        <option value="english">English</option>
+					        <option value="indonesian">Bahasa Indonesia</option>
+					    </select>
+					</div>
 					
 					<!-- Messages Content Area -->
-					<div class="flex-1 p-4 pt-2 overflow-hidden">
+					<div class="flex-1 p-4 pt-2 overflow-y-auto">
 					    <!-- LinkedIn Messages -->
 					    <div id="linkedinMessages" class="message-content h-full space-y-3">
 						<!-- Short Message -->
@@ -5083,6 +5092,7 @@ async function generateOutreachMessages(candidateData) {
     const purpose = document.getElementById('outreachPurpose').value;
     const customPurpose = document.getElementById('customPurpose').value;
 	const userCompany = document.getElementById('userCompany').value.trim() || 'a leading company';
+	const messageLanguage = document.getElementById('messageLanguage').value;
     
     const requestData = {
         candidate: {
@@ -5095,6 +5105,7 @@ async function generateOutreachMessages(candidateData) {
         currentJobRole: candidateData.title,
         currentCompanyName: candidateData.companyContext || 'No company information available',
     	recruiterCompany: userCompany,
+		language: messageLanguage,
         userId: currentUser?.id || "test-user-123"
     };
     
