@@ -997,7 +997,7 @@
                     <h4 class="font-semibold text-white mb-4">Quick Links</h4>
                     <ul class="space-y-2">
                         <li><button onclick="showPricingPage()" class="text-gray-400 hover:text-accent-cyan text-sm transition-colors">Pricing</button></li>
-                        <li><a href="#" class="text-gray-400 hover:text-accent-cyan text-sm transition-colors">How it Works</a></li>
+                        <li><button onclick="showHowItWorks()" class="text-gray-400 hover:text-accent-cyan text-sm transition-colors">How it Works</button></li>
                         <li><a href="#" class="text-gray-400 hover:text-accent-cyan text-sm transition-colors">Features</a></li>
                         <li><a href="#" class="text-gray-400 hover:text-accent-cyan text-sm transition-colors">Contact</a></li>
                     </ul>
@@ -1634,6 +1634,8 @@ let isSearching = false;
 let isAnalyzing = false;
 	window.showPricingPage = showPricingPage;
 	window.showPrivacyPolicy = showPrivacyPolicy;
+	window.showHowItWorks = showHowItWorks;
+
 
 	
 // Authentication functions
@@ -1810,6 +1812,14 @@ function showPrivacyPolicy() {
 
 function hidePrivacyPolicy() {
     document.getElementById('privacyPolicyPage').classList.add('hidden');
+}
+
+function showHowItWorks() {
+    document.getElementById('howItWorksPage').classList.remove('hidden');
+}
+
+function hideHowItWorks() {
+    document.getElementById('howItWorksPage').classList.add('hidden');
 }
 	
 // Pricing page management
@@ -6252,6 +6262,16 @@ setTimeout(() => {
 	    }
 	});
 
+	// Add these event listeners in your DOMContentLoaded section:
+	document.getElementById('closeHowItWorks').addEventListener('click', hideHowItWorks);
+	
+	// Close when clicking outside
+	document.getElementById('howItWorksPage').addEventListener('click', function(e) {
+	    if (e.target === this) {
+	        hideHowItWorks();
+	    }
+	});
+
 	// Low credit warning button
 	document.getElementById('lowCreditWarning').addEventListener('click', showPricingPage);
 	
@@ -6527,6 +6547,228 @@ setTimeout(() => {
             <div class="text-center text-sm text-gray-400">
                 <p>Last updated: January 2025</p>
                 <p class="mt-2">Questions? Contact us at support@aapgrp.com</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- How It Works Modal -->
+<div id="howItWorksPage" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-dark-secondary rounded-xl max-w-5xl w-full max-h-screen overflow-y-auto">
+        <!-- Header -->
+        <div class="p-6 border-b border-gray-700">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-accent-cyan/20 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-accent-cyan" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">How Leadfinder Works</h2>
+                        <p class="text-gray-400">AI-powered talent discovery in 3 simple steps</p>
+                    </div>
+                </div>
+                <button id="closeHowItWorks" class="text-gray-400 hover:text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="p-6">
+            <!-- Hero Section -->
+            <div class="text-center mb-8 bg-gradient-to-r from-accent-cyan/10 to-accent-teal/10 rounded-xl p-6 border border-accent-cyan/30">
+                <h3 class="text-xl font-bold text-white mb-3">Find Perfect Candidates in Minutes, Not Hours</h3>
+                <p class="text-gray-300 max-w-2xl mx-auto">Our AI scans thousands of LinkedIn profiles across Indonesia, analyzes compatibility, and ranks candidates by how well they match your specific requirements.</p>
+            </div>
+
+            <!-- Step-by-Step Process -->
+            <div class="space-y-8">
+                <!-- Step 1 -->
+                <div class="flex items-start space-x-6">
+                    <div class="flex-shrink-0">
+                        <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                            <span class="text-white font-bold text-2xl">1</span>
+                        </div>
+                    </div>
+                    <div class="flex-1">
+                        <div class="bg-dark-primary rounded-xl p-6">
+                            <h4 class="text-xl font-bold text-white mb-3 flex items-center">
+                                <svg class="w-5 h-5 text-blue-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                </svg>
+                                Tell Us What You're Looking For
+                            </h4>
+                            <p class="text-gray-300 mb-4">Simply enter the role you need to fill (like "Restaurant Manager" or "Software Developer"), choose the location and experience level. Our smart search understands context - no complex Boolean operators needed.</p>
+                            
+                            <!-- Mini Demo -->
+                            <div class="bg-dark-secondary rounded-lg p-4 border border-gray-600">
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <span class="text-sm text-gray-400">Example search:</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-3 text-sm">
+                                    <div>
+                                        <span class="text-gray-400">Job Title:</span>
+                                        <span class="text-accent-cyan ml-2">Digital Marketing Manager</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-400">Location:</span>
+                                        <span class="text-accent-cyan ml-2">Jakarta</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-400">Industry:</span>
+                                        <span class="text-accent-cyan ml-2">Technology</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-400">Experience:</span>
+                                        <span class="text-accent-cyan ml-2">3-5 years</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="flex items-start space-x-6">
+                    <div class="flex-shrink-0">
+                        <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                            <span class="text-white font-bold text-2xl">2</span>
+                        </div>
+                    </div>
+                    <div class="flex-1">
+                        <div class="bg-dark-primary rounded-xl p-6">
+                            <h4 class="text-xl font-bold text-white mb-3 flex items-center">
+                                <svg class="w-5 h-5 text-purple-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                AI Analyzes Thousands of Profiles
+                            </h4>
+                            <p class="text-gray-300 mb-4">Our AI scans LinkedIn profiles across Indonesia, extracting key information like skills, experience, education, and career progression. It understands context - not just keywords.</p>
+                            
+                            <!-- Processing Visual -->
+                            <div class="bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-lg p-4 border border-purple-500/30">
+                                <div class="grid grid-cols-3 gap-4 text-center">
+                                    <div>
+                                        <div class="text-2xl font-bold text-purple-400">5,000+</div>
+                                        <div class="text-xs text-gray-400">Profiles Scanned</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-2xl font-bold text-blue-400">15+</div>
+                                        <div class="text-xs text-gray-400">Data Points Analyzed</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-2xl font-bold text-accent-cyan">30s</div>
+                                        <div class="text-xs text-gray-400">Processing Time</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="flex items-start space-x-6">
+                    <div class="flex-shrink-0">
+                        <div class="w-16 h-16 bg-gradient-to-br from-accent-cyan to-accent-teal rounded-xl flex items-center justify-center shadow-lg">
+                            <span class="text-white font-bold text-2xl">3</span>
+                        </div>
+                    </div>
+                    <div class="flex-1">
+                        <div class="bg-dark-primary rounded-xl p-6">
+                            <h4 class="text-xl font-bold text-white mb-3 flex items-center">
+                                <svg class="w-5 h-5 text-accent-cyan mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                </svg>
+                                Get Ranked, Ready-to-Contact Candidates
+                            </h4>
+                            <p class="text-gray-300 mb-4">Receive candidates ranked by AI compatibility score (0-100), with detailed insights about their fit, potential concerns, and personalized outreach suggestions.</p>
+                            
+                            <!-- Results Preview -->
+                            <div class="space-y-3">
+                                <div class="bg-dark-secondary rounded-lg p-3 border-l-4 border-green-500">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <div class="font-semibold text-white">Ahmad Suharto</div>
+                                            <div class="text-sm text-gray-400">Digital Marketing Manager • 4 years</div>
+                                        </div>
+                                        <div class="text-center">
+                                            <div class="text-lg font-bold text-green-400">87</div>
+                                            <div class="text-xs text-gray-400">AI Score</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bg-dark-secondary rounded-lg p-3 border-l-4 border-yellow-500">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <div class="font-semibold text-white">Sari Permata</div>
+                                            <div class="text-sm text-gray-400">Marketing Specialist • 3 years</div>
+                                        </div>
+                                        <div class="text-center">
+                                            <div class="text-lg font-bold text-yellow-400">74</div>
+                                            <div class="text-xs text-gray-400">AI Score</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Why It Works Better -->
+            <div class="mt-12 bg-gradient-to-r from-dark-primary to-dark-tertiary rounded-xl p-6 border border-gray-600">
+                <h3 class="text-xl font-bold text-white mb-6 text-center">Why Leadfinder Outperforms Traditional Recruiting</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Traditional Way -->
+                    <div class="space-y-4">
+                        <h4 class="font-semibold text-red-400 flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                            </svg>
+                            Traditional LinkedIn Search
+                        </h4>
+                        <ul class="space-y-2 text-gray-400 text-sm">
+                            <li>• 3-4 hours of manual scrolling</li>
+                            <li>• Keyword-based matching only</li>
+                            <li>• Miss qualified candidates</li>
+                            <li>• No compatibility scoring</li>
+                            <li>• Subjective candidate evaluation</li>
+                            <li>• Limited to basic filters</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Leadfinder Way -->
+                    <div class="space-y-4">
+                        <h4 class="font-semibold text-accent-cyan flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            Leadfinder AI Search
+                        </h4>
+                        <ul class="space-y-2 text-accent-cyan text-sm">
+                            <li>• 30 seconds automated search</li>
+                            <li>• Context-aware AI matching</li>
+                            <li>• Discover hidden talent</li>
+                            <li>• 0-100 compatibility scores</li>
+                            <li>• Data-driven candidate ranking</li>
+                            <li>• Advanced AI insights & analytics</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA Section -->
+            <div class="mt-8 text-center bg-gradient-to-r from-accent-cyan/10 to-accent-teal/10 rounded-xl p-6 border border-accent-cyan/30">
+                <h3 class="text-xl font-bold text-white mb-3">Ready to Transform Your Hiring?</h3>
+                <p class="text-gray-300 mb-4">Join 500+ Indonesian businesses finding better candidates faster</p>
+                <button class="bg-accent-cyan hover:bg-accent-teal text-dark-primary font-bold py-3 px-8 rounded-lg transition-colors transform hover:scale-105" onclick="document.getElementById('howItWorksPage').classList.add('hidden'); document.getElementById('jobTitle').focus();">
+                    Start Your First Search Free
+                </button>
             </div>
         </div>
     </div>
