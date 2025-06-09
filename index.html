@@ -2133,13 +2133,13 @@ function processSearchResults(data) {
 function showHistorySearchResult(searchData) {
     console.log('Showing history search result for:', searchData);
 
-	// Make candidate IDs unique for history results too
-    const searchTimestamp = Date.now();
-    const candidatesWithUniqueIds = (searchData.candidates || []).map((candidate, index) => ({
-        ...candidate,
-        id: `${candidate.originalId || candidate.id}_${searchTimestamp}`,
-        originalId: candidate.originalId || candidate.id
-    }));
+	// Use existing IDs from history - don't regenerate them
+	const candidatesWithUniqueIds = (searchData.candidates || []).map((candidate, index) => ({
+	    ...candidate,
+	    // Keep the original ID structure from when it was first saved
+	    id: candidate.id,
+	    originalId: candidate.originalId || candidate.id
+	}));
     
     // Update results description with correct search data
     const resultsTitle = document.querySelector('#resultsState h3');
