@@ -1804,6 +1804,14 @@ async function syncCreditsAfterEvent(eventType = 'manual') {
     }
 }
 
+function showPrivacyPolicy() {
+    document.getElementById('privacyPolicyPage').classList.remove('hidden');
+}
+
+function hidePrivacyPolicy() {
+    document.getElementById('privacyPolicyPage').classList.add('hidden');
+}
+	
 // Pricing page management
 function showPricingPage() {
     document.getElementById('pricingPage').classList.remove('hidden');
@@ -5626,26 +5634,8 @@ function showConfirmModal(title, message) {
         modal.addEventListener('click', handleBackdrop);
     });
 }
-
-function showPrivacyPolicy() {
-    document.getElementById('privacyPolicyPage').classList.remove('hidden');
-}
-
-function hidePrivacyPolicy() {
-    document.getElementById('privacyPolicyPage').classList.add('hidden');
-}
 	
 // --- Utility: Modal/Keyboard Shortcuts & Startup
-
-// Add this inside your DOMContentLoaded block with other event listeners:
-document.getElementById('closePrivacyPolicy').addEventListener('click', hidePrivacyPolicy);
-
-// Close when clicking outside
-document.getElementById('privacyPolicyPage').addEventListener('click', function(e) {
-    if (e.target === this) {
-        hidePrivacyPolicy();
-    }
-});
 	
 // Close modals when clicking outside
 document.addEventListener('click', (e) => {
@@ -6249,6 +6239,16 @@ setTimeout(() => {
 	document.getElementById('pricingPage').addEventListener('click', function(e) {
 	    if (e.target === this) {
 	        hidePricingPage();
+	    }
+	});
+
+	// Add this inside your DOMContentLoaded block with other event listeners:
+	document.getElementById('closePrivacyPolicy').addEventListener('click', hidePrivacyPolicy);
+	
+	// Close when clicking outside
+	document.getElementById('privacyPolicyPage').addEventListener('click', function(e) {
+	    if (e.target === this) {
+	        hidePrivacyPolicy();
 	    }
 	});
 
