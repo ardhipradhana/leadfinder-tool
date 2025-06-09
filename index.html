@@ -1789,21 +1789,19 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
         currentUser = session.user;
         hideAuthModal();
         
-        // Only check credits once per session with debouncing
+        // Only run once per session
         if (!authInitialized) {
-            // Clear any pending timeout
+            authInitialized = true; // Set flag immediately to prevent duplicates
             clearTimeout(authTimeout);
             
-            // Set a short delay to let auth settle
             authTimeout = setTimeout(async () => {
-                authInitialized = true;
                 await checkAuthAndCredits();
-		    subscribeToCredits();
+                subscribeToCredits();
             }, 100);
         }
     } else if (event === 'SIGNED_OUT') {
         clearTimeout(authTimeout);
-        authInitialized = false;
+        authInitialized = false; // Reset flag on sign out
         currentUser = null;
         userCredits = 0;
         updateCreditsDisplay();
