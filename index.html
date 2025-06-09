@@ -1694,36 +1694,53 @@ async function checkAuthAndCredits() {
     }
 }
 
-// Real-time credit updates
+let creditSyncInterval = null;
+
 function subscribeToCredits() {
     if (!currentUser) return;
     
-    console.log('=== SETTING UP REAL-TIME SUBSCRIPTION ===');
+    console.log('=== SETTING UP CREDIT POLLING (Real-time not available) ===');
     console.log('User ID:', currentUser.id);
     
-    const subscription = supabaseClient
-        .channel(`credit-updates-${currentUser.id}`)  // ← Make channel name unique per user
-        .on(
-            'postgres_changes',
-            {
-                event: 'UPDATE',
-                schema: 'public',
-                table: 'leadfinder_users',
-                filter: `id=eq.${currentUser.id}`
-            },
-            (payload) => {
-                console.log('=== REAL-TIME UPDATE RECEIVED ===');
-                console.log('Credits updated in real-time:', payload.new.credits);
-                userCredits = payload.new.credits;
-                updateCreditsDisplay();
-                showCustomToast('Credits Updated', `Your credits have been updated to ${userCredits}`, 'info', 3000);
-            }
-        )
-        .subscribe((status) => {
-            console.log('=== SUBSCRIPTION STATUS ===', status);
-        });
+    // Clear any existing interval
+    if (creditSyncInterval) {
+        clearInterval(creditSyncInterval);
+    }
     
-    return subscription;
+    // Poll every 10 seconds for credit changes
+    creditSyncInterval = setInterval(async () => {
+        try {
+            const { data: profile } = await supabaseClient
+                .from('leadfinder_users')
+                .select('credits')
+                .eq('id', currentUser.id)
+                .single();
+            
+            if (profile && profile.credits !== userCredits) {
+                console.log('=== CREDIT CHANGE DETECTED ===');
+                console.log('Old credits:', userCredits, 'New credits:', profile.credits);
+                userCredits = profile.credits;
+                updateCreditsDisplay();
+                showCustomToast('Credits Updated', 
+                    `Your credits have been updated to ${userCredits}`, 
+                    'info', 3000);
+            }
+        } catch (error) {
+            console.log('Credit sync poll failed:', error);
+        }
+    }, 10000); // Poll every 10 seconds
+    
+    console.log('=== CREDIT POLLING STARTED ===');
+    return creditSyncInterval;
+}
+
+// Also add cleanup when user logs out
+function stopCreditSync() {
+    if (creditSyncInterval) {
+        clearInterval(creditSyncInterval);
+        creditSyncInterval = null;
+        console.log('Credit polling stopped');
+    }
 }
 	
 async function deductCredit(amount = 1) {
@@ -1817,8 +1834,10 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
         }
     } else if (event === 'SIGNED_OUT') {
         clearTimeout(authTimeout);
+	    stopCreditSync();
         authInitialized = false;
-        profileCreationInProgress = false; // Reset both flags
+        profileCreationInProgress = false;// Reset both flags
+		lastProcessedSession = null;
         currentUser = null;
         userCredits = 0;
         updateCreditsDisplay();
