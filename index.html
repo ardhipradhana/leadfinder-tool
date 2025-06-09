@@ -464,7 +464,7 @@
 				        <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V4z"/>
 				    </svg>
 				    <span id="creditsDisplay" class="text-accent-cyan font-medium">0 credits</span>
-				    <button onclick="syncCreditsAfterEvent('manual')" class="text-gray-400 hover:text-accent-cyan ml-2" title="Refresh credits">
+				    <button id="refreshCreditsBtn" class="text-gray-400 hover:text-accent-cyan ml-2" title="Refresh credits">
 				        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 				            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
 				        </svg>
@@ -1797,11 +1797,20 @@ async function signInWithGoogle() {
 let authInitialized = false;
 let authTimeout = null;
 
-let profileCreationInProgress = false; // Add this flag at the top
+let profileCreationInProgress = false;
+let lastProcessedSession = null; // Track processed sessions
+let authProcessingTimeout = null; // Debounce auth processing
 
 supabaseClient.auth.onAuthStateChange(async (event, session) => {
     console.log('Auth state change:', event, 'authInitialized:', authInitialized);
     console.log('Session exists:', !!session, 'User ID:', session?.user?.id);
+    
+    // Prevent processing the same session multiple times
+    const sessionId = session?.access_token?.substring(0, 10) || 'no-session';
+    if (sessionId === lastProcessedSession && sessionId !== 'no-session') {
+        console.log('Same session already processed, skipping');
+        return;
+    }
     
     if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session) {
         console.log('Inside auth handler - about to set currentUser');
@@ -1813,25 +1822,30 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
             console.log('About to call checkAuthAndCredits');
             authInitialized = true;
             profileCreationInProgress = true;
-            clearTimeout(authTimeout);
+            lastProcessedSession = sessionId; // Mark this session as processed
             
-            authTimeout = setTimeout(async () => {
+            // Clear any existing timeout
+            clearTimeout(authTimeout);
+            clearTimeout(authProcessingTimeout);
+            
+            // Debounce: wait a bit in case more auth events come rapidly
+            authProcessingTimeout = setTimeout(async () => {
                 try {
                     await checkAuthAndCredits();
                     subscribeToCredits();
                 } finally {
-                    profileCreationInProgress = false; // Reset flag when done
+                    profileCreationInProgress = false;
                 }
-            }, 100);
+            }, 200); // Slightly longer delay to let auth settle
         } else {
             console.log('Skipped checkAuthAndCredits - authInitialized:', authInitialized, 'profileCreationInProgress:', profileCreationInProgress);
         }
     } else if (event === 'SIGNED_OUT') {
         clearTimeout(authTimeout);
-	    stopCreditSync();
+        clearTimeout(authProcessingTimeout);
         authInitialized = false;
-        profileCreationInProgress = false;// Reset both flags
-		lastProcessedSession = null;
+        profileCreationInProgress = false;
+        lastProcessedSession = null; // Reset on sign out
         currentUser = null;
         userCredits = 0;
         updateCreditsDisplay();
@@ -6089,6 +6103,11 @@ setTimeout(() => {
 	        !e.target.closest('#generateOutreachBtn')) {
 	        popup.classList.add('hidden');
 	    }
+	});
+
+	// Refresh credits button
+	document.getElementById('refreshCreditsBtn').addEventListener('click', async () => {
+	    await syncCreditsAfterEvent('manual');
 	});
 	
 	});
