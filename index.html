@@ -1565,6 +1565,7 @@ let currentHistoryData = [];
 let isSearching = false;
 let isAnalyzing = false;
 
+	
 // Authentication functions
 function showAuthModal() {
     document.getElementById('authModal').classList.remove('hidden');
@@ -1647,7 +1648,7 @@ async function checkAuthAndCredits() {
                             id: currentUser.id,
                             email: currentUser.email,
                             full_name: currentUser.user_metadata?.full_name || currentUser.email,
-                            credits: 3
+                            credits: 5
                         })
                         .select()
                         .single();
@@ -1700,8 +1701,11 @@ async function checkAuthAndCredits() {
 function subscribeToCredits() {
     if (!currentUser) return;
     
+    console.log('=== SETTING UP REAL-TIME SUBSCRIPTION ===');
+    console.log('User ID:', currentUser.id);
+    
     const subscription = supabaseClient
-        .channel('credit-updates')
+        .channel(`credit-updates-${currentUser.id}`)  // ← Make channel name unique per user
         .on(
             'postgres_changes',
             {
@@ -1711,13 +1715,16 @@ function subscribeToCredits() {
                 filter: `id=eq.${currentUser.id}`
             },
             (payload) => {
+                console.log('=== REAL-TIME UPDATE RECEIVED ===');
                 console.log('Credits updated in real-time:', payload.new.credits);
                 userCredits = payload.new.credits;
                 updateCreditsDisplay();
                 showCustomToast('Credits Updated', `Your credits have been updated to ${userCredits}`, 'info', 3000);
             }
         )
-        .subscribe();
+        .subscribe((status) => {
+            console.log('=== SUBSCRIPTION STATUS ===', status);
+        });
     
     return subscription;
 }
