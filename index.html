@@ -1954,12 +1954,19 @@ async function handleSearch(e) {
     }
     isSearching = true;
     
-    const creditsRequired = 1;
-    if (userCredits < creditsRequired) {
-        showCustomToast('Insufficient Credits', `You need ${creditsRequired} credits for this search type.`, 'error');
-        isSearching = false;
-        return;
-    }
+    // Check auth first, then credits
+	const hasValidAuth = await checkAuthAndCredits();
+	if (!hasValidAuth) {
+	    isSearching = false;
+	    return; // Auth modal will be shown by checkAuthAndCredits()
+	}
+	
+	const creditsRequired = 1;
+	if (userCredits < creditsRequired) {
+	    showCustomToast('Insufficient Credits', `You need ${creditsRequired} credits for this search type.`, 'error');
+	    isSearching = false;
+	    return;
+	}
 
     const formData = new FormData(searchForm);
     const searchParams = {
