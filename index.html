@@ -1827,7 +1827,19 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
 });
 
 // --- 4. Main session check on page load ---
-console.log('Step 4: Skipping Supabase session check for now...');
+console.log('Step 4: Initializing auth system...');
+try {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    console.log('Initial session check:', !!session);
+    if (session) {
+        console.log('Found existing session, user:', session.user.id);
+        // Don't do anything here, let the auth state change handler deal with it
+    } else {
+        console.log('No existing session found');
+    }
+} catch (error) {
+    console.log('Auth check failed:', error);
+}
 console.log('Step 6: Auth handling completed');
 
 console.log('Step 7: Moving to DOM elements...');
