@@ -1790,16 +1790,16 @@ let profileCreationInProgress = false; // Add this flag at the top
 
 supabaseClient.auth.onAuthStateChange(async (event, session) => {
     console.log('Auth state change:', event, 'authInitialized:', authInitialized);
-	console.log('Session exists:', !!session, 'User ID:', session?.user?.id);
+    console.log('Session exists:', !!session, 'User ID:', session?.user?.id);
     
-    if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session) 
-    console.log('Inside auth handler - about to set currentUser');
+    if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session) {
+        console.log('Inside auth handler - about to set currentUser');
         currentUser = session.user;
         hideAuthModal();
         
         // Only run once per session AND prevent overlapping calls
         if (!authInitialized && !profileCreationInProgress) {
-		console.log('About to call checkAuthAndCredits');
+            console.log('About to call checkAuthAndCredits');
             authInitialized = true;
             profileCreationInProgress = true;
             clearTimeout(authTimeout);
@@ -1812,7 +1812,8 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
                     profileCreationInProgress = false; // Reset flag when done
                 }
             }, 100);
-		console.log('Skipped checkAuthAndCredits - authInitialized:', authInitialized, 'profileCreationInProgress:', profileCreationInProgress);
+        } else {
+            console.log('Skipped checkAuthAndCredits - authInitialized:', authInitialized, 'profileCreationInProgress:', profileCreationInProgress);
         }
     } else if (event === 'SIGNED_OUT') {
         clearTimeout(authTimeout);
