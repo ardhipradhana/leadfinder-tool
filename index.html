@@ -4309,10 +4309,17 @@ function updateBookmarkCounter() {
 function updateBookmarkIcons() {
     document.querySelectorAll('.bookmark-icon').forEach(icon => {
         const candidateId = icon.dataset.candidateId;
-        const bookmarked = isBookmarked(candidateId);
         
-        icon.className = `bookmark-icon ${bookmarked ? 'bookmarked' : 'not-bookmarked'}`;
-        icon.title = bookmarked ? 'Remove from saved candidates' : 'Save candidate';
+        // Only update if we have a valid candidate ID
+        if (candidateId) {
+            const bookmarked = isBookmarked(candidateId);
+            icon.className = `bookmark-icon ${bookmarked ? 'bookmarked' : 'not-bookmarked'}`;
+            icon.title = bookmarked ? 'Remove from saved candidates' : 'Save candidate';
+        } else {
+            // Default to not bookmarked if no ID
+            icon.className = 'bookmark-icon not-bookmarked';
+            icon.title = 'Save candidate';
+        }
     });
 }
 
