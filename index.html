@@ -1695,6 +1695,32 @@ async function checkAuthAndCredits() {
         isCheckingCredits = false;
     }
 }
+
+// Real-time credit updates
+function subscribeToCredits() {
+    if (!currentUser) return;
+    
+    const subscription = supabaseClient
+        .channel('credit-updates')
+        .on(
+            'postgres_changes',
+            {
+                event: 'UPDATE',
+                schema: 'public',
+                table: 'leadfinder_users',
+                filter: `id=eq.${currentUser.id}`
+            },
+            (payload) => {
+                console.log('Credits updated in real-time:', payload.new.credits);
+                userCredits = payload.new.credits;
+                updateCreditsDisplay();
+                showCustomToast('Credits Updated', `Your credits have been updated to ${userCredits}`, 'info', 3000);
+            }
+        )
+        .subscribe();
+    
+    return subscription;
+}
 	
 async function deductCredit(amount = 1) {
 	console.log('=== DEDUCT CREDIT DEBUG ===');
@@ -1772,6 +1798,7 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
             authTimeout = setTimeout(async () => {
                 authInitialized = true;
                 await checkAuthAndCredits();
+		    subscribeToCredits();
             }, 100);
         }
     } else if (event === 'SIGNED_OUT') {
