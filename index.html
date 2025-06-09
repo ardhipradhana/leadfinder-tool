@@ -1783,7 +1783,7 @@ let authInitialized = false;
 let authTimeout = null;
 
 supabaseClient.auth.onAuthStateChange(async (event, session) => {
-    console.log('Auth state change:', event);
+    console.log('Auth state change:', event, 'authInitialized:', authInitialized);
     
     if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session) {
         currentUser = session.user;
