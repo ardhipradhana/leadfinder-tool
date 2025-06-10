@@ -1903,57 +1903,54 @@ function hideFeatures() {
     document.getElementById('featuresPage').classList.add('hidden');
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Show/hide functions attached to window for global access
-    function showContact() {
-        document.getElementById('contactPage').classList.remove('hidden');
-    }
-    function hideContact() {
-        document.getElementById('contactPage').classList.add('hidden');
-    }
-    window.showContact = showContact;
-    window.hideContact = hideContact;
+const closeContactBtn = document.getElementById('closeContact');
+if (closeContactBtn) {
+    closeContactBtn.addEventListener('click', hideContact);
+}
 
-    // Close (✕) button
-    const closeContactBtn = document.getElementById('closeContact');
-    if (closeContactBtn) {
-        closeContactBtn.addEventListener('click', hideContact);
-    }
+// Close when clicking outside
+const contactModal = document.getElementById('contactPage');
+if (contactModal) {
+    contactModal.addEventListener('click', function(e) {
+	if (e.target === this) {
+	    hideContact();
+	}
+    });
+}
 
-    // Close when clicking backdrop
-    const contactModal = document.getElementById('contactPage');
-    if (contactModal) {
-        contactModal.addEventListener('click', function(e) {
-            if (e.target === this) {
-                hideContact();
-            }
-        });
-    }
+// Contact form handler
+const contactForm = document.getElementById('contactForm');
+if (contactForm) {
+    contactForm.addEventListener('submit', function(e) {
+	e.preventDefault();
+	
+	const name = document.getElementById('contactName').value;
+	const email = document.getElementById('contactEmail').value;
+	const subject = document.getElementById('contactSubject').value;
+	const message = document.getElementById('contactMessage').value;
+	
+	// Create mailto link
+	const mailtoLink = mailto:support@aapgrp.com?subject=Leadfinder ${subject}: ${name}&body=Name: ${name}%0D%0AEmail: ${email}%0D%0A%0D%0AMessage:%0D%0A${encodeURIComponent(message)};
 
-    // Contact form handler
-    const contactForm = document.getElementById('contactForm');
-    if (contactForm) {
-        contactForm.addEventListener('submit', function(e) {
-            e.preventDefault();
+	window.open(mailtoLink, '_blank');
+	
+	// Show success message
+	showMessage('Message prepared! Your email client should open now.', false);
+	
+	// Reset form
+	contactForm.reset();
+    });
+}
+	
+function showContact() {
+    document.getElementById('contactPage').classList.remove('hidden');
+}
 
-            const name = document.getElementById('contactName').value;
-            const email = document.getElementById('contactEmail').value;
-            const subject = document.getElementById('contactSubject').value;
-            const message = document.getElementById('contactMessage').value;
+function hideContact() {
+    document.getElementById('contactPage').classList.add('hidden');
+}
 
-            // Create mailto link
-            const mailtoLink = `mailto:support@aapgrp.com?subject=Leadfinder ${subject}: ${name}&body=Name: ${name}%0D%0AEmail: ${email}%0D%0A%0D%0AMessage:%0D%0A${encodeURIComponent(message)}`;
-
-            window.open(mailtoLink, '_blank');
-
-            // Show success message (define showMessage elsewhere)
-            showMessage('Message prepared! Your email client should open now.', false);
-
-            // Reset form
-            contactForm.reset();
-        });
-    }
-});
+window.hideContact = hideContact;
 	
 // Pricing page management
 function showPricingPage() {
