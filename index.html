@@ -1008,9 +1008,8 @@
                     <h4 class="font-semibold text-white mb-4">Legal</h4>
                     <ul class="space-y-2">
                         <li><button onclick="showPrivacyPolicy()" class="text-gray-400 hover:text-accent-cyan text-sm transition-colors">Privacy Policy</button></li>
-                        <li><a href="#" class="text-gray-400 hover:text-accent-cyan text-sm transition-colors">Terms of Service</a></li>
+                        <li><button onclick="showTermsOfService()" class="text-gray-400 hover:text-accent-cyan text-sm transition-colors">Terms of Service</button></li>
                         <li><button onclick="showFAQ()" class="text-gray-400 hover:text-accent-cyan text-sm transition-colors">FAQ</button></li>
-                        <li><a href="#" class="text-gray-400 hover:text-accent-cyan text-sm transition-colors">Support</a></li>
                     </ul>
                 </div>
 
@@ -1640,6 +1639,8 @@ let isAnalyzing = false;
 	window.showFAQ = showFAQ;
 	window.showFeatures = showFeatures;
 	window.showContact = showContact;
+	window.showTermsOfService = showTermsOfService;
+	window.hideTermsOfService = hideTermsOfService;
 	
 // Authentication functions
 function showAuthModal() {
@@ -1831,6 +1832,14 @@ function showFAQ() {
 
 function hideFAQ() {
     document.getElementById('faqPage').classList.add('hidden');
+}
+
+function showTermsOfService() {
+    document.getElementById('termsOfServicePage').classList.remove('hidden');
+}
+
+function hideTermsOfService() {
+    document.getElementById('termsOfServicePage').classList.add('hidden');
 }
 
 // FAQ Accordion functionality
@@ -6353,6 +6362,15 @@ setTimeout(() => {
 	    }
 	});
 
+	document.getElementById('closeTermsOfService').addEventListener('click', hideTermsOfService);
+
+	// Close when clicking outside
+	document.getElementById('termsOfServicePage').addEventListener('click', function(e) {
+	    if (e.target === this) {
+	        hideTermsOfService();
+	    }
+	});
+
 	// Add these event listeners in your DOMContentLoaded section:
 	document.getElementById('closeHowItWorks').addEventListener('click', hideHowItWorks);
 	
@@ -7820,6 +7838,372 @@ setTimeout(() => {
            </div>
        </div>
    </div>
+</div>
+
+<!-- Terms of Service Modal -->
+<div id="termsOfServicePage" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-dark-secondary rounded-xl max-w-4xl w-full max-h-screen overflow-y-auto">
+        <!-- Header -->
+        <div class="p-6 border-b border-gray-700">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-accent-cyan/20 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-accent-cyan" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-1H8v1a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v4H7V5zm2 5H7v2h2v-2zm2-5h2v4h-2V5zm2 5h-2v2h2v-2z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">Terms of Service</h2>
+                        <p class="text-gray-400">Your rights and responsibilities using Leadfinder</p>
+                    </div>
+                </div>
+                <button id="closeTermsOfService" class="text-gray-400 hover:text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="p-6 space-y-6">
+            <!-- Quick Summary -->
+            <div class="bg-gradient-to-r from-accent-cyan/10 to-accent-teal/10 border border-accent-cyan/30 rounded-xl p-6">
+                <h3 class="text-lg font-bold text-accent-cyan mb-3 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                    </svg>
+                    The Simple Version
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div class="space-y-2">
+                        <p class="text-accent-cyan font-medium">✅ What You Can Do:</p>
+                        <ul class="text-gray-300 space-y-1 ml-4">
+                            <li>• Search for candidates professionally</li>
+                            <li>• Export and share candidate data</li>
+                            <li>• Use our AI insights for hiring</li>
+                            <li>• Cancel anytime, no questions asked</li>
+                        </ul>
+                    </div>
+                    <div class="space-y-2">
+                        <p class="text-red-400 font-medium">❌ What You Can't Do:</p>
+                        <ul class="text-gray-300 space-y-1 ml-4">
+                            <li>• Use data for spam or harassment</li>
+                            <li>• Share your account credentials</li>
+                            <li>• Attempt to reverse-engineer our AI</li>
+                            <li>• Violate candidate privacy rights</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 1. Service Description -->
+            <div class="bg-dark-primary rounded-lg p-6">
+                <h3 class="text-lg font-bold text-white mb-4">1. Service Description</h3>
+                <div class="space-y-3 text-gray-300">
+                    <p>Leadfinder is an AI-powered talent discovery platform that helps businesses find and evaluate potential candidates from publicly available professional profiles across Indonesia.</p>
+                    
+                    <div class="bg-dark-secondary rounded-lg p-4 border border-gray-600">
+                        <h4 class="font-semibold text-accent-cyan mb-2">Our Service Includes:</h4>
+                        <ul class="text-sm space-y-1">
+                            <li>• AI-powered candidate search and ranking</li>
+                            <li>• Compatibility scoring based on job requirements</li>
+                            <li>• Professional profile analysis and insights</li>
+                            <li>• Export capabilities for candidate data</li>
+                            <li>• Automated outreach message generation</li>
+                        </ul>
+                    </div>
+                    
+                    <p class="text-yellow-300 text-sm bg-yellow-900/20 p-3 rounded-lg border border-yellow-600/30">
+                        <strong>Important:</strong> We provide tools to help you find candidates. The actual recruitment, interviewing, and hiring processes are your responsibility.
+                    </p>
+                </div>
+            </div>
+
+            <!-- 2. User Responsibilities -->
+            <div class="bg-dark-primary rounded-lg p-6">
+                <h3 class="text-lg font-bold text-white mb-4">2. Your Responsibilities</h3>
+                <div class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-dark-secondary rounded-lg p-4">
+                            <h4 class="font-semibold text-green-400 mb-2">Professional Use</h4>
+                            <ul class="text-gray-300 text-sm space-y-1">
+                                <li>• Use the service for legitimate recruitment purposes only</li>
+                                <li>• Respect candidate privacy and data protection laws</li>
+                                <li>• Provide accurate information in your searches</li>
+                                <li>• Maintain the confidentiality of candidate data</li>
+                            </ul>
+                        </div>
+                        <div class="bg-dark-secondary rounded-lg p-4">
+                            <h4 class="font-semibold text-red-400 mb-2">Prohibited Activities</h4>
+                            <ul class="text-gray-300 text-sm space-y-1">
+                                <li>• Spam or unsolicited mass messaging</li>
+                                <li>• Discriminatory hiring practices</li>
+                                <li>• Sharing or reselling candidate data</li>
+                                <li>• Attempting to breach our security measures</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4">
+                        <p class="text-blue-300 text-sm">
+                            <strong>Account Security:</strong> You're responsible for maintaining the security of your account credentials. Don't share your login details with unauthorized users.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Payment & Credits -->
+            <div class="bg-dark-primary rounded-lg p-6">
+                <h3 class="text-lg font-bold text-white mb-4">3. Payment Terms & Credits</h3>
+                <div class="space-y-4 text-gray-300">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/30 rounded-lg p-4">
+                            <h4 class="font-semibold text-green-400 mb-2">Free Credits</h4>
+                            <p class="text-sm">All users receive 5 free searches monthly. Free credits reset automatically on the 1st of each month and cannot be carried over.</p>
+                        </div>
+                        <div class="bg-gradient-to-br from-accent-cyan/10 to-accent-teal/10 border border-accent-cyan/30 rounded-lg p-4">
+                            <h4 class="font-semibold text-accent-cyan mb-2">Purchased Credits</h4>
+                            <p class="text-sm">Paid credits never expire and can be used anytime. All payments are processed securely through our payment partner, Midtrans.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <p><strong class="text-white">Pricing:</strong> Current rates are displayed on our pricing page and may be updated with 30 days notice.</p>
+                        <p><strong class="text-white">Refunds:</strong> 7-day satisfaction guarantee on first purchases. Unused credits may be refunded on a case-by-case basis.</p>
+                        <p><strong class="text-white">Payment Issues:</strong> Contact support@aapgrp.com for any billing concerns.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Data Usage & Privacy -->
+            <div class="bg-dark-primary rounded-lg p-6">
+                <h3 class="text-lg font-bold text-white mb-4">4. Data Usage & Privacy</h3>
+                <div class="space-y-4">
+                    <div class="bg-purple-900/20 border border-purple-500/30 rounded-lg p-4">
+                        <h4 class="font-semibold text-purple-400 mb-2">🔍 What Data We Access</h4>
+                        <p class="text-gray-300 text-sm">We only access publicly available professional information from platforms like LinkedIn, JobStreet, and other job boards. No private messages, personal contacts, or confidential data is ever accessed.</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-dark-secondary rounded-lg p-4">
+                            <h4 class="font-semibold text-accent-cyan mb-2">Your Data Rights</h4>
+                            <ul class="text-gray-300 text-sm space-y-1">
+                                <li>• Access your personal data</li>
+                                <li>• Correct inaccurate information</li>
+                                <li>• Delete your account and data</li>
+                                <li>• Export data in structured format</li>
+                            </ul>
+                        </div>
+                        <div class="bg-dark-secondary rounded-lg p-4">
+                            <h4 class="font-semibold text-yellow-400 mb-2">Candidate Data Ethics</h4>
+                            <ul class="text-gray-300 text-sm space-y-1">
+                                <li>• Use candidate data responsibly</li>
+                                <li>• Respect privacy preferences</li>
+                                <li>• Follow applicable employment laws</li>
+                                <li>• Don't share data without consent</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. Service Availability -->
+            <div class="bg-dark-primary rounded-lg p-6">
+                <h3 class="text-lg font-bold text-white mb-4">5. Service Availability & Limitations</h3>
+                <div class="space-y-4 text-gray-300">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-dark-secondary rounded-lg p-4 text-center">
+                            <div class="text-2xl mb-2">🎯</div>
+                            <h4 class="font-semibold text-green-400 mb-1">99.5% Uptime</h4>
+                            <p class="text-xs">Target availability</p>
+                        </div>
+                        <div class="bg-dark-secondary rounded-lg p-4 text-center">
+                            <div class="text-2xl mb-2">🔧</div>
+                            <h4 class="font-semibold text-yellow-400 mb-1">Scheduled Maintenance</h4>
+                            <p class="text-xs">Announced 24h ahead</p>
+                        </div>
+                        <div class="bg-dark-secondary rounded-lg p-4 text-center">
+                            <div class="text-2xl mb-2">🌐</div>
+                            <h4 class="font-semibold text-blue-400 mb-1">Indonesia Focus</h4>
+                            <p class="text-xs">Optimized for local market</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-red-900/20 border border-red-500/30 rounded-lg p-4">
+                        <h4 class="font-semibold text-red-400 mb-2">Service Limitations</h4>
+                        <ul class="text-sm space-y-1">
+                            <li>• AI accuracy depends on available public data quality</li>
+                            <li>• Search results may vary based on platform changes</li>
+                            <li>• Service currently limited to Indonesian talent market</li>
+                            <li>• Credits may be temporarily suspended for maintenance</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. Intellectual Property -->
+            <div class="bg-dark-primary rounded-lg p-6">
+                <h3 class="text-lg font-bold text-white mb-4">6. Intellectual Property</h3>
+                <div class="space-y-4 text-gray-300">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-dark-secondary rounded-lg p-4">
+                            <h4 class="font-semibold text-accent-cyan mb-2">Our Property</h4>
+                            <ul class="text-sm space-y-1">
+                                <li>• AI algorithms and scoring methods</li>
+                                <li>• Software platform and interface</li>
+                                <li>• Leadfinder brand and trademarks</li>
+                                <li>• Analysis and insights methodology</li>
+                            </ul>
+                        </div>
+                        <div class="bg-dark-secondary rounded-lg p-4">
+                            <h4 class="font-semibold text-green-400 mb-2">Your Property</h4>
+                            <ul class="text-sm space-y-1">
+                                <li>• Search queries and criteria</li>
+                                <li>• Your company data and preferences</li>
+                                <li>• Exported candidate lists</li>
+                                <li>• Your recruitment decisions</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <p class="text-sm bg-gray-900/50 p-3 rounded-lg">
+                        <strong>Important:</strong> While you own your search data, candidate profile information remains the property of the original platforms and individuals.
+                    </p>
+                </div>
+            </div>
+
+            <!-- 7. Termination -->
+            <div class="bg-dark-primary rounded-lg p-6">
+                <h3 class="text-lg font-bold text-white mb-4">7. Account Termination</h3>
+                <div class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4">
+                            <h4 class="font-semibold text-blue-400 mb-2">You Can Cancel Anytime</h4>
+                            <ul class="text-gray-300 text-sm space-y-1">
+                                <li>• No long-term contracts or commitments</li>
+                                <li>• Keep unused credits after cancellation</li>
+                                <li>• Export your data before closing</li>
+                                <li>• Reactivate your account later if needed</li>
+                            </ul>
+                        </div>
+                        <div class="bg-red-900/20 border border-red-500/30 rounded-lg p-4">
+                            <h4 class="font-semibold text-red-400 mb-2">We May Suspend Accounts For</h4>
+                            <ul class="text-gray-300 text-sm space-y-1">
+                                <li>• Violating these terms of service</li>
+                                <li>• Suspicious or fraudulent activity</li>
+                                <li>• Repeated payment failures</li>
+                                <li>• Misuse of candidate data</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-yellow-900/20 border border-yellow-600/30 rounded-lg p-4">
+                        <p class="text-yellow-300 text-sm">
+                            <strong>Fair Warning:</strong> We'll always try to resolve issues before account suspension. You'll receive email warnings and opportunities to correct any problems.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 8. Limitation of Liability -->
+            <div class="bg-dark-primary rounded-lg p-6">
+                <h3 class="text-lg font-bold text-white mb-4">8. Limitation of Liability</h3>
+                <div class="space-y-4 text-gray-300">
+                    <div class="bg-dark-secondary rounded-lg p-4">
+                        <p class="text-sm">
+                            Leadfinder provides tools to assist with talent discovery. We don't guarantee the accuracy of candidate information, successful hires, or specific business outcomes. Our maximum liability is limited to the amount you paid for credits in the last 12 months.
+                        </p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <h4 class="font-semibold text-accent-cyan mb-2">We're Responsible For:</h4>
+                            <ul class="space-y-1">
+                                <li>• Platform uptime and performance</li>
+                                <li>• Data security and privacy protection</li>
+                                <li>• Customer support and issue resolution</li>
+                                <li>• Transparent billing and credit management</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-yellow-400 mb-2">You're Responsible For:</h4>
+                            <ul class="space-y-1">
+                                <li>• Your hiring decisions and processes</li>
+                                <li>• Compliance with employment laws</li>
+                                <li>• Candidate relationship management</li>
+                                <li>• Proper use of exported data</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 9. Updates & Changes -->
+            <div class="bg-dark-primary rounded-lg p-6">
+                <h3 class="text-lg font-bold text-white mb-4">9. Terms Updates</h3>
+                <div class="space-y-3 text-gray-300">
+                    <p>We may update these terms occasionally to reflect service improvements or legal requirements. Here's how we handle changes:</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-dark-secondary rounded-lg p-3 text-center">
+                            <div class="text-2xl mb-2">📧</div>
+                            <h4 class="font-semibold text-blue-400 mb-1">Email Notification</h4>
+                            <p class="text-xs">30 days advance notice</p>
+                        </div>
+                        <div class="bg-dark-secondary rounded-lg p-3 text-center">
+                            <div class="text-2xl mb-2">🔄</div>
+                            <h4 class="font-semibold text-green-400 mb-1">Version Control</h4>
+                            <p class="text-xs">Clear change tracking</p>
+                        </div>
+                        <div class="bg-dark-secondary rounded-lg p-3 text-center">
+                            <div class="text-2xl mb-2">✅</div>
+                            <h4 class="font-semibold text-purple-400 mb-1">Your Choice</h4>
+                            <p class="text-xs">Accept or cancel service</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact & Legal -->
+            <div class="bg-gradient-to-r from-gray-500/10 to-slate-500/10 rounded-xl p-6 border border-gray-500/30">
+                <h3 class="text-lg font-bold text-white mb-4 text-center">Questions About These Terms?</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-accent-cyan/20 rounded-lg flex items-center justify-center mx-auto mb-3">
+                            <svg class="w-6 h-6 text-accent-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                        <h4 class="font-semibold text-white mb-2">Legal Questions</h4>
+                        <p class="text-gray-300 text-sm mb-3">For legal or compliance questions</p>
+                        <a href="mailto:legal@aapgrp.com" class="text-accent-cyan hover:text-accent-teal text-sm font-medium underline">
+                            legal@aapgrp.com
+                        </a>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center mx-auto mb-3">
+                            <svg class="w-6 h-6 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <h4 class="font-semibold text-white mb-2">General Support</h4>
+                        <p class="text-gray-300 text-sm mb-3">For account or service questions</p>
+                        <a href="mailto:support@aapgrp.com" class="text-blue-400 hover:text-blue-300 text-sm font-medium underline">
+                            support@aapgrp.com
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="mt-6 pt-4 border-t border-gray-600 text-center text-sm text-gray-400">
+                    <p><strong class="text-white">Governing Law:</strong> These terms are governed by Indonesian law</p>
+                    <p class="mt-2">Last updated: January 2025 • Version 2.1</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 </body>
