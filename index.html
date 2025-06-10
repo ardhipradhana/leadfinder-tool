@@ -998,7 +998,7 @@
                     <ul class="space-y-2">
                         <li><button onclick="showPricingPage()" class="text-gray-400 hover:text-accent-cyan text-sm transition-colors">Pricing</button></li>
                         <li><button onclick="showHowItWorks()" class="text-gray-400 hover:text-accent-cyan text-sm transition-colors">How it Works</button></li>
-                        <li><a href="#" class="text-gray-400 hover:text-accent-cyan text-sm transition-colors">Features</a></li>
+                        <li><button onclick="showFeatures()" class="text-gray-400 hover:text-accent-cyan text-sm transition-colors">Features</button></li>
                         <li><a href="#" class="text-gray-400 hover:text-accent-cyan text-sm transition-colors">Contact</a></li>
                     </ul>
                 </div>
@@ -1009,7 +1009,7 @@
                     <ul class="space-y-2">
                         <li><button onclick="showPrivacyPolicy()" class="text-gray-400 hover:text-accent-cyan text-sm transition-colors">Privacy Policy</button></li>
                         <li><a href="#" class="text-gray-400 hover:text-accent-cyan text-sm transition-colors">Terms of Service</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-accent-cyan text-sm transition-colors">FAQ</a></li>
+                        <li><button onclick="showFAQ()" class="text-gray-400 hover:text-accent-cyan text-sm transition-colors">FAQ</button></li>
                         <li><a href="#" class="text-gray-400 hover:text-accent-cyan text-sm transition-colors">Support</a></li>
                     </ul>
                 </div>
@@ -1635,7 +1635,8 @@ let isAnalyzing = false;
 	window.showPricingPage = showPricingPage;
 	window.showPrivacyPolicy = showPrivacyPolicy;
 	window.showHowItWorks = showHowItWorks;
-
+	window.showFAQ = showFAQ;
+	window.showFeatures = showFeatures;
 
 	
 // Authentication functions
@@ -1820,6 +1821,66 @@ function showHowItWorks() {
 
 function hideHowItWorks() {
     document.getElementById('howItWorksPage').classList.add('hidden');
+}
+
+function showFAQ() {
+    document.getElementById('faqPage').classList.remove('hidden');
+}
+
+function hideFAQ() {
+    document.getElementById('faqPage').classList.add('hidden');
+}
+
+// FAQ Accordion functionality
+document.addEventListener('click', (e) => {
+    // FAQ question click
+    if (e.target.closest('.faq-question')) {
+        const question = e.target.closest('.faq-question');
+        const answer = question.nextElementSibling;
+        const arrow = question.querySelector('.faq-arrow');
+        
+        // Toggle answer visibility
+        answer.classList.toggle('hidden');
+        
+        // Rotate arrow
+        if (answer.classList.contains('hidden')) {
+            arrow.style.transform = 'rotate(0deg)';
+        } else {
+            arrow.style.transform = 'rotate(180deg)';
+        }
+    }
+    
+    // Category filter buttons
+    if (e.target.closest('.faq-category-btn')) {
+        const category = e.target.closest('.faq-category-btn').dataset.category;
+        
+        // Remove active class from all category buttons
+        document.querySelectorAll('.faq-category-btn').forEach(btn => {
+            btn.classList.remove('ring-2', 'ring-accent-cyan');
+        });
+        
+        // Add active class to clicked button
+        e.target.closest('.faq-category-btn').classList.add('ring-2', 'ring-accent-cyan');
+        
+        // Hide all sections
+        document.querySelectorAll('.faq-section').forEach(section => {
+            section.style.display = 'none';
+        });
+        
+        // Show target section
+        const targetSection = document.querySelector(`[data-category="${category}"]`);
+        if (targetSection) {
+            targetSection.style.display = 'block';
+        }
+    }
+});
+
+function showFeatures() {
+    document.getElementById('featuresPage').classList.remove('hidden');
+}
+
+function hideFeatures() {
+    document.getElementById('featuresPage').classList.add('hidden');
 }
 	
 // Pricing page management
@@ -6272,6 +6333,24 @@ setTimeout(() => {
 	    }
 	});
 
+	document.getElementById('closeFAQ').addEventListener('click', hideFAQ);
+
+	// Close when clicking outside
+	document.getElementById('faqPage').addEventListener('click', function(e) {
+	    if (e.target === this) {
+	        hideFAQ();
+	    }
+	});
+
+	document.getElementById('closeFeatures').addEventListener('click', hideFeatures);
+
+	// Close when clicking outside
+	document.getElementById('featuresPage').addEventListener('click', function(e) {
+	    if (e.target === this) {
+	        hideFeatures();
+	    }
+	});
+
 	// Low credit warning button
 	document.getElementById('lowCreditWarning').addEventListener('click', showPricingPage);
 	
@@ -6773,6 +6852,1136 @@ setTimeout(() => {
         </div>
     </div>
 </div>
+
+<!-- FAQ Modal -->
+<div id="faqPage" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-dark-secondary rounded-xl max-w-4xl w-full max-h-screen overflow-y-auto">
+        <!-- Header -->
+        <div class="p-6 border-b border-gray-700">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-accent-cyan/20 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-accent-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">Frequently Asked Questions</h2>
+                        <p class="text-gray-400">Everything you need to know about Leadfinder</p>
+                    </div>
+                </div>
+                <button id="closeFAQ" class="text-gray-400 hover:text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="p-6">
+            <!-- Quick Access Categories -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                <button class="faq-category-btn bg-gradient-to-r from-blue-500/20 to-blue-600/20 border border-blue-500/30 rounded-lg p-4 text-left hover:from-blue-500/30 hover:to-blue-600/30 transition-all" data-category="getting-started">
+                    <div class="font-semibold text-blue-400 mb-1">🚀 Getting Started</div>
+                    <div class="text-sm text-gray-400">Account, credits, first search</div>
+                </button>
+                <button class="faq-category-btn bg-gradient-to-r from-purple-500/20 to-purple-600/20 border border-purple-500/30 rounded-lg p-4 text-left hover:from-purple-500/30 hover:to-purple-600/30 transition-all" data-category="how-it-works">
+                    <div class="font-semibold text-purple-400 mb-1">🤖 How AI Works</div>
+                    <div class="text-sm text-gray-400">Search quality, accuracy, data</div>
+                </button>
+                <button class="faq-category-btn bg-gradient-to-r from-green-500/20 to-green-600/20 border border-green-500/30 rounded-lg p-4 text-left hover:from-green-500/30 hover:to-green-600/30 transition-all" data-category="billing">
+                    <div class="font-semibold text-green-400 mb-1">💳 Billing & Credits</div>
+                    <div class="text-sm text-gray-400">Pricing, payments, refunds</div>
+                </button>
+            </div>
+
+            <!-- FAQ Items -->
+            <div class="space-y-4">
+                <!-- Getting Started Section -->
+                <div class="faq-section" data-category="getting-started">
+                    <h3 class="text-lg font-bold text-blue-400 mb-4 flex items-center">
+                        <span class="text-2xl mr-2">🚀</span>
+                        Getting Started
+                    </h3>
+
+                    <!-- FAQ Item -->
+                    <div class="faq-item bg-dark-primary rounded-lg">
+                        <button class="faq-question w-full text-left p-4 flex items-center justify-between hover:bg-dark-tertiary/50 transition-colors">
+                            <span class="font-semibold text-white">How do I create an account and start searching?</span>
+                            <svg class="faq-arrow w-5 h-5 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+                        <div class="faq-answer hidden px-4 pb-4">
+                            <div class="text-gray-300 space-y-2">
+                                <p>Getting started is simple and takes less than 2 minutes:</p>
+                                <ol class="list-decimal list-inside space-y-1 ml-4">
+                                    <li>Click "Continue with Google" or enter your email for a magic link</li>
+                                    <li>You'll automatically get <strong class="text-accent-cyan">5 free searches</strong> to try the platform</li>
+                                    <li>Fill in your first search criteria (job title, location, experience)</li>
+                                    <li>Hit "Search Talent" and get results in 30 seconds!</li>
+                                </ol>
+                                <div class="mt-3 p-3 bg-accent-cyan/10 border border-accent-cyan/30 rounded-lg">
+                                    <p class="text-accent-cyan text-sm"><strong>Pro tip:</strong> Start with a specific job title like "Digital Marketing Manager" for best results.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item bg-dark-primary rounded-lg">
+                        <button class="faq-question w-full text-left p-4 flex items-center justify-between hover:bg-dark-tertiary/50 transition-colors">
+                            <span class="font-semibold text-white">What information do I need to provide for a good search?</span>
+                            <svg class="faq-arrow w-5 h-5 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+                        <div class="faq-answer hidden px-4 pb-4">
+                            <div class="text-gray-300 space-y-3">
+                                <p>The more specific you are, the better our AI can find perfect matches:</p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="bg-dark-secondary rounded-lg p-3">
+                                        <h4 class="font-semibold text-accent-cyan mb-2">✅ Required (for best results)</h4>
+                                        <ul class="text-sm space-y-1">
+                                            <li>• Specific job title</li>
+                                            <li>• Target location</li>
+                                            <li>• Experience level</li>
+                                        </ul>
+                                    </div>
+                                    <div class="bg-dark-secondary rounded-lg p-3">
+                                        <h4 class="font-semibold text-yellow-400 mb-2">⚡ Optional (for precision)</h4>
+                                        <ul class="text-sm space-y-1">
+                                            <li>• Industry preference</li>
+                                            <li>• Company size</li>
+                                            <li>• Specific skills</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item bg-dark-primary rounded-lg">
+                        <button class="faq-question w-full text-left p-4 flex items-center justify-between hover:bg-dark-tertiary/50 transition-colors">
+                            <span class="font-semibold text-white">Is there a limit to how many candidates I can see per search?</span>
+                            <svg class="faq-arrow w-5 h-5 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+                        <div class="faq-answer hidden px-4 pb-4">
+                            <div class="text-gray-300">
+                                <p>Each search typically returns <strong class="text-accent-cyan">8-15 top-ranked candidates</strong>. This is intentional - we focus on quality over quantity.</p>
+                                <div class="mt-3 space-y-2">
+                                    <p><strong>Why we limit results:</strong></p>
+                                    <ul class="list-disc list-inside space-y-1 ml-4 text-sm">
+                                        <li>Higher quality candidates with better compatibility scores</li>
+                                        <li>Saves you time reviewing irrelevant profiles</li>
+                                        <li>Our AI pre-filters to show only the most promising matches</li>
+                                    </ul>
+                                </div>
+                                <div class="mt-3 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                                    <p class="text-blue-400 text-sm"><strong>Need more candidates?</strong> Adjust your search criteria or run multiple targeted searches for different experience levels.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- How AI Works Section -->
+                <div class="faq-section" data-category="how-it-works">
+                    <h3 class="text-lg font-bold text-purple-400 mb-4 flex items-center">
+                        <span class="text-2xl mr-2">🤖</span>
+                        How Our AI Works
+                    </h3>
+
+                    <div class="faq-item bg-dark-primary rounded-lg">
+                        <button class="faq-question w-full text-left p-4 flex items-center justify-between hover:bg-dark-tertiary/50 transition-colors">
+                            <span class="font-semibold text-white">How accurate are the AI compatibility scores?</span>
+                            <svg class="faq-arrow w-5 h-5 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+                        <div class="faq-answer hidden px-4 pb-4">
+                            <div class="text-gray-300 space-y-3">
+                                <p>Our AI compatibility scores are highly accurate, with <strong class="text-accent-cyan">85%+ precision</strong> based on successful hires by our users.</p>
+                                
+                                <div class="bg-dark-secondary rounded-lg p-4">
+                                    <h4 class="font-semibold text-purple-400 mb-2">How scores are calculated:</h4>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                                        <div>• <strong>Role Relevance (35%):</strong> Job title and responsibility match</div>
+                                        <div>• <strong>Experience Fit (30%):</strong> Years and industry experience</div>
+                                        <div>• <strong>Skills Match (20%):</strong> Technical and soft skills alignment</div>
+                                        <div>• <strong>Career Trajectory (15%):</strong> Growth pattern and ambition</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
+                                    <p class="text-green-400 text-sm"><strong>Proven results:</strong> Candidates with 80+ scores have 3x higher interview success rates than random LinkedIn searches.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item bg-dark-primary rounded-lg">
+                        <button class="faq-question w-full text-left p-4 flex items-center justify-between hover:bg-dark-tertiary/50 transition-colors">
+                            <span class="font-semibold text-white">What data sources does your AI use?</span>
+                            <svg class="faq-arrow w-5 h-5 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+                        <div class="faq-answer hidden px-4 pb-4">
+                            <div class="text-gray-300 space-y-3">
+                                <p>We analyze publicly available professional information from multiple sources:</p>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="bg-dark-secondary rounded-lg p-3">
+                                        <h4 class="font-semibold text-blue-400 mb-2">📱 Primary Sources</h4>
+                                        <ul class="text-sm space-y-1">
+                                            <li>• LinkedIn public profiles</li>
+                                            <li>• JobStreet candidate profiles</li>
+                                            <li>• Karir.com professional data</li>
+                                            <li>• Other Indonesian job boards</li>
+                                        </ul>
+                                    </div>
+                                    <div class="bg-dark-secondary rounded-lg p-3">
+                                        <h4 class="font-semibold text-purple-400 mb-2">🔍 Data Points Analyzed</h4>
+                                        <ul class="text-sm space-y-1">
+                                            <li>• Work experience & progression</li>
+                                            <li>• Skills & endorsements</li>
+                                            <li>• Education & certifications</li>
+                                            <li>• Industry connections</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                
+                                <div class="p-3 bg-accent-cyan/10 border border-accent-cyan/30 rounded-lg">
+                                    <p class="text-accent-cyan text-sm"><strong>Privacy note:</strong> We only access publicly available information. No private messages or confidential data is ever accessed.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item bg-dark-primary rounded-lg">
+                        <button class="faq-question w-full text-left p-4 flex items-center justify-between hover:bg-dark-tertiary/50 transition-colors">
+                            <span class="font-semibold text-white">Can I search for candidates outside Indonesia?</span>
+                            <svg class="faq-arrow w-5 h-5 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+                        <div class="faq-answer hidden px-4 pb-4">
+                            <div class="text-gray-300 space-y-3">
+                                <p>Currently, Leadfinder focuses exclusively on <strong class="text-accent-cyan">Indonesian talent</strong> to provide the highest quality results for local businesses.</p>
+                                
+                                <div class="bg-dark-secondary rounded-lg p-4">
+                                    <h4 class="font-semibold text-yellow-400 mb-2">🇮🇩 Why Indonesia-focused?</h4>
+                                    <ul class="text-sm space-y-1">
+                                        <li>• Deeper understanding of local job market dynamics</li>
+                                        <li>• Better salary and cultural context analysis</li>
+                                        <li>• More accurate career progression patterns</li>
+                                        <li>• Optimized for Bahasa Indonesia and local platforms</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                                    <p class="text-blue-400 text-sm"><strong>Coming soon:</strong> We're planning to expand to Singapore and Malaysia in 2025. Join our waitlist for early access!</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Billing & Credits Section -->
+                <div class="faq-section" data-category="billing">
+                    <h3 class="text-lg font-bold text-green-400 mb-4 flex items-center">
+                        <span class="text-2xl mr-2">💳</span>
+                        Billing & Credits
+                    </h3>
+
+                    <div class="faq-item bg-dark-primary rounded-lg">
+                        <button class="faq-question w-full text-left p-4 flex items-center justify-between hover:bg-dark-tertiary/50 transition-colors">
+                            <span class="font-semibold text-white">How much does it cost per search?</span>
+                            <svg class="faq-arrow w-5 h-5 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+                        <div class="faq-answer hidden px-4 pb-4">
+                            <div class="text-gray-300 space-y-3">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="bg-gradient-to-r from-blue-500/10 to-blue-600/10 rounded-lg p-4 border border-blue-500/30">
+                                        <h4 class="font-semibold text-blue-400 mb-2">🆓 Free Plan</h4>
+                                        <div class="text-2xl font-bold text-white mb-1">5 searches</div>
+                                        <div class="text-sm text-gray-400">Per month • Auto-resets</div>
+                                        <div class="text-xs text-blue-400 mt-2">Perfect for trying the platform</div>
+                                    </div>
+                                    <div class="bg-gradient-to-r from-accent-cyan/10 to-accent-teal/10 rounded-lg p-4 border border-accent-cyan/30">
+                                        <h4 class="font-semibold text-accent-cyan mb-2">💎 Credit Top-up</h4>
+                                        <div class="text-2xl font-bold text-white mb-1">Rp 20k</div>
+                                        <div class="text-sm text-gray-400">Per search • Never expires</div>
+                                        <div class="text-xs text-accent-cyan mt-2">30 credits = Rp 599k (bulk discount)</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
+                                    <p class="text-green-400 text-sm"><strong>Cost comparison:</strong> Traditional recruiters charge 15-25% of annual salary. One Leadfinder search costs about the same as a coffee! ☕</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item bg-dark-primary rounded-lg">
+                        <button class="faq-question w-full text-left p-4 flex items-center justify-between hover:bg-dark-tertiary/50 transition-colors">
+                            <span class="font-semibold text-white">What payment methods do you accept?</span>
+                            <svg class="faq-arrow w-5 h-5 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+                        <div class="faq-answer hidden px-4 pb-4">
+                            <div class="text-gray-300 space-y-3">
+                                <p>We support all major Indonesian payment methods through our secure Midtrans integration:</p>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div class="bg-dark-secondary rounded-lg p-3 text-center">
+                                        <div class="text-2xl mb-2">🏦</div>
+                                        <h4 class="font-semibold text-white mb-1">Bank Transfer</h4>
+                                        <div class="text-xs text-gray-400">BCA, Mandiri, BNI, BRI</div>
+                                    </div>
+                                    <div class="bg-dark-secondary rounded-lg p-3 text-center">
+                                        <div class="text-2xl mb-2">💳</div>
+                                        <h4 class="font-semibold text-white mb-1">Credit/Debit Cards</h4>
+                                        <div class="text-xs text-gray-400">Visa, Mastercard, JCB</div>
+                                    </div>
+                                    <div class="bg-dark-secondary rounded-lg p-3 text-center">
+                                        <div class="text-2xl mb-2">📱</div>
+                                        <h4 class="font-semibold text-white mb-1">E-Wallets</h4>
+                                        <div class="text-xs text-gray-400">OVO, DANA, GoPay, LinkAja</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="p-3 bg-accent-cyan/10 border border-accent-cyan/30 rounded-lg">
+                                    <p class="text-accent-cyan text-sm"><strong>Security:</strong> All payments are processed securely by Midtrans (Gojek's payment partner). We never store your payment details.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item bg-dark-primary rounded-lg">
+                        <button class="faq-question w-full text-left p-4 flex items-center justify-between hover:bg-dark-tertiary/50 transition-colors">
+                            <span class="font-semibold text-white">Can I get a refund if I'm not satisfied?</span>
+                            <svg class="faq-arrow w-5 h-5 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+                        <div class="faq-answer hidden px-4 pb-4">
+                            <div class="text-gray-300 space-y-3">
+                                <p>Yes! We offer a <strong class="text-accent-cyan">7-day satisfaction guarantee</strong> on your first credit purchase.</p>
+                                
+                                <div class="bg-dark-secondary rounded-lg p-4">
+                                    <h4 class="font-semibold text-green-400 mb-2">🛡️ Our Refund Policy</h4>
+                                    <ul class="text-sm space-y-1">
+                                        <li>• <strong>Full refund</strong> within 7 days of first purchase</li>
+                                        <li>• <strong>Partial refund</strong> for unused credits (case-by-case)</li>
+                                        <li>• <strong>Credit adjustment</strong> for technical issues or search failures</li>
+                                        <li>• <strong>No questions asked</strong> for first-time users unsatisfied with results</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                                    <p class="text-blue-400 text-sm"><strong>How to request:</strong> Simply email support@aapgrp.com with your order number. Refunds are processed within 3-5 business days.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Still Have Questions -->
+            <div class="mt-8 bg-gradient-to-r from-accent-cyan/10 to-accent-teal/10 rounded-xl p-6 border border-accent-cyan/30 text-center">
+                <h3 class="text-xl font-bold text-white mb-3">Still Have Questions?</h3>
+                <p class="text-gray-300 mb-4">Our support team is here to help you succeed with AI-powered recruiting</p>
+                <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                    <a href="mailto:support@aapgrp.com" class="bg-accent-cyan hover:bg-accent-teal text-dark-primary font-semibold py-2 px-6 rounded-lg transition-colors">
+                        📧 Email Support
+                    </a>
+                    <button class="bg-dark-primary hover:bg-dark-tertiary text-white font-semibold py-2 px-6 rounded-lg transition-colors border border-gray-600">
+                        💬 Live Chat (Coming Soon)
+                    </button>
+                </div>
+                <div class="mt-3 text-sm text-gray-400">
+                    Average response time: <span class="text-accent-cyan font-semibold">2 hours during business hours</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Features Modal -->
+<div id="featuresPage" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-dark-secondary rounded-xl max-w-6xl w-full max-h-screen overflow-y-auto">
+        <!-- Header -->
+        <div class="p-6 border-b border-gray-700">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-accent-cyan to-accent-teal rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-dark-primary" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">Platform Features</h2>
+                        <p class="text-gray-400">Everything you need for smarter talent acquisition</p>
+                    </div>
+                </div>
+                <button id="closeFeatures" class="text-gray-400 hover:text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="p-6">
+            <!-- Hero Stats -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div class="bg-gradient-to-br from-blue-500/20 to-blue-600/20 rounded-lg p-4 text-center border border-blue-500/30">
+                    <div class="text-2xl font-bold text-blue-400">30s</div>
+                    <div class="text-xs text-gray-400">Search Time</div>
+                </div>
+                <div class="bg-gradient-to-br from-purple-500/20 to-purple-600/20 rounded-lg p-4 text-center border border-purple-500/30">
+                    <div class="text-2xl font-bold text-purple-400">85%+</div>
+                    <div class="text-xs text-gray-400">AI Accuracy</div>
+                </div>
+                <div class="bg-gradient-to-br from-green-500/20 to-green-600/20 rounded-lg p-4 text-center border border-green-500/30">
+                    <div class="text-2xl font-bold text-green-400">5,000+</div>
+                    <div class="text-xs text-gray-400">Profiles Scanned</div>
+                </div>
+                <div class="bg-gradient-to-br from-accent-cyan/20 to-accent-teal/20 rounded-lg p-4 text-center border border-accent-cyan/30">
+                    <div class="text-2xl font-bold text-accent-cyan">500+</div>
+                    <div class="text-xs text-gray-400">Happy Businesses</div>
+                </div>
+            </div>
+
+            <!-- Feature Categories -->
+            <div class="space-y-8">
+                <!-- AI-Powered Search -->
+                <div class="bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-xl p-6 border border-blue-500/30">
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
+                            <svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-white">AI-Powered Talent Discovery</h3>
+                            <p class="text-gray-400">Advanced algorithms that understand context, not just keywords</p>
+                        </div>
+                    </div>
+
+                <!-- Data & Privacy -->
+                <div class="bg-gradient-to-r from-gray-500/10 to-slate-500/10 rounded-xl p-6 border border-gray-500/30">
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="w-12 h-12 bg-gradient-to-br from-gray-500 to-slate-500 rounded-lg flex items-center justify-center">
+                            <svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-white">Data Security & Privacy</h3>
+                            <p class="text-gray-400">Enterprise-grade security you can trust</p>
+                        </div>
+                        <span class="px-3 py-1 bg-green-500/30 text-green-300 text-xs rounded-full font-medium">SECURE</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-dark-primary rounded-lg p-4">
+                            <div class="flex items-center space-x-3 mb-3">
+                                <div class="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+                                    </svg>
+                                </div>
+                                <h4 class="font-semibold text-white">Public Data Only</h4>
+                            </div>
+                            <p class="text-gray-300 text-sm">We only access publicly available professional information. No private messages or confidential data.</p>
+                        </div>
+
+                        <div class="bg-dark-primary rounded-lg p-4">
+                            <div class="flex items-center space-x-3 mb-3">
+                                <div class="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                    </svg>
+                                </div>
+                                <h4 class="font-semibold text-white">SOC 2 Compliant</h4>
+                            </div>
+                            <p class="text-gray-300 text-sm">Enterprise-grade security standards with encrypted data storage and secure API endpoints.</p>
+                        </div>
+
+                        <div class="bg-dark-primary rounded-lg p-4">
+                            <div class="flex items-center space-x-3 mb-3">
+                                <div class="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                                    </svg>
+                                </div>
+                                <h4 class="font-semibold text-white">GDPR Ready</h4>
+                            </div>
+                            <p class="text-gray-300 text-sm">Full compliance with international privacy regulations. Data retention policies and user rights respected.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feature Comparison Table -->
+            <div class="mt-8 bg-dark-primary rounded-xl p-6">
+                <h3 class="text-xl font-bold text-white mb-6 text-center">Leadfinder vs Traditional Methods</h3>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b border-gray-700">
+                                <th class="text-left text-gray-400 pb-4 font-medium">Feature</th>
+                                <th class="text-center text-red-400 pb-4 font-medium">Manual LinkedIn</th>
+                                <th class="text-center text-yellow-400 pb-4 font-medium">Recruiting Agencies</th>
+                                <th class="text-center text-accent-cyan pb-4 font-medium">Leadfinder AI</th>
+                            </tr>
+                        </thead>
+                        <tbody class="space-y-3">
+                            <tr class="border-b border-gray-700/50">
+                                <td class="py-3 text-gray-300">Search Time</td>
+                                <td class="text-center py-3 text-red-400">3-4 hours</td>
+                                <td class="text-center py-3 text-yellow-400">1-2 weeks</td>
+                                <td class="text-center py-3 text-accent-cyan font-bold">30 seconds</td>
+                            </tr>
+                            <tr class="border-b border-gray-700/50">
+                                <td class="py-3 text-gray-300">Cost per Hire</td>
+                                <td class="text-center py-3 text-red-400">Time = Money</td>
+                                <td class="text-center py-3 text-yellow-400">15-25% salary</td>
+                                <td class="text-center py-3 text-accent-cyan font-bold">Rp 20k</td>
+                            </tr>
+                            <tr class="border-b border-gray-700/50">
+                                <td class="py-3 text-gray-300">Candidate Quality</td>
+                                <td class="text-center py-3 text-red-400">Hit or miss</td>
+                                <td class="text-center py-3 text-yellow-400">Good</td>
+                                <td class="text-center py-3 text-accent-cyan font-bold">AI-Validated</td>
+                            </tr>
+                            <tr class="border-b border-gray-700/50">
+                                <td class="py-3 text-gray-300">Compatibility Scoring</td>
+                                <td class="text-center py-3 text-red-400">❌</td>
+                                <td class="text-center py-3 text-yellow-400">Subjective</td>
+                                <td class="text-center py-3 text-accent-cyan font-bold">✅ 0-100 Score</td>
+                            </tr>
+                            <tr class="border-b border-gray-700/50">
+                                <td class="py-3 text-gray-300">Growth Analytics</td>
+                                <td class="text-center py-3 text-red-400">❌</td>
+                                <td class="text-center py-3 text-yellow-400">❌</td>
+                                <td class="text-center py-3 text-accent-cyan font-bold">✅ Predictive AI</td>
+                            </tr>
+                            <tr class="border-b border-gray-700/50">
+                                <td class="py-3 text-gray-300">Personalized Outreach</td>
+                                <td class="text-center py-3 text-red-400">Manual</td>
+                                <td class="text-center py-3 text-yellow-400">Template-based</td>
+                                <td class="text-center py-3 text-accent-cyan font-bold">✅ AI-Generated</td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 text-gray-300">Success Rate</td>
+                                <td class="text-center py-3 text-red-400">~20%</td>
+                                <td class="text-center py-3 text-yellow-400">~40%</td>
+                                <td class="text-center py-3 text-accent-cyan font-bold">85%+</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Coming Soon Features -->
+            <div class="mt-8 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-xl p-6 border border-indigo-500/30">
+                <div class="text-center mb-6">
+                    <h3 class="text-xl font-bold text-white mb-2">🚀 Coming Soon</h3>
+                    <p class="text-gray-400">Exciting features in development</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-dark-primary rounded-lg p-4 opacity-75">
+                        <div class="text-center">
+                            <div class="w-12 h-12 bg-indigo-500/20 rounded-lg flex items-center justify-center mx-auto mb-3">
+                                <svg class="w-6 h-6 text-indigo-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/>
+                                </svg>
+                            </div>
+                            <h4 class="font-semibold text-white mb-2">ATS Integration</h4>
+                            <p class="text-gray-400 text-xs">Direct integration with popular ATS platforms</p>
+                            <div class="mt-2 text-xs text-indigo-400">Q2 2025</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-dark-primary rounded-lg p-4 opacity-75">
+                        <div class="text-center">
+                            <div class="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center mx-auto mb-3">
+                                <svg class="w-6 h-6 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <h4 class="font-semibold text-white mb-2">Video Screening</h4>
+                            <p class="text-gray-400 text-xs">AI-powered video interview analysis</p>
+                            <div class="mt-2 text-xs text-purple-400">Q3 2025</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-dark-primary rounded-lg p-4 opacity-75">
+                        <div class="text-center">
+                            <div class="w-12 h-12 bg-teal-500/20 rounded-lg flex items-center justify-center mx-auto mb-3">
+                                <svg class="w-6 h-6 text-teal-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M3 6a3 3 0 013-3h10a1 1 0 01.8 1.6L14.25 8l2.55 3.4A1 1 0 0116 13H6a1 1 0 00-1 1v3a1 1 0 11-2 0V6z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <h4 class="font-semibold text-white mb-2">Team Collaboration</h4>
+                            <p class="text-gray-400 text-xs">Share searches with hiring managers</p>
+                            <div class="mt-2 text-xs text-teal-400">Q2 2025</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-dark-primary rounded-lg p-4 opacity-75">
+                        <div class="text-center">
+                            <div class="w-12 h-12 bg-orange-500/20 rounded-lg flex items-center justify-center mx-auto mb-3">
+                                <svg class="w-6 h-6 text-orange-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V4z"/>
+                                </svg>
+                            </div>
+                            <h4 class="font-semibold text-white mb-2">Skills Assessment</h4>
+                            <p class="text-gray-400 text-xs">Automated technical skill validation</p>
+                            <div class="mt-2 text-xs text-orange-400">Q4 2025</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 text-center">
+                    <p class="text-sm text-gray-400">Want early access to new features? 
+                        <a href="mailto:beta@aapgrp.com" class="text-indigo-400 hover:text-indigo-300 underline">Join our beta program</a>
+                    </p>
+                </div>
+            </div>
+
+            <!-- CTA Section -->
+            <div class="mt-8 text-center bg-gradient-to-r from-accent-cyan/10 to-accent-teal/10 rounded-xl p-8 border border-accent-cyan/30">
+                <h3 class="text-2xl font-bold text-white mb-3">Ready to Transform Your Hiring Process?</h3>
+                <p class="text-gray-300 mb-6 max-w-2xl mx-auto">Join hundreds of Indonesian businesses already using AI to find better candidates faster. Start with 5 free searches - no credit card required.</p>
+                
+                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <button class="bg-accent-cyan hover:bg-accent-teal text-dark-primary font-bold py-3 px-8 rounded-lg transition-colors transform hover:scale-105 shadow-lg hover:shadow-xl" onclick="document.getElementById('featuresPage').classList.add('hidden'); document.getElementById('jobTitle').focus();">
+                        🚀 Start Free Search Now
+                    </button>
+                    <button class="bg-dark-primary hover:bg-dark-tertiary text-white font-semibold py-3 px-8 rounded-lg transition-colors border border-gray-600" onclick="document.getElementById('featuresPage').classList.add('hidden'); showPricingPage();">
+                        💎 View Pricing Plans
+                    </button>
+                </div>
+
+                <div class="mt-6 flex items-center justify-center space-x-8 text-sm text-gray-400">
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                        <span>5 Free Searches</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                        <span>No Credit Card</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                        <span>30 Second Setup</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="bg-dark-primary rounded-lg p-4">
+                            <div class="flex items-center space-x-3 mb-3">
+                                <div class="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                    </svg>
+                                </div>
+                                <h4 class="font-semibold text-white">Smart Search</h4>
+                            </div>
+                            <p class="text-gray-300 text-sm mb-3">AI understands job requirements beyond keywords - finds relevant candidates even with different job titles.</p>
+                            <div class="text-xs text-blue-400">✨ Finds hidden talent others miss</div>
+                        </div>
+
+                        <div class="bg-dark-primary rounded-lg p-4">
+                            <div class="flex items-center space-x-3 mb-3">
+                                <div class="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+                                </div>
+                                <h4 class="font-semibold text-white">Compatibility Scoring</h4>
+                            </div>
+                            <p class="text-gray-300 text-sm mb-3">0-100 AI scores based on role fit, experience match, skills alignment, and career trajectory.</p>
+                            <div class="text-xs text-purple-400">🎯 Focus on top candidates first</div>
+                        </div>
+
+                        <div class="bg-dark-primary rounded-lg p-4">
+                            <div class="flex items-center space-x-3 mb-3">
+                                <div class="w-8 h-8 bg-accent-cyan/20 rounded-lg flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-accent-cyan" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                    </svg>
+                                </div>
+                                <h4 class="font-semibold text-white">Quality Filtering</h4>
+                            </div>
+                            <p class="text-gray-300 text-sm mb-3">Automatically filters out inactive profiles, incomplete data, and non-relevant matches.</p>
+                            <div class="text-xs text-accent-cyan">⚡ Only show actionable candidates</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Advanced Analytics -->
+                <div class="bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-xl p-6 border border-purple-500/30">
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                            <svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"/>
+                                <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-white">Career Predictive Analytics</h3>
+                            <p class="text-gray-400">Deep insights into candidate potential and growth trajectory</p>
+                        </div>
+                        <span class="px-3 py-1 bg-purple-500/30 text-purple-300 text-xs rounded-full font-medium">PREMIUM</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-dark-primary rounded-lg p-4">
+                            <div class="flex items-center space-x-3 mb-3">
+                                <div class="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                </div>
+                                <h4 class="font-semibold text-white">Growth Potential Analysis</h4>
+                            </div>
+                            <p class="text-gray-300 text-sm mb-3">AI predicts career trajectory, leadership potential, and skill development capacity based on historical patterns.</p>
+                            <div class="flex items-center space-x-2">
+                                <span class="text-xs text-purple-400">💰 5 credits</span>
+                                <span class="text-xs text-gray-500">•</span>
+                                <span class="text-xs text-gray-400">Individual analysis</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-dark-primary rounded-lg p-4">
+                            <div class="flex items-center space-x-3 mb-3">
+                                <div class="w-8 h-8 bg-pink-500/20 rounded-lg flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-pink-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/>
+                                    </svg>
+                                </div>
+                                <h4 class="font-semibold text-white">Bulk Team Analysis</h4>
+                            </div>
+                            <p class="text-gray-300 text-sm mb-3">Compare multiple candidates side-by-side with detailed compatibility breakdowns and hiring recommendations.</p>
+                            <div class="flex items-center space-x-2">
+                                <span class="text-xs text-pink-400">💎 3 credits each</span>
+                                <span class="text-xs text-gray-500">•</span>
+                                <span class="text-xs text-gray-400">Bulk discount</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-dark-primary rounded-lg p-4">
+                            <div class="flex items-center space-x-3 mb-3">
+                                <div class="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                                    </svg>
+                                </div>
+                                <h4 class="font-semibold text-white">Market Intelligence</h4>
+                            </div>
+                            <p class="text-gray-300 text-sm mb-3">Salary benchmarking, industry trends, and competitive landscape analysis for better hiring decisions.</p>
+                            <div class="text-xs text-blue-400">📊 Included in analytics</div>
+                        </div>
+
+                        <div class="bg-dark-primary rounded-lg p-4">
+                            <div class="flex items-center space-x-3 mb-3">
+                                <div class="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.293l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z" clip-rule="evenodd"/>
+                                    </svg>
+                                </div>
+                                <h4 class="font-semibold text-white">Risk Assessment</h4>
+                            </div>
+                            <p class="text-gray-300 text-sm mb-3">Identify potential red flags, flight risk indicators, and cultural fit assessments before reaching out.</p>
+                            <div class="text-xs text-green-400">🛡️ Reduce bad hires</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Smart Outreach -->
+                <div class="bg-gradient-to-r from-green-500/10 to-teal-500/10 rounded-xl p-6 border border-green-500/30">
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-teal-500 rounded-lg flex items-center justify-center">
+                            <svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
+                                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-white">AI-Generated Outreach</h3>
+                            <p class="text-gray-400">Personalized messages that actually get responses</p>
+                        </div>
+                        <span class="px-3 py-1 bg-green-500/30 text-green-300 text-xs rounded-full font-medium">NEW</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-dark-primary rounded-lg p-4">
+                            <div class="flex items-center space-x-3 mb-3">
+                                <div class="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                                    </svg>
+                                </div>
+                                <h4 class="font-semibold text-white">LinkedIn Messages</h4>
+                            </div>
+                            <p class="text-gray-300 text-sm mb-3">Short & engaging LinkedIn InMails and connection requests tailored to each candidate's background.</p>
+                            <div class="text-xs text-blue-400">📱 Mobile-optimized length</div>
+                        </div>
+
+                        <div class="bg-dark-primary rounded-lg p-4">
+                            <div class="flex items-center space-x-3 mb-3">
+                                <div class="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
+                                        <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
+                                    </svg>
+                                </div>
+                                <h4 class="font-semibold text-white">Professional Emails</h4>
+                            </div>
+                            <p class="text-gray-300 text-sm mb-3">Formal email templates with compelling value propositions and clear next steps for serious candidates.</p>
+                            <div class="text-xs text-green-400">📧 Higher response rates</div>
+                        </div>
+
+                        <div class="bg-dark-primary rounded-lg p-4">
+                            <div class="flex items-center space-x-3 mb-3">
+                                <div class="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/>
+                                    </svg>
+                                </div>
+                                <h4 class="font-semibold text-white">Multi-Language Support</h4>
+                            </div>
+                            <p class="text-gray-300 text-sm mb-3">Generate messages in English or Bahasa Indonesia based on candidate preference and company culture.</p>
+                            <div class="text-xs text-purple-400">🌏 Local + International reach</div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 p-3 bg-gradient-to-r from-green-500/10 to-teal-500/10 rounded-lg border border-green-500/20">
+                        <div class="flex items-center justify-between">
+                            <div class="text-sm text-gray-300">
+                                <span class="font-semibold text-green-400">💰 2 credits</span> per candidate • 
+                                <span class="text-green-400">Generates 4 message variants</span> (2 LinkedIn + 2 Email)
+                            </div>
+                            <div class="text-xs text-gray-400">One-click copy to clipboard</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Workflow & Organization -->
+                <div class="bg-gradient-to-r from-orange-500/10 to-red-500/10 rounded-xl p-6 border border-orange-500/30">
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center">
+                            <svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V4z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-white">Smart Organization Tools</h3>
+                            <p class="text-gray-400">Keep your talent pipeline organized and actionable</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-dark-primary rounded-lg p-4">
+                            <div class="flex items-center space-x-3 mb-3">
+                                <div class="w-8 h-8 bg-yellow-500/20 rounded-lg flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
+                                    </svg>
+                                </div>
+                                <h4 class="font-semibold text-white">Candidate Bookmarking</h4>
+                            </div>
+                            <p class="text-gray-300 text-sm mb-3">Save promising candidates for later review. Build your talent pipeline across multiple searches.</p>
+                            <div class="text-xs text-yellow-400">⭐ Up to 50 saved candidates</div>
+                        </div>
+
+                        <div class="bg-dark-primary rounded-lg p-4">
+                            <div class="flex items-center space-x-3 mb-3">
+                                <div class="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V4z"/>
+                                    </svg>
+                                </div>
+                                <h4 class="font-semibold text-white">Advanced Filtering</h4>
+                            </div>
+                            <p class="text-gray-300 text-sm mb-3">Filter by score, experience, location, verification status. Find exactly who you need.</p>
+                            <div class="text-xs text-blue-400">🎛️ Real-time filtering</div>
+                        </div>
+
+                        <div class="bg-dark-primary rounded-lg p-4">
+                            <div class="flex items-center space-x-3 mb-3">
+                                <div class="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                                    </svg>
+                                </div>
+                                <h4 class="font-semibold text-white">Candidate Comparison</h4>
+                            </div>
+                            <p class="text-gray-300 text-sm mb-3">Side-by-side comparison with radar charts, detailed breakdowns, and hiring recommendations.</p>
+                            <div class="text-xs text-green-400">📊 Visual comparisons</div>
+                        </div>
+
+                        <div class="bg-dark-primary rounded-lg p-4">
+                            <div class="flex items-center space-x-3 mb-3">
+                                <div class="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                    </svg>
+                                </div>
+                                <h4 class="font-semibold text-white">Export & Sharing</h4>
+                            </div>
+                            <p class="text-gray-300 text-sm mb-3">Export to CSV, PDF, or copy to clipboard. Share with your team or import into your ATS.</p>
+                            <div class="text-xs text-purple-400">📤 Multiple formats</div>
+                        </div>
+                    </div>
+                </div>
+	
+		<!-- Data & Privacy -->
+                <div class="bg-gradient-to-r from-gray-500/10 to-slate-500/10 rounded-xl p-6 border border-gray-500/30">
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="w-12 h-12 bg-gradient-to-br from-gray-500 to-slate-500 rounded-lg flex items-center justify-center">
+                            <svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-white">Data Security & Privacy</h3>
+                            <p class="text-gray-400">Enterprise-grade security you can trust</p>
+                        </div>
+                        <span class="px-3 py-1 bg-green-500/30 text-green-300 text-xs rounded-full font-medium">SECURE</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-dark-primary rounded-lg p-4">
+                            <div class="flex items-center space-x-3 mb-3">
+                                <div class="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+                                    </svg>
+                                </div>
+                                <h4 class="font-semibold text-white">Public Data Only</h4>
+                            </div>
+                            <p class="text-gray-300 text-sm">We only access publicly available professional information. No private messages or confidential data.</p>
+                        </div>
+
+                        <div class="bg-dark-primary rounded-lg p-4">
+                            <div class="flex items-center space-x-3 mb-3">
+                                <div class="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                    </svg>
+                                </div>
+                                <h4 class="font-semibold text-white">SOC 2 Compliant</h4>
+                            </div>
+                            <p class="text-gray-300 text-sm">Enterprise-grade security standards with encrypted data storage and secure API endpoints.</p>
+                        </div>
+
+                        <div class="bg-dark-primary rounded-lg p-4">
+                            <div class="flex items-center space-x-3 mb-3">
+                                <div class="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                                    </svg>
+                                </div>
+                                <h4 class="font-semibold text-white">GDPR Ready</h4>
+                            </div>
+                            <p class="text-gray-300 text-sm">Full compliance with international privacy regulations. Data retention policies and user rights respected.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feature Comparison Table -->
+            <div class="mt-8 bg-dark-primary rounded-xl p-6">
+                <h3 class="text-xl font-bold text-white mb-6 text-center">Leadfinder vs Traditional Methods</h3>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b border-gray-700">
+                                <th class="text-left text-gray-400 pb-4 font-medium">Feature</th>
+                                <th class="text-center text-red-400 pb-4 font-medium">Manual LinkedIn</th>
+                                <th class="text-center text-yellow-400 pb-4 font-medium">Recruiting Agencies</th>
+                                <th class="text-center text-accent-cyan pb-4 font-medium">Leadfinder AI</th>
+                            </tr>
+                        </thead>
+                        <tbody class="space-y-3">
+                            <tr class="border-b border-gray-700/50">
+                                <td class="py-3 text-gray-300">Search Time</td>
+                                <td class="text-center py-3 text-red-400">3-4 hours</td>
+                                <td class="text-center py-3 text-yellow-400">1-2 weeks</td>
+                                <td class="text-center py-3 text-accent-cyan font-bold">30 seconds</td>
+                            </tr>
+                            <tr class="border-b border-gray-700/50">
+                                <td class="py-3 text-gray-300">Cost per Hire</td>
+                                <td class="text-center py-3 text-red-400">Time = Money</td>
+                                <td class="text-center py-3 text-yellow-400">15-25% salary</td>
+                                <td class="text-center py-3 text-accent-cyan font-bold">Rp 20k</td>
+                            </tr>
+                            <tr class="border-b border-gray-700/50">
+                                <td class="py-3 text-gray-300">Candidate Quality</td>
+                                <td class="text-center py-3 text-red-400">Hit or miss</td>
+                                <td class="text-center py-3 text-yellow-400">Good</td>
+                                <td class="text-center py-3 text-accent-cyan font-bold">AI-Validated</td>
+                            </tr>
+                            <tr class="border-b border-gray-700/50">
+                                <td class="py-3 text-gray-300">Compatibility Scoring</td>
+                                <td class="text-center py-3 text-red-400">❌</td>
+                                <td class="text-center py-3 text-yellow-400">Subjective</td>
+                                <td class="text-center py-3 text-accent-cyan font-bold">✅ 0-100 Score</td>
+                            </tr>
+                            <tr class="border-b border-gray-700/50">
+                                <td class="py-3 text-gray-300">Growth Analytics</td>
+                                <td class="text-center py-3 text-red-400">❌</td>
+                                <td class="text-center py-3 text-yellow-400">❌</td>
+                                <td class="text-center py-3 text-accent-cyan font-bold">✅ Predictive AI</td>
+                            </tr>
+                            <tr class="border-b border-gray-700/50">
+                                <td class="py-3 text-gray-300">Personalized Outreach</td>
+                                <td class="text-center py-3 text-red-400">Manual</td>
+                                <td class="text-center py-3 text-yellow-400">Template-based</td>
+                                <td class="text-center py-3 text-accent-cyan font-bold">✅ AI-Generated</td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 text-gray-300">Success Rate</td>
+                                <td class="text-center py-3 text-red-400">~20%</td>
+                                <td class="text-center py-3 text-yellow-400">~40%</td>
+                                <td class="text-center py-3 text-accent-cyan font-bold">85%+</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Coming Soon Features -->
+            <div class="mt-8 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-xl p-6 border border-indigo-500/30">
+                <div class="text-center mb-6">
+                    <h3 class="text-xl font-bold text-white mb-2">🚀 Coming Soon</h3>
+                    <p class="text-gray-400">Exciting features in development</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-dark-primary rounded-lg p-4 opacity-75">
+                        <div class="text-center">
+                            <div class="w-12 h-12 bg-indigo-500/20 rounded-lg flex items-center justify-center mx-auto mb-3">
+                                <svg class="w-6 h-6 text-indigo-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/>
+                                </svg>
+                            </div>
+                            <h4 class="font-semibold text-white mb-2">ATS Integration</h4>
+                            <p class="text-gray-400 text-xs">Direct integration with popular ATS platforms</p>
+                            <div class="mt-2 text-xs text-indigo-400">Q2 2025</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-dark-primary rounded-lg p-4 opacity-75">
+                        <div class="text-center">
+                            <div class="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center mx-auto mb-3">
+                                <svg class="w-6 h-6 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <h4 class="font-semibold text-white mb-2">Video Screening</h4>
+                            <p class="text-gray-400 text-xs">AI-powered video interview analysis</p>
+                            <div class="mt-2 text-xs text-purple-400">Q3 2025</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-dark-primary rounded-lg p-4 opacity-75">
+                        <div class="text-center">
+                            <div class="w-12 h-12 bg-teal-500/20 rounded-lg flex items-center justify-center mx-auto mb-3">
+                                <svg class="w-6 h-6 text-teal-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M3 6a3 3 0 013-3h10a1 1 0 01.8 1.6L14.25 8l2.55 3.4A1 1 0 0116 13H6a1 1 0 00-1 1v3a1 1 0 11-2 0V6z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <h4 class="font-semibold text-white mb-2">Team Collaboration</h4>
+                            <p class="text-gray-400 text-xs">Share searches with hiring managers</p>
+                            <div class="mt-2 text-xs text-teal-400">Q2 2025</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-dark-primary rounded-lg p-4 opacity-75">
+                        <div class="text-center">
+                            <div class="w-12 h-12 bg-orange-500/20 rounded-lg flex items-center justify-center mx-auto mb-3">
+                                <svg class="w-6 h-6 text-orange-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V4z"/>
+                                </svg>
+                            </div>
+                            <h4 class="font-semibold text-white mb-2">Skills Assessment</h4>
+                            <p class="text-gray-400 text-xs">Automated technical skill validation</p>
+                            <div class="mt-2 text-xs text-orange-400">Q4 2025</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 text-center">
+                    <p class="text-sm text-gray-400">Want early access to new features? 
+                        <a href="mailto:beta@aapgrp.com" class="text-indigo-400 hover:text-indigo-300 underline">Join our beta program</a>
+                    </p>
+                </div>
+            </div>
+
+            <!-- CTA Section -->
+            <div class="mt-8 text-center bg-gradient-to-r from-accent-cyan/10 to-accent-teal/10 rounded-xl p-8 border border-accent-cyan/30">
+                <h3 class="text-2xl font-bold text-white mb-3">Ready to Transform Your Hiring Process?</h3>
+                <p class="text-gray-300 mb-6 max-w-2xl mx-auto">Join hundreds of Indonesian businesses already using AI to find better candidates faster. Start with 5 free searches - no credit card required.</p>
+                
+                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <button class="bg-accent-cyan hover:bg-accent-teal text-dark-primary font-bold py-3 px-8 rounded-lg transition-colors transform hover:scale-105 shadow-lg hover:shadow-xl" onclick="document.getElementById('featuresPage').classList.add('hidden'); document.getElementById('jobTitle').focus();">
+                        🚀 Start Free Search Now
+                    </button>
+                    <button class="bg-dark-primary hover:bg-dark-tertiary text-white font-semibold py-3 px-8 rounded-lg transition-colors border border-gray-600" onclick="document.getElementById('featuresPage').classList.add('hidden'); showPricingPage();">
+                        💎 View Pricing Plans
+                    </button>
+                </div>
+
+                <div class="mt-6 flex items-center justify-center space-x-8 text-sm text-gray-400">
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                        <span>5 Free Searches</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                        <span>No Credit Card</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                        <span>30 Second Setup</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 	
 </body>
 </html>
