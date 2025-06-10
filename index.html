@@ -1904,14 +1904,7 @@ function hideFeatures() {
 }
 
 function showContact() {
-    console.log('showContact called');
-    const modal = document.getElementById('contactPage');
-    if (modal) {
-        modal.classList.remove('hidden');
-        console.log('Contact modal should be visible');
-    } else {
-        console.log('contactPage element not found');
-    }
+    document.getElementById('contactPage').classList.remove('hidden');
 }
 
 function hideContact() {
