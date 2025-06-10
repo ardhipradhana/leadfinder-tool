@@ -528,26 +528,32 @@
 	                <span class="bg-accent-cyan text-dark-primary px-2 py-1 rounded-full text-xs font-medium">3</span>
 	            </button>
 	
-	            <button id="savedCandidatesBtn" class="bookmarks-tab flex items-center space-x-2 px-3 py-2 rounded-lg bg-dark-secondary hover:bg-dark-tertiary transition-colors">
-	                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-	                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
-	                </svg>
-	                <span>My Shortlist</span>
-	                <span id="savedCount" class="bg-accent-cyan text-dark-primary px-2 py-1 rounded-full text-xs font-medium">0</span>
-	            </button>
+	            <button id="savedCandidatesBtn" class="bookmarks-tab flex items-center space-x-2 px-3 py-2 rounded-lg bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl">
+				    <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+						<path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
+				    </svg>
+				    <span id="savedCount" class="text-white font-medium">0 saved</span>
+				</button>
 	            
-	            <div class="flex items-center space-x-2 px-3 py-2 bg-dark-secondary rounded-lg">
-	                <svg class="w-4 h-4 text-accent-cyan" fill="currentColor" viewBox="0 0 20 20">
-	                    <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4zM18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z"/>
-	                </svg>
-	                <span class="text-sm text-gray-300">Credits:</span>
-	                <span id="creditsDisplay" class="font-bold text-accent-cyan">Loading...</span>
-			    	<button id="refreshCreditsBtn" class="text-gray-400 hover:text-accent-cyan ml-2" title="Refresh credits">
-	                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-	                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-	                    </svg>
-	                </button>
-	            </div>
+	            <div class="flex items-center space-x-2 px-3 py-2 rounded-lg bg-dark-secondary">
+				    <svg class="w-4 h-4 text-accent-cyan" fill="currentColor" viewBox="0 0 20 20">
+				        <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V4z"/>
+				    </svg>
+				    <span id="creditsDisplay" class="text-accent-cyan font-medium">0 credits</span>
+				    <button id="refreshCreditsBtn" class="text-gray-400 hover:text-accent-cyan ml-2" title="Refresh credits">
+				        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+				        </svg>
+				    </button>
+				    <!-- Low Credit Warning Button -->
+				    <button id="lowCreditWarning" class="hidden px-3 py-1 bg-yellow-600 hover:bg-yellow-700 text-white text-xs rounded-full font-medium transition-colors" title="Get more credits">
+				        <svg class="w-3 h-3 mr-1 inline" fill="currentColor" viewBox="0 0 20 20">
+				            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+				        </svg>
+				        Low Credits
+				    </button>
+				    <span class="text-gray-400">• LinkedIn Search</span>
+				</div>
 	        </div>
 	    </div>
 	</header>
