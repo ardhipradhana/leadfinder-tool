@@ -5776,6 +5776,9 @@ function showConfirmModal(title, message) {
 }
 	
 // --- Utility: Modal/Keyboard Shortcuts & Startup
+
+// Add this with your other event listeners around line 5615
+document.getElementById('closeContact').addEventListener('click', hideContact);
 	
 // Close modals when clicking outside
 document.addEventListener('click', (e) => {
