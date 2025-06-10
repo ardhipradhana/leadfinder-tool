@@ -1639,7 +1639,7 @@ let isAnalyzing = false;
 	window.showHowItWorks = showHowItWorks;
 	window.showFAQ = showFAQ;
 	window.showFeatures = showFeatures;
-
+	window.showContact = showContact;
 	
 // Authentication functions
 function showAuthModal() {
@@ -1893,6 +1893,45 @@ document.addEventListener('click', (e) => {
             }
         });
     }
+
+	const closeContactBtn = document.getElementById('closeContact');
+	if (closeContactBtn) {
+	    closeContactBtn.addEventListener('click', hideContact);
+	}
+	
+	// Close when clicking outside
+	const contactModal = document.getElementById('contactPage');
+	if (contactModal) {
+	    contactModal.addEventListener('click', function(e) {
+	        if (e.target === this) {
+	            hideContact();
+	        }
+	    });
+	}
+	
+	// Contact form handler
+	const contactForm = document.getElementById('contactForm');
+	if (contactForm) {
+	    contactForm.addEventListener('submit', function(e) {
+	        e.preventDefault();
+	        
+	        const name = document.getElementById('contactName').value;
+	        const email = document.getElementById('contactEmail').value;
+	        const subject = document.getElementById('contactSubject').value;
+	        const message = document.getElementById('contactMessage').value;
+	        
+	        // Create mailto link
+	        const mailtoLink = `mailto:support@aapgrp.com?subject=Leadfinder ${subject}: ${name}&body=Name: ${name}%0D%0AEmail: ${email}%0D%0A%0D%0AMessage:%0D%0A${encodeURIComponent(message)}`;
+	        
+	        window.open(mailtoLink, '_blank');
+	        
+	        // Show success message
+	        showMessage('Message prepared! Your email client should open now.', false);
+	        
+	        // Reset form
+	        contactForm.reset();
+	    });
+	}
 });
 
 
@@ -1903,6 +1942,14 @@ function showFeatures() {
 
 function hideFeatures() {
     document.getElementById('featuresPage').classList.add('hidden');
+}
+
+function showContact() {
+    document.getElementById('contactPage').classList.remove('hidden');
+}
+
+function hideContact() {
+    document.getElementById('contactPage').classList.add('hidden');
 }
 	
 // Pricing page management
@@ -7521,7 +7568,332 @@ setTimeout(() => {
             </div>
         </div>
     </div>
-</div>    
+</div>  
+
+<!-- Contact Modal -->
+<div id="contactPage" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-dark-secondary rounded-xl max-w-5xl w-full max-h-screen overflow-y-auto">
+        <!-- Header -->
+        <div class="p-6 border-b border-gray-700">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-accent-cyan/20 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-accent-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">Contact & Support</h2>
+                        <p class="text-gray-400">We're here to help you succeed with AI-powered recruiting</p>
+                    </div>
+                </div>
+                <button id="closeContact" class="text-gray-400 hover:text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="p-6">
+            <!-- Quick Contact Options -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <!-- Email Support -->
+                <div class="bg-gradient-to-br from-blue-500/20 to-blue-600/20 rounded-xl p-6 border border-blue-500/30 text-center hover:from-blue-500/30 hover:to-blue-600/30 transition-all cursor-pointer" onclick="window.open('mailto:support@aapgrp.com?subject=Leadfinder Support Request', '_blank')">
+                    <div class="w-16 h-16 bg-blue-500/20 rounded-xl flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Email Support</h3>
+                    <p class="text-gray-300 text-sm mb-3">Get detailed help with your account, billing, or technical issues</p>
+                    <div class="text-blue-400 font-semibold text-sm">support@aapgrp.com</div>
+                    <div class="text-xs text-gray-400 mt-2">Response within 2-4 hours</div>
+                </div>
+
+                <!-- WhatsApp Support -->
+                <div class="bg-gradient-to-br from-green-500/20 to-green-600/20 rounded-xl p-6 border border-green-500/30 text-center hover:from-green-500/30 hover:to-green-600/30 transition-all cursor-pointer" onclick="window.open('https://wa.me/6281234567890?text=Hi, I need help with Leadfinder', '_blank')">
+                    <div class="w-16 h-16 bg-green-500/20 rounded-xl flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-green-400" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">WhatsApp Support</h3>
+                    <p class="text-gray-300 text-sm mb-3">Quick help in Bahasa Indonesia or English</p>
+                    <div class="text-green-400 font-semibold text-sm">+62 812-3456-7890</div>
+                    <div class="text-xs text-gray-400 mt-2">9 AM - 6 PM (WIB) Mon-Fri</div>
+                </div>
+
+                <!-- Priority Support -->
+                <div class="bg-gradient-to-br from-purple-500/20 to-purple-600/20 rounded-xl p-6 border border-purple-500/30 text-center hover:from-purple-500/30 hover:to-purple-600/30 transition-all cursor-pointer" onclick="window.open('mailto:priority@aapgrp.com?subject=Urgent Leadfinder Support', '_blank')">
+                    <div class="w-16 h-16 bg-purple-500/20 rounded-xl flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Priority Support</h3>
+                    <p class="text-gray-300 text-sm mb-3">Urgent issues, billing problems, or enterprise inquiries</p>
+                    <div class="text-purple-400 font-semibold text-sm">priority@aapgrp.com</div>
+                    <div class="text-xs text-gray-400 mt-2">Response within 30 minutes</div>
+                </div>
+            </div>
+
+            <!-- Support Categories -->
+            <div class="bg-dark-primary rounded-xl p-6 mb-8">
+                <h3 class="text-xl font-bold text-white mb-6 text-center">What Can We Help You With?</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Account Issues -->
+                    <div class="bg-dark-secondary rounded-lg p-4 border border-gray-600 hover:border-blue-500/50 transition-colors">
+                        <div class="flex items-center space-x-3 mb-3">
+                            <div class="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                                <svg class="w-6 h-6 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <h4 class="font-semibold text-white">Account Issues</h4>
+                        </div>
+                        <ul class="text-sm text-gray-300 space-y-1">
+                            <li>• Login problems</li>
+                            <li>• Password reset</li>
+                            <li>• Profile updates</li>
+                            <li>• Account deletion</li>
+                        </ul>
+                        <div class="mt-3 text-xs text-blue-400">📧 support@aapgrp.com</div>
+                    </div>
+
+                    <!-- Billing & Credits -->
+                    <div class="bg-dark-secondary rounded-lg p-4 border border-gray-600 hover:border-green-500/50 transition-colors">
+                        <div class="flex items-center space-x-3 mb-3">
+                            <div class="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
+                                <svg class="w-6 h-6 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"/>
+                                </svg>
+                            </div>
+                            <h4 class="font-semibold text-white">Billing & Credits</h4>
+                        </div>
+                        <ul class="text-sm text-gray-300 space-y-1">
+                            <li>• Payment issues</li>
+                            <li>• Credit top-ups</li>
+                            <li>• Refund requests</li>
+                            <li>• Invoice questions</li>
+                        </ul>
+                        <div class="mt-3 text-xs text-green-400">💳 priority@aapgrp.com</div>
+                    </div>
+
+                    <!-- Technical Support -->
+                    <div class="bg-dark-secondary rounded-lg p-4 border border-gray-600 hover:border-purple-500/50 transition-colors">
+                        <div class="flex items-center space-x-3 mb-3">
+                            <div class="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                                <svg class="w-6 h-6 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <h4 class="font-semibold text-white">Technical Support</h4>
+                        </div>
+                        <ul class="text-sm text-gray-300 space-y-1">
+                            <li>• Search not working</li>
+                            <li>• AI accuracy issues</li>
+                            <li>• Export problems</li>
+                            <li>• Browser compatibility</li>
+                        </ul>
+                        <div class="mt-3 text-xs text-purple-400">🛠️ support@aapgrp.com</div>
+                    </div>
+
+                    <!-- Business Inquiries -->
+                    <div class="bg-dark-secondary rounded-lg p-4 border border-gray-600 hover:border-accent-cyan/50 transition-colors">
+                        <div class="flex items-center space-x-3 mb-3">
+                            <div class="w-10 h-10 bg-accent-cyan/20 rounded-lg flex items-center justify-center">
+                                <svg class="w-6 h-6 text-accent-cyan" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <h4 class="font-semibold text-white">Business Inquiries</h4>
+                        </div>
+                        <ul class="text-sm text-gray-300 space-y-1">
+                            <li>• Enterprise plans</li>
+                            <li>• API access</li>
+                            <li>• Partnerships</li>
+                            <li>• Custom solutions</li>
+                        </ul>
+                        <div class="mt-3 text-xs text-accent-cyan">🏢 business@aapgrp.com</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Self-Help Resources -->
+            <div class="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-xl p-6 border border-indigo-500/30 mb-8">
+                <h3 class="text-xl font-bold text-white mb-6 text-center">Self-Help Resources</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Knowledge Base -->
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-indigo-500/20 rounded-xl flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-indigo-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"/>
+                            </svg>
+                        </div>
+                        <h4 class="font-semibold text-white mb-2">Knowledge Base</h4>
+                        <p class="text-gray-300 text-sm mb-3">Step-by-step guides, tutorials, and best practices</p>
+                        <button class="text-indigo-400 hover:text-indigo-300 text-sm font-medium underline" onclick="showFAQ()">
+                            Browse FAQ →
+                        </button>
+                    </div>
+
+                    <!-- Video Tutorials -->
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-red-500/20 rounded-xl flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V4z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <h4 class="font-semibold text-white mb-2">Video Tutorials</h4>
+                        <p class="text-gray-300 text-sm mb-3">Watch how to use Leadfinder effectively</p>
+                        <button class="text-red-400 hover:text-red-300 text-sm font-medium underline" onclick="window.open('https://youtube.com/@leadfinder', '_blank')">
+                            Watch Videos →
+                        </button>
+                    </div>
+
+                    <!-- Feature Guides -->
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-green-500/20 rounded-xl flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <h4 class="font-semibold text-white mb-2">Feature Guides</h4>
+                        <p class="text-gray-300 text-sm mb-3">Learn about advanced features and tips</p>
+                        <button class="text-green-400 hover:text-green-300 text-sm font-medium underline" onclick="showHowItWorks()">
+                            How It Works →
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Form -->
+            <div class="bg-dark-primary rounded-xl p-6">
+                <h3 class="text-xl font-bold text-white mb-6 text-center">Send Us a Message</h3>
+                
+                <form id="contactForm" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Your Name</label>
+                            <input type="text" id="contactName" class="w-full px-4 py-3 bg-dark-secondary border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-accent-cyan focus:border-transparent" placeholder="Your full name" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
+                            <input type="email" id="contactEmail" class="w-full px-4 py-3 bg-dark-secondary border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-accent-cyan focus:border-transparent" placeholder="your@email.com" required>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Subject</label>
+                        <select id="contactSubject" class="w-full px-4 py-3 bg-dark-secondary border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-accent-cyan focus:border-transparent" required>
+                            <option value="">Select a topic</option>
+                            <option value="account">Account Issues</option>
+                            <option value="billing">Billing & Credits</option>
+                            <option value="technical">Technical Support</option>
+                            <option value="business">Business Inquiry</option>
+                            <option value="feedback">Feedback & Suggestions</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Message</label>
+                        <textarea id="contactMessage" rows="6" class="w-full px-4 py-3 bg-dark-secondary border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-accent-cyan focus:border-transparent resize-none" placeholder="Describe your issue or question in detail..." required></textarea>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <div class="text-sm text-gray-400">
+                            We typically respond within <span class="text-accent-cyan font-semibold">2-4 hours</span>
+                        </div>
+                        <button type="submit" class="bg-accent-cyan hover:bg-accent-teal text-dark-primary font-bold py-3 px-8 rounded-lg transition-colors transform hover:scale-105">
+                            Send Message
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Office Information -->
+            <div class="mt-8 bg-gradient-to-r from-gray-500/10 to-slate-500/10 rounded-xl p-6 border border-gray-500/30">
+                <h3 class="text-xl font-bold text-white mb-6 text-center">Our Office</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Office Details -->
+                    <div class="space-y-4">
+                        <div class="flex items-start space-x-3">
+                            <div class="w-8 h-8 bg-accent-cyan/20 rounded-lg flex items-center justify-center mt-1">
+                                <svg class="w-5 h-5 text-accent-cyan" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-white">Address</h4>
+                                <p class="text-gray-300 text-sm">Jl. Sudirman No. 123<br>Jakarta Pusat 10220<br>Indonesia</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-3">
+                            <div class="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center mt-1">
+                                <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-white">Phone</h4>
+                                <p class="text-gray-300 text-sm">+62 21 2345-6789</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-3">
+                            <div class="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center mt-1">
+                                <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M10 2L3 7v11a1 1 0 001 1h3v-8h6v8h3a1 1 0 001-1V7l-7-5z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-white">Office Hours</h4>
+                                <p class="text-gray-300 text-sm">Monday - Friday: 9:00 AM - 6:00 PM (WIB)<br>Saturday: 9:00 AM - 1:00 PM (WIB)<br>Sunday: Closed</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Map -->
+                    <div class="bg-dark-secondary rounded-lg p-4 border border-gray-600">
+                        <div class="w-full h-48 bg-gray-700 rounded-lg flex items-center justify-center">
+                            <div class="text-center">
+                                <svg class="w-12 h-12 text-gray-500 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                               </svg>
+                               <p class="text-gray-400 text-sm">Interactive Map</p>
+                               <button class="mt-2 text-accent-cyan hover:text-accent-teal text-sm underline" onclick="window.open('https://maps.google.com/?q=Jl.+Sudirman+No.+123+Jakarta+Pusat', '_blank')">
+                                   View on Google Maps
+                               </button>
+                           </div>
+                       </div>
+                   </div>
+               </div>
+           </div>
+
+           <!-- Emergency Contact -->
+           <div class="mt-8 p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
+               <div class="flex items-center space-x-3">
+                   <div class="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center">
+                       <svg class="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                           <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                       </svg>
+                   </div>
+                   <div>
+                       <h4 class="font-semibold text-red-400">Urgent Issues?</h4>
+                       <p class="text-red-300 text-sm">For billing emergencies or critical technical issues that prevent you from accessing your account, call our emergency line: <strong>+62 812-9999-9999</strong> (24/7)</p>
+                   </div>
+               </div>
+           </div>
+       </div>
+   </div>
+</div>
 
 </body>
 </html>
