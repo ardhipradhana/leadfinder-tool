@@ -504,144 +504,183 @@
 	
 </head>
 <body class="bg-gray-900 text-white min-h-screen">
-    <!-- Header -->
-    <header class="bg-dark-primary border-b border-gray-700 px-6 py-4">
-        <div class="max-w-7xl mx-auto flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="w-8 h-8 bg-accent-cyan rounded-lg flex items-center justify-center">
-                    <svg class="w-5 h-5 text-dark-primary" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                </div>
-                <h1 class="text-xl font-semibold text-white">Leadfinder Tool</h1>
-            </div>
-            
-            <div class="flex items-center space-x-4">
-                <button id="searchHistoryBtn" class="flex items-center space-x-2 px-3 py-2 rounded-lg bg-dark-secondary hover:bg-dark-tertiary transition-colors">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    <span>Recent Searches</span>
-                    <span class="bg-accent-cyan text-dark-primary px-2 py-1 rounded-full text-xs font-medium">3</span>
-                </button>
-
-			    <button id="savedCandidatesBtn" class="bookmarks-tab flex items-center space-x-2 px-3 py-2 rounded-lg bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl">
-				    <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
-					<path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
-				    </svg>
-				    <span id="savedCandidatesHeaderText" class="text-white font-medium">0 saved</span>
-				</button>
-                
-                <div class="flex items-center space-x-2 px-3 py-2 rounded-lg bg-dark-secondary">
-				    <svg class="w-4 h-4 text-accent-cyan" fill="currentColor" viewBox="0 0 20 20">
-				        <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V4z"/>
-				    </svg>
-				    <span id="creditsDisplay" class="text-accent-cyan font-medium">0 credits</span>
-				    <button id="refreshCreditsBtn" class="text-gray-400 hover:text-accent-cyan ml-2" title="Refresh credits">
-				        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-				            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-				        </svg>
-				    </button>
-				    <!-- Low Credit Warning Button -->
-				    <button id="lowCreditWarning" class="hidden px-3 py-1 bg-yellow-600 hover:bg-yellow-700 text-white text-xs rounded-full font-medium transition-colors" title="Get more credits">
-				        <svg class="w-3 h-3 mr-1 inline" fill="currentColor" viewBox="0 0 20 20">
-				            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-				        </svg>
-				        Low Credits
-				    </button>
-				    <span class="text-gray-400">• LinkedIn Search</span>
-				</div>
-                
-                <button class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors">
-                    Log Out
-                </button>
-            </div>
-        </div>
-    </header>
+    <!-- Improved Header with Psychology-Driven Copy -->
+	<header class="bg-dark-primary border-b border-gray-700 px-6 py-4">
+	    <div class="max-w-7xl mx-auto flex items-center justify-between">
+	        <div class="flex items-center space-x-3">
+	            <div class="w-8 h-8 bg-accent-cyan rounded-lg flex items-center justify-center">
+	                <svg class="w-5 h-5 text-dark-primary" fill="currentColor" viewBox="0 0 20 20">
+	                    <path d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"/>
+	                </svg>
+	            </div>
+	            <div>
+	                <h1 class="text-xl font-bold text-white">Leadfinder</h1>
+	                <p class="text-xs text-gray-400">Find qualified candidates in seconds, not hours</p>
+	            </div>
+	        </div>
+	        
+	        <div class="flex items-center space-x-4">
+	            <button id="searchHistoryBtn" class="flex items-center space-x-2 px-3 py-2 rounded-lg bg-dark-secondary hover:bg-dark-tertiary transition-colors">
+	                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+	                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+	                </svg>
+	                <span>Search History</span>
+	                <span class="bg-accent-cyan text-dark-primary px-2 py-1 rounded-full text-xs font-medium">3</span>
+	            </button>
+	
+	            <button id="savedCandidatesBtn" class="bookmarks-tab flex items-center space-x-2 px-3 py-2 rounded-lg bg-dark-secondary hover:bg-dark-tertiary transition-colors">
+	                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+	                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+	                </svg>
+	                <span>My Shortlist</span>
+	                <span id="savedCount" class="bg-accent-cyan text-dark-primary px-2 py-1 rounded-full text-xs font-medium">0</span>
+	            </button>
+	            
+	            <div class="flex items-center space-x-2 px-3 py-2 bg-dark-secondary rounded-lg">
+	                <svg class="w-4 h-4 text-accent-cyan" fill="currentColor" viewBox="0 0 20 20">
+	                    <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4zM18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z"/>
+	                </svg>
+	                <span class="text-sm text-gray-300">Credits:</span>
+	                <span id="creditsDisplay" class="font-bold text-accent-cyan">Loading...</span>
+	            </div>
+	        </div>
+	    </div>
+	</header>
 
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-6 py-8">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Search Form -->
-            <div class="lg:col-span-1">
-                <div class="bg-dark-secondary rounded-xl p-6">
-                    <h2 class="text-xl font-semibold mb-6 text-white">Find Talent</h2>
-                    <p class="text-gray-300 mb-6">Search for candidates from LinkedIn with AI-powered ranking</p>
-                    
-                    <form id="searchForm" class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-2">Job Title / Role</label>
-                            <input type="text" id="jobTitle" placeholder="e.g. Restaurant Manager, Cashier, Cook" 
-                                   class="w-full px-4 py-3 bg-dark-primary border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-accent-cyan focus:outline-none">
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-2">Industry</label>
-                            <select id="industry" class="w-full px-4 py-3 bg-dark-primary border border-gray-600 rounded-lg text-white focus:border-accent-cyan focus:outline-none">
-                                <option value="">Select Industry</option>
-                                <option value="hospitality">Hospitality & Tourism</option>
-                                <option value="retail">Retail & Commerce</option>
-                                <option value="food-beverage">Food & Beverage</option>
-                                <option value="manufacturing">Manufacturing</option>
-                                <option value="technology">Technology</option>
-                                <option value="healthcare">Healthcare</option>
-                                <option value="finance">Finance</option>
-                                <option value="education">Education</option>
-                                <option value="custom">Other (Custom Industry)</option>
-                            </select>
-				<!-- Custom Industry Input (hidden by default) -->
-				<input type="text" id="customIndustry" placeholder="Enter custom industry (e.g., Gaming, Logistics, Real Estate)" 
-				       class="w-full px-4 py-3 bg-dark-primary border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-accent-cyan focus:outline-none hidden mt-3">
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-2">Location</label>
-                            <select id="location" class="w-full px-4 py-3 bg-dark-primary border border-gray-600 rounded-lg text-white focus:border-accent-cyan focus:outline-none">
-                                <option value="">Select Location</option>
-                                <option value="jakarta">Jakarta</option>
-                                <option value="surabaya">Surabaya</option>
-                                <option value="bandung">Bandung</option>
-                                <option value="medan">Medan</option>
-                                <option value="semarang">Semarang</option>
-								<option value="solo">Solo</option>
-								<option value="yogyakarta">Yogyakarta</option>
-								<option value="bali">Bali</option>
-                                <option value="makassar">Makassar</option>
-								<option value="manado">Manado</option>
-                                <option value="palembang">Palembang</option>
-                                <option value="tangerang">Tangerang</option>
-                                <option value="depok">Depok</option>
-                                <option value="bekasi">Bekasi</option>
-				    			<option value="other">Other (Custom Location)</option>
-                            </select>
-							<!-- Custom Location Input (hidden by default) -->
-							<input type="text" id="customLocation" placeholder="Enter custom location (e.g., Lampung, Malang, Remote)" 
-							       class="w-full px-4 py-3 bg-dark-primary border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-accent-cyan focus:outline-none hidden mt-3">
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-2">Experience Level</label>
-                            <select id="experience" class="w-full px-4 py-3 bg-dark-primary border border-gray-600 rounded-lg text-white focus:border-accent-cyan focus:outline-none">
-                                <option value="">Any Experience</option>
-                                <option value="entry">Entry Level (0-2 years)</option>
-                                <option value="mid">Mid Level (3-5 years)</option>
-                                <option value="senior">Senior Level (6+ years)</option>
-                                <option value="manager">Management Level</option>
-                            </select>
-                        </div>
-
-						<div class="pt-4">
-						    <button type="submit" id="searchBtn" class="w-full bg-accent-cyan hover:bg-accent-teal text-dark-primary font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center space-x-2">
-						        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-						        </svg>
-						        <span>Search Talent</span>
-						    </button>
-						    <p class="text-sm text-gray-400 mt-2 text-center">🔍 AI will match candidates against your criteria (Uses 1 credit)</p>
-						</div>
-                    </form>
-                </div>
-            </div>
+			<div class="lg:col-span-1">
+			    <div class="bg-dark-secondary rounded-xl p-6 border border-gray-600/50 shadow-lg">
+			        <!-- Header with micro-copy -->
+			        <div class="mb-6">
+			            <h2 class="text-xl font-bold text-white mb-2">Find Your Next Hire</h2>
+			            <p class="text-gray-300 text-sm">Skip the endless scrolling. Get qualified candidates ranked by AI compatibility.</p>
+			            
+			            <!-- Trust indicator -->
+			            <div class="flex items-center mt-3 text-xs text-gray-400">
+			                <svg class="w-3 h-3 mr-1 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+			                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
+			                </svg>
+			                <span>Search from 1M+ LinkedIn profiles</span>
+			            </div>
+			        </div>
+			        
+			        <form id="searchForm" class="space-y-5">
+			            <!-- Job Title - Primary Field -->
+			            <div>
+			                <label class="block text-sm font-medium text-gray-300 mb-2">
+			                    What role are you hiring for? <span class="text-red-400">*</span>
+			                </label>
+			                <input type="text" 
+			                       id="jobTitle" 
+			                       placeholder="e.g. Marketing Manager, Software Engineer, Sales Director" 
+			                       class="w-full px-4 py-3 bg-dark-primary border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-accent-cyan focus:outline-none focus:ring-2 focus:ring-accent-cyan/20 transition-all"
+			                       required>
+			                <div class="text-xs text-gray-500 mt-1">Be specific for better matches</div>
+			            </div>
+			
+			            <!-- Industry -->
+			            <div>
+			                <label class="block text-sm font-medium text-gray-300 mb-2">Industry (Optional)</label>
+			                <select id="industry" class="w-full px-4 py-3 bg-dark-primary border border-gray-600 rounded-lg text-white focus:border-accent-cyan focus:outline-none focus:ring-2 focus:ring-accent-cyan/20 transition-all">
+			                    <option value="">All Industries</option>
+			                    <option value="technology">Technology & Software</option>
+			                    <option value="finance">Finance & Banking</option>
+			                    <option value="healthcare">Healthcare & Medical</option>
+			                    <option value="education">Education & Training</option>
+			                    <option value="retail">Retail & E-commerce</option>
+			                    <option value="manufacturing">Manufacturing & Production</option>
+			                    <option value="hospitality">Hospitality & Tourism</option>
+			                    <option value="marketing">Marketing & Advertising</option>
+			                    <option value="consulting">Consulting & Professional Services</option>
+			                    <option value="real-estate">Real Estate & Construction</option>
+			                    <option value="media">Media & Entertainment</option>
+			                    <option value="logistics">Logistics & Transportation</option>
+			                    <option value="energy">Energy & Utilities</option>
+			                    <option value="nonprofit">Non-profit & Government</option>
+			                    <option value="custom">Other Industry</option>
+			                </select>
+			                <!-- Custom Industry Input (hidden by default) -->
+			                <input type="text" 
+			                       id="customIndustry" 
+			                       placeholder="Enter specific industry (e.g., Fintech, Agritech, Gaming)" 
+			                       class="w-full px-4 py-3 bg-dark-primary border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-accent-cyan focus:outline-none hidden mt-3">
+			            </div>
+			
+			            <!-- Location -->
+			            <div>
+			                <label class="block text-sm font-medium text-gray-300 mb-2">Preferred Location</label>
+			                <select id="location" class="w-full px-4 py-3 bg-dark-primary border border-gray-600 rounded-lg text-white focus:border-accent-cyan focus:outline-none focus:ring-2 focus:ring-accent-cyan/20 transition-all">
+			                    <option value="">Anywhere in Indonesia</option>
+			                    <option value="jakarta">Jakarta</option>
+			                    <option value="bandung">Bandung</option>
+			                    <option value="surabaya">Surabaya</option>
+			                    <option value="medan">Medan</option>
+			                    <option value="semarang">Semarang</option>
+			                    <option value="solo">Solo</option>
+			                    <option value="yogyakarta">Yogyakarta</option>
+			                    <option value="bali">Bali</option>
+			                    <option value="makassar">Makassar</option>
+			                    <option value="manado">Manado</option>
+			                    <option value="palembang">Palembang</option>
+			                    <option value="tangerang">Tangerang</option>
+			                    <option value="depok">Depok</option>
+			                    <option value="bekasi">Bekasi</option>
+			                    <option value="other">Other Location</option>
+			                </select>
+			                <!-- Custom Location Input (hidden by default) -->
+			                <input type="text" 
+			                       id="customLocation" 
+			                       placeholder="Enter city or region (e.g., Lampung, Malang, Remote)" 
+			                       class="w-full px-4 py-3 bg-dark-primary border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-accent-cyan focus:outline-none hidden mt-3">
+			            </div>
+			            
+			            <!-- Experience Level -->
+			            <div>
+			                <label class="block text-sm font-medium text-gray-300 mb-2">Experience Level</label>
+			                <select id="experience" class="w-full px-4 py-3 bg-dark-primary border border-gray-600 rounded-lg text-white focus:border-accent-cyan focus:outline-none focus:ring-2 focus:ring-accent-cyan/20 transition-all">
+			                    <option value="">Any Experience Level</option>
+			                    <option value="entry">Entry Level (0-2 years)</option>
+			                    <option value="mid">Mid Level (3-5 years)</option>
+			                    <option value="senior">Senior Level (6+ years)</option>
+			                    <option value="manager">Management/Leadership</option>
+			                </select>
+			            </div>
+			
+			            <!-- Search Button with Enhanced CTAp -->
+			            <div class="pt-4">
+			                <button type="submit" 
+			                        id="searchBtn" 
+			                        class="w-full bg-gradient-to-r from-accent-cyan to-accent-teal hover:from-accent-teal hover:to-accent-cyan text-dark-primary font-bold py-4 px-6 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98]">
+			                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 1114 0z"/>
+			                    </svg>
+			                    <span>Find Candidates (1 Credit)</span>
+			                </button>
+			                
+			                <!-- Quick try button -->
+			                <button type="button" 
+			                        id="sampleSearchBtn" 
+			                        class="w-full mt-3 text-accent-cyan hover:text-white border border-accent-cyan/30 hover:bg-accent-cyan/10 font-medium py-2 px-4 rounded-lg transition-all text-sm flex items-center justify-center space-x-2">
+			                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+			                    </svg>
+			                    <span>Try Sample Search</span>
+			                </button>
+			                
+			                <!-- Credit info -->
+			                <div class="flex items-center justify-center mt-3 text-xs text-gray-400">
+			                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+			                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"/>
+			                    </svg>
+			                    <span>Each search analyzes 1000+ profiles and costs 1 credit</span>
+			                </div>
+			            </div>
+			        </form>
+			    </div>
+			</div>
             
             <!-- Results Area -->
             <div class="lg:col-span-2">
