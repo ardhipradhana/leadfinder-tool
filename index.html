@@ -1910,6 +1910,9 @@ function showContact() {
 function hideContact() {
     document.getElementById('contactPage').classList.add('hidden');
 }
+
+window.showContact = showContact;
+window.hideContact = hideContact;
 	
 // Pricing page management
 function showPricingPage() {
