@@ -6046,30 +6046,12 @@ async function initiateCreditPurchase() {
         // Create order ID with timestamp for uniqueness
         const orderId = `MP-${currentUser.id.slice(0, 8)}-${Date.now()}`;
         
-        // Prepare payment request data
+        // Prepare payment request data (simplified for your backend)
         const paymentData = {
-            transaction_details: {
-                order_id: orderId,
-                gross_amount: 599000
-            },
-            credit_card: {
-                secure: true
-            },
-            customer_details: {
-                email: currentUser.email,
-                first_name: currentUser.user_metadata?.full_name || currentUser.email.split('@')[0]
-            },
-            item_details: [
-                {
-                    id: "CREDITS_30",
-                    price: 599000,
-                    quantity: 1,
-                    name: "30 Credits - Leadfinder Tool"
-                }
-            ],
-            callbacks: {
-                finish: window.location.origin
-            }
+            amount: 599000,
+            credits: 30,
+            user_email: currentUser.email,
+            user_id: currentUser.id
         };
         
         console.log('Payment data prepared:', paymentData);
@@ -6079,15 +6061,9 @@ async function initiateCreditPurchase() {
         const response = await fetch('https://montpro.app.n8n.cloud/webhook/create-payment', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer leadfinder_secretkey123`,
-                'X-User-ID': currentUser.id
+                'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                ...paymentData,
-                userId: currentUser.id,
-                userEmail: currentUser.email
-            })
+            body: JSON.stringify(paymentData)
         });
         
         if (!response.ok) {
