@@ -674,105 +674,67 @@
                     </div>
                 </div>
                 
-                <!-- Enhanced Loading State with Psychology-Driven Copy -->
+                <!-- Original Simple Loading State -->
 				<div id="loadingState" class="bg-dark-secondary rounded-xl p-8 text-center hidden">
-				    <!-- Main loading animation -->
-				    <div class="relative mb-6">
-				        <div class="w-16 h-16 mx-auto">
-				            <div class="absolute inset-0 border-4 border-gray-600 rounded-full"></div>
-				            <div class="absolute inset-0 border-4 border-accent-cyan border-t-transparent rounded-full animate-spin"></div>
-				        </div>
-				        <div class="absolute inset-0 flex items-center justify-center">
-				            <svg class="w-6 h-6 text-accent-cyan animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-				                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-				            </svg>
-				        </div>
-				    </div>
-				    
-				    <!-- Header with confidence-building copy -->
-				    <h3 class="text-xl font-bold text-white mb-2">Finding Your Perfect Candidates</h3>
-				    <p class="text-gray-300 mb-6">Our AI is analyzing thousands of LinkedIn profiles to match your requirements</p>
+				    <div class="animate-spin w-12 h-12 border-4 border-accent-cyan border-t-transparent rounded-full mx-auto mb-4"></div>
+				    <h3 class="text-xl font-semibold text-white mb-2">AI-Powered Talent Discovery</h3>
+				    <p class="text-gray-400 mb-6">Searching LinkedIn and analyzing candidates with artificial intelligence</p>
 				    
 				    <!-- Progress Bar -->
 				    <div class="mb-6">
 				        <div class="flex justify-between text-sm text-gray-300 mb-2">
-				            <span>Search Progress</span>
-				            <span id="progressPercentage" class="font-medium text-accent-cyan">0%</span>
+				            <span>Progress</span>
+				            <span id="progressPercentage">0%</span>
 				        </div>
-				        <div class="w-full bg-gray-700 rounded-full h-3 overflow-hidden">
-				            <div id="progressBar" 
-				                 class="bg-gradient-to-r from-accent-cyan to-accent-teal h-3 rounded-full transition-all duration-1000 ease-out shadow-lg" 
-				                 style="width: 0%"></div>
+				        <div class="w-full bg-gray-700 rounded-full h-3">
+				            <div id="progressBar" class="bg-gradient-to-r from-accent-cyan to-accent-teal h-3 rounded-full transition-all duration-500 ease-out" style="width: 0%"></div>
 				        </div>
 				    </div>
 				    
-				    <!-- Step-by-step process -->
-				    <div class="bg-dark-primary rounded-lg p-5">
-				        <div class="text-sm space-y-4" id="loadingSteps">
-				            <!-- Step 1 -->
-				            <div class="flex items-center justify-between step-item p-3 rounded-lg transition-all" data-step="1">
+				    <!-- Detailed Steps -->
+				    <div class="bg-dark-primary rounded-lg p-4">
+				        <div class="text-sm text-gray-300 space-y-3" id="loadingSteps">
+				            <div class="flex items-center justify-between step-item" data-step="1">
 				                <div class="flex items-center space-x-3">
-				                    <div class="w-6 h-6 rounded-full bg-gray-600 flex items-center justify-center text-xs text-white font-medium">1</div>
-				                    <span class="text-gray-300">Setting up search parameters</span>
+				                    <div class="w-6 h-6 rounded-full bg-gray-600 flex items-center justify-center text-xs text-white">1</div>
+				                    <span>Initializing LinkedIn search parameters</span>
 				                </div>
-				                <span class="text-gray-500 text-xs">⏸ Queued</span>
+				                <span class="text-gray-500">⏸ Pending</span>
 				            </div>
-				            
-				            <!-- Step 2 -->
-				            <div class="flex items-center justify-between step-item p-3 rounded-lg transition-all" data-step="2">
+				            <div class="flex items-center justify-between step-item" data-step="2">
 				                <div class="flex items-center space-x-3">
-				                    <div class="w-6 h-6 rounded-full bg-gray-600 flex items-center justify-center text-xs text-white font-medium">2</div>
-				                    <span class="text-gray-300">Scanning LinkedIn profiles</span>
+				                    <div class="w-6 h-6 rounded-full bg-gray-600 flex items-center justify-center text-xs text-white">2</div>
+				                    <span>Searching LinkedIn professional profiles</span>
 				                </div>
-				                <span class="text-gray-500 text-xs">⏸ Queued</span>
+				                <span class="text-gray-500">⏸ Pending</span>
 				            </div>
-				            
-				            <!-- Step 3 -->
-				            <div class="flex items-center justify-between step-item p-3 rounded-lg transition-all" data-step="3">
+				            <div class="flex items-center justify-between step-item" data-step="3">
 				                <div class="flex items-center space-x-3">
-				                    <div class="w-6 h-6 rounded-full bg-gray-600 flex items-center justify-center text-xs text-white font-medium">3</div>
-				                    <span class="text-gray-300">Analyzing candidate data</span>
+				                    <div class="w-6 h-6 rounded-full bg-gray-600 flex items-center justify-center text-xs text-white">3</div>
+				                    <span>Extracting candidate information</span>
 				                </div>
-				                <span class="text-gray-500 text-xs">⏸ Queued</span>
+				                <span class="text-gray-500">⏸ Pending</span>
 				            </div>
-				            
-				            <!-- Step 4 -->
-				            <div class="flex items-center justify-between step-item p-3 rounded-lg transition-all" data-step="4">
+				            <div class="flex items-center justify-between step-item" data-step="4">
 				                <div class="flex items-center space-x-3">
-				                    <div class="w-6 h-6 rounded-full bg-gray-600 flex items-center justify-center text-xs text-white font-medium">4</div>
-				                    <span class="text-gray-300">AI compatibility scoring</span>
+				                    <div class="w-6 h-6 rounded-full bg-gray-600 flex items-center justify-center text-xs text-white">4</div>
+				                    <span>Analyzing candidate data with AI</span>
 				                </div>
-				                <span class="text-gray-500 text-xs">⏸ Queued</span>
+				                <span class="text-gray-500">⏸ Pending</span>
 				            </div>
-				            
-				            <!-- Step 5 -->
-				            <div class="flex items-center justify-between step-item p-3 rounded-lg transition-all" data-step="5">
+				            <div class="flex items-center justify-between step-item" data-step="5">
 				                <div class="flex items-center space-x-3">
-				                    <div class="w-6 h-6 rounded-full bg-gray-600 flex items-center justify-center text-xs text-white font-medium">5</div>
-				                    <span class="text-gray-300">Ranking and preparing results</span>
+				                    <div class="w-6 h-6 rounded-full bg-gray-600 flex items-center justify-center text-xs text-white">5</div>
+				                    <span>Ranking and preparing results</span>
 				                </div>
-				                <span class="text-gray-500 text-xs">⏸ Queued</span>
+				                <span class="text-gray-500">⏸ Pending</span>
 				            </div>
 				        </div>
 				    </div>
 				    
-				    <!-- Motivational tip section -->
-				    <div class="mt-6 bg-accent-cyan/10 border border-accent-cyan/20 rounded-lg p-4">
-				        <div class="flex items-start space-x-3">
-				            <svg class="w-5 h-5 text-accent-cyan mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-				                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"/>
-				            </svg>
-				            <div class="text-left">
-				                <p id="loadingTip" class="text-sm text-gray-300 transition-opacity duration-300">
-				                    💡 While you wait: Prepare your interview questions and onboarding materials
-				                </p>
-				            </div>
-				        </div>
-				    </div>
-				    
-				    <!-- Time estimate -->
-				    <div class="mt-4 text-xs text-gray-400">
-				        Typical search time: 30-60 seconds
+				    <!-- Loading Tip -->
+				    <div class="mt-6 text-xs text-gray-400" id="loadingTip">
+				        💡 Tip: While you wait, prepare your interview questions
 				    </div>
 				</div>
                 
