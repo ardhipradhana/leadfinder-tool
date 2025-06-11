@@ -4268,29 +4268,41 @@ function generateComparisonCard(candidate, index) {
                 </div>
                 <div class="flex justify-between">
                     <span class="text-gray-400">Location:</span>
-                    <span class="text-white">${candidate.location}</span>
+                    <span class="text-white text-right">${candidate.location}</span>
                 </div>
-                <div class="flex justify-between">
-                    <span class="text-gray-400">Source:</span>
-                    <span style="color: ${scoreColor}">${candidate.source}</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-gray-400">Verified:</span>
-                    <span class="text-${candidate.verificationStatus === 'Verified' ? 'green-400' : 'yellow-400'}">${candidate.verificationStatus}</span>
-                </div>
+                <div class="flex justify-between items-center">
+		    <span class="text-gray-400">Source:</span>
+		    <div class="px-2 py-1 bg-blue-500/20 border border-blue-500/30 rounded-full">
+		        <span class="text-blue-400 text-xs font-medium">${candidate.source}</span>
+		    </div>
+		</div>
+		<div class="flex justify-between items-center">
+		    <span class="text-gray-400">Verified:</span>
+		    <div class="px-2 py-1 bg-${candidate.verificationStatus === 'Verified' ? 'green' : 'yellow'}-500/20 border border-${candidate.verificationStatus === 'Verified' ? 'green' : 'yellow'}-500/30 rounded-full">
+		        <span class="text-${candidate.verificationStatus === 'Verified' ? 'green' : 'yellow'}-400 text-xs font-medium">${candidate.verificationStatus === 'Verified' ? '✓ Verified' : '⚠ Unverified'}</span>
+		    </div>
+		</div>
             </div>
             
             <!-- Top Skills -->
             <div class="mt-4">
-                <h4 class="text-sm font-semibold text-gray-300 mb-2">Top Skills</h4>
-                <div class="flex flex-wrap gap-1">
-                    ${(candidate.currentSkills || []).slice(0, 3).map(skill => `
-                        <span class="px-2 py-1 text-xs rounded-full" style="background-color: ${scoreColor}20; color: ${scoreColor}; border: 1px solid ${scoreColor}40">
-                            ${skill}
-                        </span>
-                    `).join('')}
-                </div>
-            </div>
+			    <h4 class="text-sm font-semibold text-gray-300 mb-2">Top Skills</h4>
+			    <div class="flex flex-wrap gap-2">
+			        ${(candidate.currentSkills || []).slice(0, 3).map((skill, index) => {
+			            const colors = [
+			                'bg-accent-cyan/20 border-accent-cyan/30 text-accent-cyan',
+			                'bg-green-500/20 border-green-500/30 text-green-400',
+			                'bg-purple-500/20 border-purple-500/30 text-purple-400'
+			            ];
+			            const colorClass = colors[index % colors.length];
+			            return `
+			                <span class="px-3 py-1 ${colorClass} border rounded-full text-xs font-medium">
+			                    ${skill}
+			                </span>
+			            `;
+			        }).join('')}
+			    </div>
+			</div>
         </div>
     `;
 }
@@ -4412,9 +4424,9 @@ function showComparisonModal(candidates) {
         <!-- Radar Chart Comparison -->
         <div class="bg-dark-primary rounded-lg p-6">
             <h3 class="text-xl font-bold text-accent-cyan mb-4 flex items-center">
-                <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
+                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+		    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 1.657-2.657 1.657-2.657A8 8 0 1017.657 18.657z"/>
+		</svg>
                 Skills & Performance Radar
             </h3>
             <div class="flex justify-center">
