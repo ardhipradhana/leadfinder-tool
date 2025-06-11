@@ -7603,15 +7603,15 @@ setTimeout(() => {
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                 <button class="faq-category-btn bg-gradient-to-r from-blue-500/20 to-blue-600/20 border border-blue-500/30 rounded-lg p-4 text-left hover:from-blue-500/30 hover:to-blue-600/30 transition-all" data-category="getting-started">
                     <div class="font-semibold text-blue-400 mb-1">🚀 Getting Started</div>
-                    <div class="text-sm text-gray-400">Account, credits, first search</div>
+                    <div class="text-sm text-gray-400">Account setup and first search</div>
                 </button>
                 <button class="faq-category-btn bg-gradient-to-r from-purple-500/20 to-purple-600/20 border border-purple-500/30 rounded-lg p-4 text-left hover:from-purple-500/30 hover:to-purple-600/30 transition-all" data-category="how-it-works">
                     <div class="font-semibold text-purple-400 mb-1">🤖 How AI Works</div>
-                    <div class="text-sm text-gray-400">Search quality, accuracy, data</div>
+                    <div class="text-sm text-gray-400">Search quality and data sources</div>
                 </button>
                 <button class="faq-category-btn bg-gradient-to-r from-green-500/20 to-green-600/20 border border-green-500/30 rounded-lg p-4 text-left hover:from-green-500/30 hover:to-green-600/30 transition-all" data-category="billing">
                     <div class="font-semibold text-green-400 mb-1">💳 Billing & Credits</div>
-                    <div class="text-sm text-gray-400">Pricing, payments, refunds</div>
+                    <div class="text-sm text-gray-400">Pricing and payment options</div>
                 </button>
             </div>
 
@@ -7624,7 +7624,7 @@ setTimeout(() => {
                         Getting Started
                     </h3>
 
-                    <!-- FAQ Item -->
+                    <!-- FAQ Item 1 -->
                     <div class="faq-item bg-dark-primary rounded-lg">
                         <button class="faq-question w-full text-left p-4 flex items-center justify-between hover:bg-dark-tertiary/50 transition-colors">
                             <span class="font-semibold text-white">How do I create an account and start searching?</span>
@@ -7633,73 +7633,74 @@ setTimeout(() => {
                             </svg>
                         </button>
                         <div class="faq-answer hidden px-4 pb-4">
-                            <div class="text-gray-300 space-y-2">
-                                <p>Getting started is simple and takes less than 2 minutes:</p>
-                                <ol class="list-decimal list-inside space-y-1 ml-4">
-                                    <li>Click "Continue with Google" or enter your email for a magic link</li>
-                                    <li>You'll automatically get <strong class="text-accent-cyan">5 free searches</strong> to try the platform</li>
-                                    <li>Fill in your first search criteria (job title, location, experience)</li>
-                                    <li>Hit "Search Talent" and get results in 30 seconds!</li>
-                                </ol>
-                                <div class="mt-3 p-3 bg-accent-cyan/10 border border-accent-cyan/30 rounded-lg">
-                                    <p class="text-accent-cyan text-sm"><strong>Pro tip:</strong> Start with a specific job title like "Digital Marketing Manager" for best results.</p>
+                            <div class="text-gray-300 space-y-3">
+                                <p>Account creation takes less than 2 minutes. You can sign up using Google authentication or email verification.</p>
+                                <div class="bg-dark-secondary rounded-lg p-4">
+                                    <h4 class="font-semibold text-white mb-2">Setup Process:</h4>
+                                    <ol class="space-y-1 text-sm">
+                                        <li>1. Click "Continue with Google" or enter your email for magic link authentication</li>
+                                        <li>2. Complete account verification (automatic with Google, email link for others)</li>
+                                        <li>3. Access your dashboard with 5 free searches already credited</li>
+                                        <li>4. Enter search criteria and run your first candidate search</li>
+                                    </ol>
+                                </div>
+                                <div class="p-3 bg-accent-cyan/10 border border-accent-cyan/30 rounded-lg">
+                                    <p class="text-accent-cyan text-sm"><strong>Best practice:</strong> Use specific job titles like "Senior Software Engineer" rather than generic terms like "Developer" for optimal results.</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
+                    <!-- FAQ Item 2 -->
                     <div class="faq-item bg-dark-primary rounded-lg">
                         <button class="faq-question w-full text-left p-4 flex items-center justify-between hover:bg-dark-tertiary/50 transition-colors">
-                            <span class="font-semibold text-white">What information do I need to provide for a good search?</span>
+                            <span class="font-semibold text-white">What information should I provide for effective searches?</span>
                             <svg class="faq-arrow w-5 h-5 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                             </svg>
                         </button>
                         <div class="faq-answer hidden px-4 pb-4">
                             <div class="text-gray-300 space-y-3">
-                                <p>The more specific you are, the better our AI can find perfect matches:</p>
+                                <p>Search accuracy depends on the specificity and relevance of your input criteria. Our AI performs better with detailed, focused parameters.</p>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div class="bg-dark-secondary rounded-lg p-3">
-                                        <h4 class="font-semibold text-accent-cyan mb-2">✅ Required (for best results)</h4>
+                                    <div class="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
+                                        <h4 class="font-semibold text-green-400 mb-2">Required Information</h4>
                                         <ul class="text-sm space-y-1">
-                                            <li>• Specific job title</li>
-                                            <li>• Target location</li>
-                                            <li>• Experience level</li>
+                                            <li>• <strong>Job title:</strong> Specific role designation</li>
+                                            <li>• <strong>Location:</strong> City or metropolitan area</li>
+                                            <li>• <strong>Experience level:</strong> Years of relevant experience</li>
                                         </ul>
                                     </div>
-                                    <div class="bg-dark-secondary rounded-lg p-3">
-                                        <h4 class="font-semibold text-yellow-400 mb-2">⚡ Optional (for precision)</h4>
-                                        <ul class="text-sm space-y-1">
-                                            <li>• Industry preference</li>
-                                            <li>• Company size</li>
-                                            <li>• Specific skills</li>
-                                        </ul>
-                                    </div>
+                                </div>
+                                <div class="p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+                                    <p class="text-yellow-400 text-sm"><strong>Example:</strong> "Senior React Developer, Jakarta, 3-5 years experience" yields more targeted results than "Developer".</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
+                    <!-- FAQ Item 3 -->
                     <div class="faq-item bg-dark-primary rounded-lg">
                         <button class="faq-question w-full text-left p-4 flex items-center justify-between hover:bg-dark-tertiary/50 transition-colors">
-                            <span class="font-semibold text-white">Is there a limit to how many candidates I can see per search?</span>
+                            <span class="font-semibold text-white">How many candidates will I see per search?</span>
                             <svg class="faq-arrow w-5 h-5 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                             </svg>
                         </button>
                         <div class="faq-answer hidden px-4 pb-4">
-                            <div class="text-gray-300">
-                                <p>Each search typically returns <strong class="text-accent-cyan">8-15 top-ranked candidates</strong>. This is intentional - we focus on quality over quantity.</p>
-                                <div class="mt-3 space-y-2">
-                                    <p><strong>Why we limit results:</strong></p>
-                                    <ul class="list-disc list-inside space-y-1 ml-4 text-sm">
-                                        <li>Higher quality candidates with better compatibility scores</li>
-                                        <li>Saves you time reviewing irrelevant profiles</li>
-                                        <li>Our AI pre-filters to show only the most promising matches</li>
+                            <div class="text-gray-300 space-y-3">
+                                <p>Each search returns 10 carefully vetted candidates, ranked by compatibility score. This focused approach prioritizes quality over quantity.</p>
+                                <div class="bg-dark-secondary rounded-lg p-4">
+                                    <h4 class="font-semibold text-accent-cyan mb-2">Quality-First Approach</h4>
+                                    <ul class="space-y-1 text-sm">
+                                        <li>• AI pre-filtering eliminates irrelevant profiles</li>
+                                        <li>• Compatibility scoring from 0-100 ensures relevance</li>
+                                        <li>• Reduces time spent reviewing unqualified candidates</li>
+                                        <li>• Higher response rates from targeted outreach</li>
                                     </ul>
                                 </div>
-                                <div class="mt-3 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
-                                    <p class="text-blue-400 text-sm"><strong>Need more candidates?</strong> Adjust your search criteria or run multiple targeted searches for different experience levels.</p>
+                                <div class="p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                                    <p class="text-blue-400 text-sm"><strong>Need more candidates?</strong> Run additional searches with modified criteria (different experience levels, broader location scope) to expand your candidate pool.</p>
                                 </div>
                             </div>
                         </div>
@@ -7713,73 +7714,84 @@ setTimeout(() => {
                         How Our AI Works
                     </h3>
 
+                    <!-- FAQ Item 1 -->
                     <div class="faq-item bg-dark-primary rounded-lg">
                         <button class="faq-question w-full text-left p-4 flex items-center justify-between hover:bg-dark-tertiary/50 transition-colors">
-                            <span class="font-semibold text-white">How accurate are the AI compatibility scores?</span>
+                            <span class="font-semibold text-white">How accurate are the candidate matches?</span>
                             <svg class="faq-arrow w-5 h-5 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                             </svg>
                         </button>
                         <div class="faq-answer hidden px-4 pb-4">
                             <div class="text-gray-300 space-y-3">
-                                <p>Our AI compatibility scores are highly accurate, with <strong class="text-accent-cyan">85%+ precision</strong> based on successful hires by our users.</p>
-                                
+                                <p>Our AI delivers 85-92% match accuracy based on user feedback and hiring outcomes. The system analyzes multiple data points for comprehensive candidate evaluation.</p>
                                 <div class="bg-dark-secondary rounded-lg p-4">
-                                    <h4 class="font-semibold text-purple-400 mb-2">How scores are calculated:</h4>
+                                    <h4 class="font-semibold text-purple-400 mb-2">AI Analysis Components</h4>
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                                        <div>• <strong>Role Relevance (35%):</strong> Job title and responsibility match</div>
-                                        <div>• <strong>Experience Fit (30%):</strong> Years and industry experience</div>
-                                        <div>• <strong>Skills Match (20%):</strong> Technical and soft skills alignment</div>
-                                        <div>• <strong>Career Trajectory (15%):</strong> Growth pattern and ambition</div>
+                                        <div class="space-y-2">
+                                            <p class="font-medium text-white">Profile Analysis</p>
+                                            <ul class="space-y-1 text-gray-300">
+                                                <li>• Complete professional history review</li>
+                                                <li>• Contextual skill assessment</li>
+                                                <li>• Career progression pattern analysis</li>
+                                            </ul>
+                                        </div>
+                                        <div class="space-y-2">
+                                            <p class="font-medium text-white">Compatibility Scoring</p>
+                                            <ul class="space-y-1 text-gray-300">
+                                                <li>• Skills and experience alignment</li>
+                                                <li>• Industry background relevance</li>
+                                                <li>• Seniority level appropriateness</li>
+                                            </ul>
+                                        </div>
                                     </div>
                                 </div>
-                                
                                 <div class="p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
-                                    <p class="text-green-400 text-sm"><strong>Proven results:</strong> Candidates with 80+ scores have 3x higher interview success rates than random LinkedIn searches.</p>
+                                    <p class="text-green-400 text-sm"><strong>Performance indicator:</strong> Candidates with 75%+ compatibility scores typically show high interview-to-hire conversion rates.</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
+                    <!-- FAQ Item 2 -->
                     <div class="faq-item bg-dark-primary rounded-lg">
                         <button class="faq-question w-full text-left p-4 flex items-center justify-between hover:bg-dark-tertiary/50 transition-colors">
-                            <span class="font-semibold text-white">What data sources does your AI use?</span>
+                            <span class="font-semibold text-white">What are your data sources?</span>
                             <svg class="faq-arrow w-5 h-5 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                             </svg>
                         </button>
                         <div class="faq-answer hidden px-4 pb-4">
                             <div class="text-gray-300 space-y-3">
-                                <p>We analyze publicly available professional information from multiple sources:</p>
-                                
+                                <p>All candidate information is sourced from publicly available professional profiles and platforms. No private or confidential data is accessed.</p>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div class="bg-dark-secondary rounded-lg p-3">
-                                        <h4 class="font-semibold text-blue-400 mb-2">📱 Primary Sources</h4>
+                                    <div class="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
+                                        <h4 class="font-semibold text-green-400 mb-2">Data Sources</h4>
                                         <ul class="text-sm space-y-1">
-                                            <li>• LinkedIn public profiles</li>
-                                            <li>• JobStreet candidate profiles</li>
-                                            <li>• Karir.com professional data</li>
-                                            <li>• Other Indonesian job boards</li>
+                                            <li>• Public LinkedIn profiles</li>
+                                            <li>• Professional portfolio websites</li>
+                                            <li>• Public job board profiles</li>
+                                            <li>• Company team pages</li>
                                         </ul>
                                     </div>
-                                    <div class="bg-dark-secondary rounded-lg p-3">
-                                        <h4 class="font-semibold text-purple-400 mb-2">🔍 Data Points Analyzed</h4>
+                                    <div class="bg-red-500/10 border border-red-500/30 rounded-lg p-4">
+                                        <h4 class="font-semibold text-red-400 mb-2">Privacy Boundaries</h4>
                                         <ul class="text-sm space-y-1">
-                                            <li>• Work experience & progression</li>
-                                            <li>• Skills & endorsements</li>
-                                            <li>• Education & certifications</li>
-                                            <li>• Industry connections</li>
+                                            <li>• No access to private messages</li>
+                                            <li>• No personal social media data</li>
+                                            <li>• No confidential company information</li>
+                                            <li>• No protected contact details</li>
                                         </ul>
                                     </div>
                                 </div>
-                                
-                                <div class="p-3 bg-accent-cyan/10 border border-accent-cyan/30 rounded-lg">
-                                    <p class="text-accent-cyan text-sm"><strong>Privacy note:</strong> We only access publicly available information. No private messages or confidential data is ever accessed.</p>
+                                <div class="p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                                    <p class="text-blue-400 text-sm"><strong>Privacy compliance:</strong> Data collection adheres to professional networking platform terms and Indonesian data protection regulations.</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
+                    <!-- FAQ Item 3 -->
                     <div class="faq-item bg-dark-primary rounded-lg">
                         <button class="faq-question w-full text-left p-4 flex items-center justify-between hover:bg-dark-tertiary/50 transition-colors">
                             <span class="font-semibold text-white">Can I search for candidates outside Indonesia?</span>
@@ -7789,20 +7801,30 @@ setTimeout(() => {
                         </button>
                         <div class="faq-answer hidden px-4 pb-4">
                             <div class="text-gray-300 space-y-3">
-                                <p>Currently, Leadfinder focuses exclusively on <strong class="text-accent-cyan">Indonesian talent</strong> to provide the highest quality results for local businesses.</p>
-                                
+                                <p>Currently, Leadfinder specializes exclusively in Indonesian talent to deliver optimal results for the local market.</p>
                                 <div class="bg-dark-secondary rounded-lg p-4">
-                                    <h4 class="font-semibold text-yellow-400 mb-2">🇮🇩 Why Indonesia-focused?</h4>
-                                    <ul class="text-sm space-y-1">
-                                        <li>• Deeper understanding of local job market dynamics</li>
-                                        <li>• Better salary and cultural context analysis</li>
-                                        <li>• More accurate career progression patterns</li>
-                                        <li>• Optimized for Bahasa Indonesia and local platforms</li>
+                                    <h4 class="font-semibold text-yellow-400 mb-2">Indonesia-Focused Advantages</h4>
+                                    <ul class="text-sm space-y-2">
+                                        <li class="flex items-start space-x-2">
+                                            <span class="text-yellow-400 mt-0.5">•</span>
+                                            <span><strong>Market expertise:</strong> Deep understanding of Indonesian professional landscape and hiring practices</span>
+                                        </li>
+                                        <li class="flex items-start space-x-2">
+                                            <span class="text-yellow-400 mt-0.5">•</span>
+                                            <span><strong>Cultural context:</strong> Accurate compensation benchmarking and workplace culture analysis</span>
+                                        </li>
+                                        <li class="flex items-start space-x-2">
+                                            <span class="text-yellow-400 mt-0.5">•</span>
+                                            <span><strong>Language optimization:</strong> Enhanced performance with Bahasa Indonesia content and local platform data</span>
+                                        </li>
+                                        <li class="flex items-start space-x-2">
+                                            <span class="text-yellow-400 mt-0.5">•</span>
+                                            <span><strong>Career pattern recognition:</strong> Local industry career progression understanding</span>
+                                        </li>
                                     </ul>
                                 </div>
-                                
-                                <div class="p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
-                                    <p class="text-blue-400 text-sm"><strong>Coming soon:</strong> We're planning to expand to Singapore and Malaysia in 2025. Join our waitlist for early access!</p>
+                                <div class="p-3 bg-purple-500/10 border border-purple-500/30 rounded-lg">
+                                    <p class="text-purple-400 text-sm"><strong>Expansion roadmap:</strong> Vietnam market coverage planned for 2025.</p>
                                 </div>
                             </div>
                         </div>
@@ -7816,9 +7838,10 @@ setTimeout(() => {
                         Billing & Credits
                     </h3>
 
+                    <!-- FAQ Item 1 -->
                     <div class="faq-item bg-dark-primary rounded-lg">
                         <button class="faq-question w-full text-left p-4 flex items-center justify-between hover:bg-dark-tertiary/50 transition-colors">
-                            <span class="font-semibold text-white">How much does it cost per search?</span>
+                            <span class="font-semibold text-white">What are the pricing options?</span>
                             <svg class="faq-arrow w-5 h-5 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                             </svg>
@@ -7827,85 +7850,146 @@ setTimeout(() => {
                             <div class="text-gray-300 space-y-3">
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div class="bg-gradient-to-r from-blue-500/10 to-blue-600/10 rounded-lg p-4 border border-blue-500/30">
-                                        <h4 class="font-semibold text-blue-400 mb-2">🆓 Free Plan</h4>
+                                        <h4 class="font-semibold text-blue-400 mb-2 flex items-center">
+                                            <span class="text-xl mr-2">🆓</span>
+                                            Free Tier
+                                        </h4>
                                         <div class="text-2xl font-bold text-white mb-1">5 searches</div>
-                                        <div class="text-sm text-gray-400">Per month • Auto-resets</div>
-                                        <div class="text-xs text-blue-400 mt-2">Perfect for trying the platform</div>
-                                    </div>
-                                    <div class="bg-gradient-to-r from-accent-cyan/10 to-accent-teal/10 rounded-lg p-4 border border-accent-cyan/30">
-                                        <h4 class="font-semibold text-accent-cyan mb-2">💎 Credit Top-up</h4>
-                                        <div class="text-2xl font-bold text-white mb-1">Rp 20k</div>
-                                        <div class="text-sm text-gray-400">Per search • Never expires</div>
-                                        <div class="text-xs text-accent-cyan mt-2">30 credits = Rp 599k (bulk discount)</div>
+                                        <div class="text-sm text-gray-400 mb-2">Monthly allocation • Auto-renewable</div>
+                                        <div class="text-xs text-blue-400 bg-blue-500/20 rounded px-2 py-1">Platform evaluation</div>
+				    </div>
+                                </div>
+                                <div class="bg-dark-secondary rounded-lg p-4">
+                                    <h4 class="font-semibold text-accent-cyan mb-2">Credit Package</h4>
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                                        <div class="bg-dark-primary rounded-lg p-3 text-center">
+                                            <div class="text-lg font-bold text-white">30 Credits</div>
+                                            <div class="text-accent-cyan">IDR 599,000</div>
+                                            <div class="text-xs text-gray-400">~IDR 20,000 per search</div>
+                                        </div>
                                     </div>
                                 </div>
-                                
-                                <div class="p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
-                                    <p class="text-green-400 text-sm"><strong>Cost comparison:</strong> Traditional recruiters charge 15-25% of annual salary. One Leadfinder search costs about the same as a coffee! ☕</p>
+                                <div class="p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+                                    <p class="text-yellow-400 text-sm"><strong>Recommendation:</strong> Start with free searches to evaluate platform fit, then purchase credits based on needs.</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
+                    <!-- FAQ Item 2 -->
                     <div class="faq-item bg-dark-primary rounded-lg">
                         <button class="faq-question w-full text-left p-4 flex items-center justify-between hover:bg-dark-tertiary/50 transition-colors">
-                            <span class="font-semibold text-white">What payment methods do you accept?</span>
+                            <span class="font-semibold text-white">What payment methods are accepted?</span>
                             <svg class="faq-arrow w-5 h-5 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                             </svg>
                         </button>
                         <div class="faq-answer hidden px-4 pb-4">
                             <div class="text-gray-300 space-y-3">
-                                <p>We support all major Indonesian payment methods through our secure Midtrans integration:</p>
-                                
+                                <p>Payment processing is handled through Midtrans, supporting all major Indonesian payment methods with enterprise-grade security.</p>
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <div class="bg-dark-secondary rounded-lg p-3 text-center">
-                                        <div class="text-2xl mb-2">🏦</div>
+                                    <div class="bg-dark-secondary rounded-lg p-4 text-center">
+                                        <div class="text-3xl mb-2">🏦</div>
                                         <h4 class="font-semibold text-white mb-1">Bank Transfer</h4>
                                         <div class="text-xs text-gray-400">BCA, Mandiri, BNI, BRI</div>
                                     </div>
-                                    <div class="bg-dark-secondary rounded-lg p-3 text-center">
-                                        <div class="text-2xl mb-2">💳</div>
+                                    <div class="bg-dark-secondary rounded-lg p-4 text-center">
+                                        <div class="text-3xl mb-2">💳</div>
                                         <h4 class="font-semibold text-white mb-1">Credit/Debit Cards</h4>
                                         <div class="text-xs text-gray-400">Visa, Mastercard, JCB</div>
                                     </div>
-                                    <div class="bg-dark-secondary rounded-lg p-3 text-center">
-                                        <div class="text-2xl mb-2">📱</div>
+                                    <div class="bg-dark-secondary rounded-lg p-4 text-center">
+                                        <div class="text-3xl mb-2">📱</div>
                                         <h4 class="font-semibold text-white mb-1">E-Wallets</h4>
                                         <div class="text-xs text-gray-400">OVO, DANA, GoPay, LinkAja</div>
                                     </div>
                                 </div>
-                                
-                                <div class="p-3 bg-accent-cyan/10 border border-accent-cyan/30 rounded-lg">
-                                    <p class="text-accent-cyan text-sm"><strong>Security:</strong> All payments are processed securely by Midtrans (Gojek's payment partner). We never store your payment details.</p>
+                                <div class="p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
+                                    <p class="text-green-400 text-sm"><strong>Security assurance:</strong> All transactions processed through Midtrans with PCI DSS compliance. Payment details are never stored on our servers.</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
+                    <!-- FAQ Item 3 -->
                     <div class="faq-item bg-dark-primary rounded-lg">
                         <button class="faq-question w-full text-left p-4 flex items-center justify-between hover:bg-dark-tertiary/50 transition-colors">
-                            <span class="font-semibold text-white">Can I get a refund if I'm not satisfied?</span>
+                            <span class="font-semibold text-white">What is your refund policy?</span>
                             <svg class="faq-arrow w-5 h-5 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                             </svg>
                         </button>
                         <div class="faq-answer hidden px-4 pb-4">
                             <div class="text-gray-300 space-y-3">
-                                <p>Yes! We offer a <strong class="text-accent-cyan">7-day satisfaction guarantee</strong> on your first credit purchase.</p>
-                                
+                                <p>We offer a satisfaction guarantee designed to ensure platform value and user confidence.</p>
                                 <div class="bg-dark-secondary rounded-lg p-4">
-                                    <h4 class="font-semibold text-green-400 mb-2">🛡️ Our Refund Policy</h4>
-                                    <ul class="text-sm space-y-1">
-                                        <li>• <strong>Full refund</strong> within 7 days of first purchase</li>
-                                        <li>• <strong>Partial refund</strong> for unused credits (case-by-case)</li>
-                                        <li>• <strong>Credit adjustment</strong> for technical issues or search failures</li>
-                                        <li>• <strong>No questions asked</strong> for first-time users unsatisfied with results</li>
-                                    </ul>
+                                    <h4 class="font-semibold text-green-400 mb-3 flex items-center">
+                                        <span class="text-xl mr-2">🛡️</span>
+                                        Refund Policy Terms
+                                    </h4>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                        <div class="space-y-2">
+                                            <p class="font-medium text-white">First-Time Users</p>
+                                            <ul class="space-y-1 text-gray-300">
+                                                <li>• 7-day full refund on initial purchase</li>
+                                                <li>• No usage restrictions or questions</li>
+                                                <li>• Email request process</li>
+                                            </ul>
+                                        </div>
+                                        <div class="space-y-2">
+                                            <p class="font-medium text-white">Technical Issues</p>
+                                            <ul class="space-y-1 text-gray-300">
+                                                <li>• Credit restoration for failed searches</li>
+                                                <li>• Partial refunds evaluated case-by-case</li>
+                                                <li>• Service level compensation</li>
+                                            </ul>
+                                        </div>
+                                    </div>
                                 </div>
-                                
                                 <div class="p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
-                                    <p class="text-blue-400 text-sm"><strong>How to request:</strong> Simply email support@aapgrp.com with your order number. Refunds are processed within 3-5 business days.</p>
+                                    <p class="text-blue-400 text-sm"><strong>Process:</strong> Submit refund requests to support@aapgrp.com with order reference. Standard response time is 24-48 hours.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FAQ Item 4 -->
+                    <div class="faq-item bg-dark-primary rounded-lg">
+                        <button class="faq-question w-full text-left p-4 flex items-center justify-between hover:bg-dark-tertiary/50 transition-colors">
+                            <span class="font-semibold text-white">Do credits expire?</span>
+                            <svg class="faq-arrow w-5 h-5 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+                        <div class="faq-answer hidden px-4 pb-4">
+                            <div class="text-gray-300 space-y-3">
+                                <p>Credit expiration policies differ between free and purchased credits to optimize platform usage.</p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
+                                        <h4 class="font-semibold text-blue-400 mb-2 flex items-center">
+                                            <span class="text-xl mr-2">🆓</span>
+                                            Free Credits
+                                        </h4>
+                                        <ul class="text-sm space-y-1">
+                                            <li>• Monthly allocation: 5 searches</li>
+                                            <li>• Reset date: 1st of each month</li>
+                                            <li>• Non-transferable between months</li>
+                                        </ul>
+                                    </div>
+                                    <div class="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
+                                        <h4 class="font-semibold text-green-400 mb-2 flex items-center">
+                                            <span class="text-xl mr-2">💰</span>
+                                            Purchased Credits
+                                        </h4>
+                                        <ul class="text-sm space-y-1">
+                                            <li>• <strong>No expiration date</strong></li>
+                                            <li>• Permanent account balance</li>
+                                            <li>• Use at your own pace</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="p-3 bg-purple-500/10 border border-purple-500/30 rounded-lg">
+                                    <p class="text-purple-400 text-sm"><strong>Usage priority:</strong> System automatically uses free credits first each month, preserving purchased credits for extended availability.</p>
                                 </div>
                             </div>
                         </div>
@@ -7913,20 +7997,32 @@ setTimeout(() => {
                 </div>
             </div>
 
-            <!-- Still Have Questions -->
+            <!-- Support Contact Section -->
             <div class="mt-8 bg-gradient-to-r from-accent-cyan/10 to-accent-teal/10 rounded-xl p-6 border border-accent-cyan/30 text-center">
-                <h3 class="text-xl font-bold text-white mb-3">Still Have Questions?</h3>
-                <p class="text-gray-300 mb-4">Our support team is here to help you succeed with AI-powered recruiting</p>
-                <div class="flex flex-col sm:flex-row gap-3 justify-center">
-                    <a href="mailto:support@aapgrp.com" class="bg-accent-cyan hover:bg-accent-teal text-dark-primary font-semibold py-2 px-6 rounded-lg transition-colors">
-                        📧 Email Support
-                    </a>
-                    <button class="bg-dark-primary hover:bg-dark-tertiary text-white font-semibold py-2 px-6 rounded-lg transition-colors border border-gray-600">
-                        💬 Live Chat (Coming Soon)
-                    </button>
+                <div class="flex items-center justify-center mb-3">
+                    <div class="w-12 h-12 bg-accent-cyan/20 rounded-lg flex items-center justify-center mr-3">
+                        <svg class="w-6 h-6 text-accent-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.959 8.959 0 01-4.906-1.42c-1.09-.703-2.426-.993-3.795-.84L3 18.5c-.825.247-1.5-.076-1.5-.85 0-.824.75-1.5 1.5-1.5.75 0 1.5-.676 1.5-1.5v-1c0-.824-.75-1.5-1.5-1.5-.75 0-1.5-.676-1.5-1.5C3 10.5 3.582 6 8 6c4.418 0 8 3.582 8 6z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-white">Need Additional Support?</h3>
                 </div>
-                <div class="mt-3 text-sm text-gray-400">
-                    Average response time: <span class="text-accent-cyan font-semibold">2 hours during business hours</span>
+                <p class="text-gray-300 mb-4">Our support team is available to assist with technical questions, account issues, and platform guidance.</p>
+                <div class="flex flex-col sm:flex-row gap-3 justify-center items-center">
+                    <a href="mailto:support@aapgrp.com" class="bg-accent-cyan hover:bg-accent-teal text-dark-primary font-bold py-3 px-6 rounded-lg transition-colors transform hover:scale-105 flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                        Contact Support
+                    </a>
+                    <div class="text-gray-400 text-sm">
+                        <div class="flex items-center">
+                            <svg class="w-4 h-4 mr-1 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            Response within 24 hours
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
