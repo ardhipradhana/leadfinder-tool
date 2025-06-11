@@ -549,8 +549,15 @@
 				        </svg>
 				        Low Credits
 				    </button>
-				</div>
+				</div>	
 	        </div>
+			<!-- Add this right after the credits display div, before the closing div of the header -->
+			<button id="logoutBtn" class="flex items-center space-x-2 px-3 py-2 rounded-lg bg-red-600/20 hover:bg-red-600/30 text-red-400 hover:text-red-300 transition-colors border border-red-600/30">
+			    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+			    </svg>
+			    <span>Logout</span>
+			</button>
 	    </div>
 	</header>
 
@@ -6991,6 +6998,29 @@ setTimeout(() => {
 	document.getElementById('lowCreditWarning').addEventListener('click', showPricingPage);
 	
 	});
+
+	// Leadfinder logo click to refresh
+	document.querySelector('h1').closest('div').addEventListener('click', function() {
+	    location.reload();
+	});
+	
+	// Logout button event listener
+	document.getElementById('logoutBtn').addEventListener('click', async function() {
+	    try {
+	        const { error } = await supabaseClient.auth.signOut();
+	        if (error) {
+	            console.error('Logout error:', error);
+	            showCustomToast('Logout Failed', 'Please try again', 'error');
+	        } else {
+	            showCustomToast('Logged Out', 'You have been successfully logged out', 'success');
+	            // The auth state change listener will handle the rest
+	        }
+	    } catch (error) {
+	        console.error('Logout error:', error);
+	        showCustomToast('Logout Failed', 'Please try again', 'error');
+	    }
+	});
+	
     </script>
 
 	<!-- Add this right before </body> -->
