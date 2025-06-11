@@ -3191,9 +3191,9 @@ function updateModalProfile(candidate) {
     if (profileContent) {
         profileContent.innerHTML = `
             ${profileData.map(([label, value]) => `
-                <div class="text-right">
+                <div class="flex justify-between">
                     <span class="text-gray-400">${label}</span>
-                    <span class="text-white">${value}</span>
+                    <span class="text-white text-right">${value}</span>
                 </div>
             `).join('')}
             ${candidate.companyContext ? `
