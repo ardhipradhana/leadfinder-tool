@@ -8498,39 +8498,65 @@ setTimeout(() => {
             </div>
 
             <!-- 4. Data Usage -->
-            <div class="bg-dark-primary rounded-lg p-6">
-                <h3 class="text-lg font-bold text-white mb-4">4. Data Usage & Candidate Information</h3>
-                <div class="space-y-4">
-                    <div class="bg-dark-secondary rounded-lg p-4">
-                        <h4 class="font-semibold text-purple-400 mb-2">What Data We Access</h4>
-                        <p class="text-gray-300 text-sm">
-                            We only access publicly available professional information from platforms like LinkedIn. No private messages, personal contacts, or confidential data is ever accessed.
-                        </p>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="bg-dark-secondary rounded-lg p-4">
-                            <h4 class="font-semibold text-accent-cyan mb-2">Your Responsibilities</h4>
-                            <ul class="text-gray-300 text-sm space-y-1">
-                                <li>• Use candidate data responsibly</li>
-                                <li>• Respect privacy preferences</li>
-                                <li>• Follow employment and privacy laws</li>
-                                <li>• Don't share data without proper consent</li>
-                            </ul>
-                        </div>
-                        
-                        <div class="bg-dark-secondary rounded-lg p-4">
-                            <h4 class="font-semibold text-yellow-400 mb-2">Our Commitments</h4>
-                            <ul class="text-gray-300 text-sm space-y-1">
-                                <li>• Only public data sources</li>
-                                <li>• Secure data transmission</li>
-                                <li>• No selling of candidate information</li>
-                                <li>• Transparent data practices</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
+			<div class="bg-dark-primary rounded-lg p-6">
+			    <h3 class="text-lg font-bold text-white mb-4">4. Data Usage & Candidate Information</h3>
+			    <div class="space-y-4">
+			        <div class="bg-dark-secondary rounded-lg p-4">
+			            <h4 class="font-semibold text-purple-400 mb-2">What Data We Access</h4>
+			            <p class="text-gray-300 text-sm">
+			                We only access publicly available professional information from platforms like LinkedIn through third-party search APIs. No private messages, personal contacts, or confidential data is ever accessed.
+			            </p>
+			        </div>
+			        
+			        <!-- NEW: How We Collect Data -->
+			        <div class="bg-dark-secondary rounded-lg p-4">
+			            <h4 class="font-semibold text-blue-400 mb-2">How We Collect Data</h4>
+			            <p class="text-gray-300 text-sm mb-3">
+			                We use <strong class="text-blue-300">Tavily AI Search API</strong> and other professional search services to access publicly available candidate information. We do not directly scrape or access LinkedIn's servers.
+			            </p>
+			            <div class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3">
+			                <p class="text-blue-300 text-xs">
+			                    <strong>Compliance Note:</strong> All data collection is performed through legitimate third-party search services that comply with platform terms and data protection regulations.
+			                </p>
+			            </div>
+			        </div>
+			        
+			        <!-- UPDATED: Data Sources -->
+			        <div class="bg-dark-secondary rounded-lg p-4">
+			            <h4 class="font-semibold text-green-400 mb-2">Data Sources</h4>
+			            <ul class="text-gray-300 text-sm space-y-1">
+			                <li>• Public LinkedIn profiles (accessed via Tavily API)</li>
+			                <li>• Professional portfolio websites</li>
+			                <li>• Public job board profiles</li>
+			                <li>• Company team pages</li>
+			                <li>• Other publicly available professional information</li>
+			            </ul>
+			        </div>
+			        
+			        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+			            <div class="bg-dark-secondary rounded-lg p-4">
+			                <h4 class="font-semibold text-accent-cyan mb-2">Your Responsibilities</h4>
+			                <ul class="text-gray-300 text-sm space-y-1">
+			                    <li>• Use candidate data responsibly</li>
+			                    <li>• Respect privacy preferences</li>
+			                    <li>• Follow employment and privacy laws</li>
+			                    <li>• Don't share data without proper consent</li>
+			                </ul>
+			            </div>
+			            
+			            <div class="bg-dark-secondary rounded-lg p-4">
+			                <h4 class="font-semibold text-yellow-400 mb-2">Our Commitments</h4>
+			                <ul class="text-gray-300 text-sm space-y-1">
+			                    <li>• Only public data sources</li>
+			                    <li>• Legitimate API-based data access</li>
+			                    <li>• Secure data transmission</li>
+			                    <li>• No selling of candidate information</li>
+			                    <li>• Transparent data practices</li>
+			                </ul>
+			            </div>
+			        </div>
+			    </div>
+			</div>
 
             <!-- 5. Service Availability -->
             <div class="bg-dark-primary rounded-lg p-6">
