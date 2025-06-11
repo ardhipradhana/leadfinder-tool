@@ -2396,6 +2396,7 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
         currentUser = null;
         userCredits = 0;
         updateCreditsDisplay();
+		hideLowCreditsBanner();
         showAuthModal();
     }
 });
