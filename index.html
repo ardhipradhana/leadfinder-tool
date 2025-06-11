@@ -2664,6 +2664,8 @@ async function handleSearch(e) {
         
     } catch (error) {
         if (timeoutId) clearTimeout(timeoutId);
+		isSearching = false;
+	    
         if (error.name === 'AbortError') {
             showCustomToast('Search Timeout', 'Search is taking longer than expected. Please try again.', 'error');
         }
