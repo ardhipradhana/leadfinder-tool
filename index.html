@@ -3279,8 +3279,8 @@ function updateModalGrowthOpportunities(candidate) {
 
     const growthOpportunities = candidate.growthOpportunities || [];
     growthContainer.innerHTML = growthOpportunities.map(opportunity => `
-        <div class="flex items-start space-x-2">
-            <div class="w-2 h-2 bg-accent-cyan rounded-full mt-2"></div>
+        <div class="flex items-center space-x-2">
+            <div class="w-2 h-2 bg-accent-cyan rounded-full flex-shrink-0"></div>
             <span class="text-gray-300 text-sm">${opportunity}</span>
         </div>
     `).join('');
