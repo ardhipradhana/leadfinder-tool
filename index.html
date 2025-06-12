@@ -5005,15 +5005,17 @@ function switchHistoryTab(tabType) {
 
 // Check if candidate is bookmarked
 function isBookmarked(candidateId) {
+    const saved = JSON.parse(localStorage.getItem('leadfinder_saved_candidates') || '[]');
+    
     // First try exact match (for current session)
-    if (savedCandidates.some(candidate => candidate.id === candidateId)) {
+    if (saved.some(candidate => candidate.id === candidateId)) {
         return true;
     }
     
     // Then try originalId match (for cross-session matching)
     const currentCandidate = window.currentCandidates?.find(c => c.id === candidateId);
     if (currentCandidate && currentCandidate.originalId) {
-        return savedCandidates.some(candidate => 
+        return saved.some(candidate => 
             candidate.originalId === currentCandidate.originalId || 
             candidate.id === currentCandidate.originalId
         );
@@ -5086,13 +5088,11 @@ function updateBookmarkIcons() {
     document.querySelectorAll('.bookmark-icon').forEach(icon => {
         const candidateId = icon.dataset.candidateId;
         
-        // Only update if we have a valid candidate ID
         if (candidateId) {
             const bookmarked = isBookmarked(candidateId);
             icon.className = `bookmark-icon ${bookmarked ? 'bookmarked' : 'not-bookmarked'}`;
             icon.title = bookmarked ? 'Remove from saved candidates' : 'Save candidate';
         } else {
-            // Default to not bookmarked if no ID
             icon.className = 'bookmark-icon not-bookmarked';
             icon.title = 'Save candidate';
         }
