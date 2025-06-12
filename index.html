@@ -2629,25 +2629,25 @@ async function handleSearch(e) {
     isSearching = true;
     
     // Check auth first, then credits
-	const hasValidAuth = await checkAuthAndCredits();
-	if (!hasValidAuth) {
-	    isSearching = false;
-	    return; // Auth modal will be shown by checkAuthAndCredits()
-	}
+    const hasValidAuth = await checkAuthAndCredits();
+    if (!hasValidAuth) {
+        isSearching = false;
+        return; // Auth modal will be shown by checkAuthAndCredits()
+    }
 
-	// Check if user has credits
-	if (userCredits <= 0) {
-	    showPricingPage();
-	    isSearching = false;
-	    return;
-	}
-	
-	const creditsRequired = 1;
-	if (userCredits < creditsRequired) {
-	    showCustomToast('Insufficient Credits', `You need ${creditsRequired} credits for this search type.`, 'error');
-	    isSearching = false;
-	    return;
-	}
+    // Check if user has credits
+    if (userCredits <= 0) {
+        showPricingPage();
+        isSearching = false;
+        return;
+    }
+    
+    const creditsRequired = 1;
+    if (userCredits < creditsRequired) {
+        showCustomToast('Insufficient Credits', `You need ${creditsRequired} credits for this search type.`, 'error');
+        isSearching = false;
+        return;
+    }
 
     const formData = new FormData(searchForm);
     const searchParams = {
@@ -2694,56 +2694,72 @@ async function handleSearch(e) {
             })
         });
 
-    	console.log('Response received:', response.status, response.statusText);
-    	console.log('Response headers:', Object.fromEntries(response.headers.entries()));
-        console.log('Webhook response status:', response.status);
+        console.log('Response received:', response.status, response.statusText);
+        console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            const errorText = await response.text();
+            console.log('Error response body:', errorText);
+            throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
         }
 
         const data = await response.json();
         console.log('JSON parsed successfully:', data);
+        
+        // Handle array response from backend
+        const responseData = Array.isArray(data) ? data[0] : data;
+        console.log('Processed response data:', responseData);
         await loadingPromise;
 
-        if (data.success) {
+        if (responseData.success) {
             console.log('Data has success=true, processing results...');
-
-			cancelLoadingAnimation();
+            cancelLoadingAnimation();
             
             // DEDUCT CREDIT AND LOG TRANSACTION (with error handling)
-		try {
-		    const creditDeducted = await deductCredit(1);
-			if (creditDeducted) {
-			    await logCreditTransaction(-1, 'search', `Search: ${searchParams.jobTitle} in ${searchParams.location}`);
-			    await syncCreditsAfterEvent('search_completed');
-			    console.log('Credit deducted successfully');
-			}
-		} catch (creditError) {
-		    console.log('Credit deduction failed, continuing with search:', creditError);
-		}
+            try {
+                const creditDeducted = await deductCredit(1);
+                if (creditDeducted) {
+                    await logCreditTransaction(-1, 'search', `Search: ${searchParams.jobTitle} in ${searchParams.location}`);
+                    await syncCreditsAfterEvent('search_completed');
+                    console.log('Credit deducted successfully');
+                }
+            } catch (creditError) {
+                console.log('Credit deduction failed, continuing with search:', creditError);
+            }
             
-            saveToSearchHistory(searchParams, data.results.totalFound, data.results.candidates);
-            processSearchResults(data);
+            // Use new structure - topCandidatesCount instead of results.totalFound
+            saveToSearchHistory(searchParams, responseData.topCandidatesCount, responseData.candidates);
+            processSearchResults(responseData, searchParams); // Pass searchParams for query reconstruction
             loadingState.classList.add('hidden');
             resultsState.classList.remove('hidden');
+        } else {
+            throw new Error(responseData.error || 'Search failed - no success flag');
         }
+        
         clearTimeout(timeoutId);
         isSearching = false;
         
     } catch (error) {
-	    console.error('Detailed error information:');
-    console.error('Error name:', error.name);
-    console.error('Error message:', error.message);
-    console.error('Error stack:', error.stack);
+        console.error('Detailed error information:');
+        console.error('Error name:', error.name);
+        console.error('Error message:', error.message);
+        console.error('Error stack:', error.stack);
+        
         if (timeoutId) clearTimeout(timeoutId);
-		cancelLoadingAnimation();
-		isSearching = false;
-	    
+        cancelLoadingAnimation();
+        isSearching = false;
+        
         if (error.name === 'AbortError') {
             showCustomToast('Search Timeout', 'Search is taking longer than expected. Please try again.', 'error');
+        } else {
+            // Handle other types of errors
+            console.error('Search failed:', error);
+            showCustomToast('Search Failed', error.message || 'An unexpected error occurred. Please try again.', 'error');
         }
-        console.error('Search failed:', error);
-        isSearching = false;
+        
+        // Show initial state again on error
+        loadingState.classList.add('hidden');
+        initialState.classList.remove('hidden');
     }
 }
 
@@ -2775,48 +2791,63 @@ async function logCreditTransaction(amount, type, description) {
 // --- Results Processing & Candidate Rendering ---
 
 // Process backend results and update UI
-function processSearchResults(data) {
-	// Make candidate IDs unique by adding timestamp
+function processSearchResults(data, searchParams) {
+    // Handle array response from backend
+    const responseData = Array.isArray(data) ? data[0] : data;
+    
+    // Reconstruct the query object from frontend search parameters
+    const reconstructedQuery = {
+        jobTitle: searchParams.jobTitle || "Unknown",
+        industry: searchParams.industry || "General", 
+        location: searchParams.location || "Indonesia",
+        experience: searchParams.experience || "Unknown"
+    };
+    
+    // Create analytics object from the new structure
+    const analytics = {
+        averageScore: Math.round(responseData.candidates.reduce((sum, c) => sum + c.aiScore, 0) / responseData.candidates.length),
+        highScoreCandidates: responseData.candidates.filter(c => c.aiScore >= 80).length,
+        mediumScoreCandidates: responseData.candidates.filter(c => c.aiScore >= 60 && c.aiScore < 80).length,
+        lowScoreCandidates: responseData.candidates.filter(c => c.aiScore < 60).length,
+        searchQuality: "Good",
+        recommendedAction: "Contact top candidates and review medium-priority options"
+    };
+
+    // Make candidate IDs unique by adding timestamp
     const searchTimestamp = Date.now();
-    data.results.candidates = data.results.candidates.map((candidate, index) => ({
+    responseData.candidates = responseData.candidates.map((candidate, index) => ({
         ...candidate,
         id: `${candidate.id}_${searchTimestamp}`,
         originalId: candidate.id // Keep original for reference
     }));
+    
     // Store candidates globally for modal access
-    currentCandidates = data.results.candidates;
+    currentCandidates = responseData.candidates;
+    
     // Update results description
     const resultsTitle = document.querySelector('#resultsState h3');
     const resultsDesc = document.querySelector('#resultsState p');
     
     if (resultsTitle && resultsDesc) {
         resultsTitle.textContent = 'Search Results';
-        resultsDesc.textContent = `Found ${data.results.totalFound} candidates matching "${data.query.jobTitle}" in ${data.query.location}`;
+        resultsDesc.textContent = `Found ${responseData.topCandidatesCount} candidates matching "${reconstructedQuery.jobTitle}" in ${reconstructedQuery.location}`;
     }
     
     // Update candidate cards with real data
-    updateCandidateCards(data.results.candidates);
+    updateCandidateCards(responseData.candidates);
     
-    // Update analytics if you have an analytics section
-    if (data.analytics) updateAnalytics(data.analytics);
+    // Update analytics
+    if (analytics) updateAnalytics(analytics);
 
-    // Save to local search history as well
-    // saveToSearchHistory(data.query, data.results.totalFound, data.results.candidates);
-    updateSearchHistoryUI();
-
-    // Update AI Insights
-	console.log('About to generate AI insights with query:', data.query);
-	const aiInsights = generateAIInsights(data.results.candidates, data.query);
-	console.log('Generated insights:', aiInsights);
-	
-	// Update insights text with markdown-style formatting
-	const formattedInsights = aiInsights.replace(/\*\*(.*?)\*\*/g, '<strong class="text-accent-cyan">$1</strong>');
-	document.getElementById('aiInsightsText').innerHTML = formattedInsights;
-	
-	// Generate and populate stats grid
-	const statsGrid = generateStatsGrid(data.results.candidates);
-	document.getElementById('statsGrid').innerHTML = statsGrid;
-	
+    // Update AI Insights with reconstructed query
+    const aiInsights = generateAIInsights(responseData.candidates, reconstructedQuery);
+    const formattedInsights = aiInsights.replace(/\*\*(.*?)\*\*/g, '<strong class="text-accent-cyan">$1</strong>');
+    document.getElementById('aiInsightsText').innerHTML = formattedInsights;
+    
+    // Generate and populate stats grid
+    const statsGrid = generateStatsGrid(responseData.candidates);
+    document.getElementById('statsGrid').innerHTML = statsGrid;
+    
     // Setup result filters
     setTimeout(() => {
         setupResultFilters();
