@@ -2694,6 +2694,8 @@ async function handleSearch(e) {
             })
         });
 
+    	console.log('Response received:', response.status, response.statusText);
+    	console.log('Response headers:', Object.fromEntries(response.headers.entries()));
         console.log('Webhook response status:', response.status);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -2729,6 +2731,10 @@ async function handleSearch(e) {
         isSearching = false;
         
     } catch (error) {
+	    console.error('Detailed error information:');
+    console.error('Error name:', error.name);
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
         if (timeoutId) clearTimeout(timeoutId);
 		cancelLoadingAnimation();
 		isSearching = false;
