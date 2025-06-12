@@ -8781,5 +8781,33 @@ setTimeout(() => {
     </div>
 </div>
 
+<script>
+// Fix missing functions
+let currentCandidates = [];
+
+function isBookmarked(candidateId) {
+    const saved = JSON.parse(localStorage.getItem('leadfinder_saved_candidates') || '[]');
+    const currentCandidate = currentCandidates.find(c => c.id === candidateId);
+    
+    if (!currentCandidate) return false;
+    
+    return saved.some(savedCandidate => {
+        return savedCandidate.originalId === currentCandidate.originalId || 
+               savedCandidate.name === currentCandidate.name;
+    });
+}
+
+function updateBookmarkIcons() {
+    document.querySelectorAll('.bookmark-icon').forEach(icon => {
+        const candidateId = icon.dataset.candidateId;
+        if (candidateId) {
+            const bookmarked = isBookmarked(candidateId);
+            icon.className = `bookmark-icon ${bookmarked ? 'bookmarked' : 'not-bookmarked'}`;
+            icon.title = bookmarked ? 'Remove from saved candidates' : 'Save candidate';
+        }
+    });
+}
+</script>
+	
 </body>
 </html>
