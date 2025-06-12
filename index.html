@@ -1780,6 +1780,7 @@ let currentHistoryData = [];
 let isSearching = false;
 let isAnalyzing = false;
 let loadingCancelled = false;
+let savedCandidates = JSON.parse(localStorage.getItem('leadfinder_saved_candidates') || '[]');
 window.showPricingPage = showPricingPage;
 window.showPrivacyPolicy = showPrivacyPolicy;
 window.showHowItWorks = showHowItWorks;
@@ -5003,9 +5004,6 @@ function switchHistoryTab(tabType) {
         document.getElementById('analyticsHistoryContent').classList.remove('hidden');
     }
 }
-
-// Bookmark Management System
-let savedCandidates = JSON.parse(localStorage.getItem('leadfinder_saved_candidates') || '[]');
 
 // Check if candidate is bookmarked
 function isBookmarked(candidateId) {
