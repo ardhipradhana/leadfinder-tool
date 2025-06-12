@@ -2825,6 +2825,7 @@ function processSearchResults(data, searchParams) {
     // Store candidates globally for modal access
     currentCandidates = responseData.candidates;
 	console.log('✅ SET currentCandidates:', currentCandidates?.length, 'candidates'); 
+	setTimeout(() => console.log('⏰ currentCandidates after 1 second:', currentCandidates?.length), 1000);
     
     // Update results description
     const resultsTitle = document.querySelector('#resultsState h3');
