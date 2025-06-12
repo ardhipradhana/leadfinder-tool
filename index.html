@@ -1771,9 +1771,7 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 
 let currentUser = null;
 let userCredits = 0;
-	console.log('Step 3: Variables declared');
 let currentSearchResults = [];
-let currentCandidates = [];
 let progressInterval = null;
 let activeCandidate = null;
 let currentHistoryData = [];
@@ -2888,8 +2886,8 @@ function showHistorySearchResult(searchData) {
     updateCandidateCards(searchData.candidates || []);
     
     // Update the global candidate state for filtering
-	currentCandidates = candidatesWithUniqueIds;
-    currentCandidates = searchData.candidates || [];
+	window.currentCandidates = candidatesWithUniqueIds;
+    window.currentCandidates = searchData.candidates || [];
     attachCandidateCardHandlers(currentCandidates);
     
     // Update AI Insights for this search
@@ -5208,7 +5206,7 @@ function showSavedCandidatesInMainView() {
     }
     
     // Show saved candidates in main view
-    currentCandidates = savedCands; // Set global candidates
+    window.currentCandidates = savedCands;
     
     // Update results description
     const resultsTitle = document.querySelector('#resultsState h3');
