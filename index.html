@@ -2682,6 +2682,7 @@ async function handleSearch(e) {
         const response = await fetch('https://montpro.app.n8n.cloud/webhook/leadfinder-tool', {
             method: 'POST',
             signal: controller.signal,
+			keepalive: true,
             headers: { 
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer leadfinder_secretkey123`,
