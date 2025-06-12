@@ -5007,7 +5007,21 @@ let savedCandidates = JSON.parse(localStorage.getItem('leadfinder_saved_candidat
 
 // Check if candidate is bookmarked
 function isBookmarked(candidateId) {
-    return savedCandidates.some(candidate => candidate.id === candidateId);
+    // First try exact match (for current session)
+    if (savedCandidates.some(candidate => candidate.id === candidateId)) {
+        return true;
+    }
+    
+    // Then try originalId match (for cross-session matching)
+    const currentCandidate = currentCandidates.find(c => c.id === candidateId);
+    if (currentCandidate && currentCandidate.originalId) {
+        return savedCandidates.some(candidate => 
+            candidate.originalId === currentCandidate.originalId || 
+            candidate.id === currentCandidate.originalId
+        );
+    }
+    
+    return false;
 }
 
 // Toggle bookmark status
@@ -5016,23 +5030,26 @@ function toggleBookmark(candidateId) {
     if (!candidate) return;
     
     if (isBookmarked(candidateId)) {
-        // Remove bookmark
-        savedCandidates = savedCandidates.filter(c => c.id !== candidateId);
+        // Remove bookmark - check both id and originalId
+        savedCandidates = savedCandidates.filter(c => 
+            c.id !== candidateId && 
+            c.originalId !== candidate.originalId &&
+            c.id !== candidate.originalId
+        );
         showCustomToast('Removed', `${candidate.name} removed from saved candidates`, 'info');
     } else {
-        // Add bookmark (check limit)
+        // Add bookmark
         if (savedCandidates.length >= 50) {
             showCustomToast('Limit Reached', 'Maximum 50 candidates can be saved. Remove some candidates first.', 'error');
             return;
         }
         
-        // Add timestamp for when it was saved
         const candidateWithTimestamp = {
             ...candidate,
             savedAt: new Date().toISOString()
         };
         
-        savedCandidates.unshift(candidateWithTimestamp); // Add to beginning
+        savedCandidates.unshift(candidateWithTimestamp);
         showCustomToast('Saved', `${candidate.name} added to saved candidates`, 'success');
     }
     
