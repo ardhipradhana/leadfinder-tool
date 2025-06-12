@@ -3042,6 +3042,19 @@ function getSourceBadge(source) {
     </span>`;
 }
 
+function createSnippet(candidate) {
+    const recommendation = candidate.recommendation || '';
+    
+    // Extract the meaningful part after the priority label
+    const cleaned = recommendation
+        .replace(/^(High|Medium|Low)\s+priority\s+contact\s*[-–]?\s*/i, '')
+        .replace(/^(High|Medium|Low)\s+priority\s*[-–]?\s*/i, '')
+        .trim();
+    
+    // Capitalize first letter if needed
+    return cleaned.charAt(0).toUpperCase() + cleaned.slice(1) || 'Experienced professional in relevant field';
+}
+
 // Render 1 candidate card as HTML
 function createCandidateCardHTML(candidate) {
 	console.log(`=== RENDERING CARD FOR: ${candidate.name} ===`);
@@ -3123,13 +3136,12 @@ function createCandidateCardHTML(candidate) {
                         </div>
                         
                         <!-- Description -->
-                        <p class="text-gray-300 text-sm leading-relaxed mb-4">${candidate.snippet}</p>
+                        <p class="text-gray-300 text-sm leading-relaxed mb-4">${createSnippet(candidate)}</p>
                         
                         <!-- Footer Info -->
                         <div class="flex items-center justify-between pt-3 border-t border-gray-700/50">
                             <div class="flex items-center space-x-4">
                                 <span class="text-xs text-gray-500">Profile Available</span>
-                                <span class="text-xs text-gray-500">${candidate.lastUpdated}</span>
                                 ${getVerificationBadge(candidate.verificationStatus)}
                             </div>
                             
