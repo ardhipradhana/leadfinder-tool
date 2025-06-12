@@ -2824,7 +2824,7 @@ function processSearchResults(data, searchParams) {
     }));
     
     // Store candidates globally for modal access
-    currentCandidates = responseData.candidates;
+    window.currentCandidates = responseData.candidates;
 	console.log('✅ SET currentCandidates:', currentCandidates?.length, 'candidates'); 
 	setTimeout(() => console.log('⏰ currentCandidates after 1 second:', currentCandidates?.length), 1000);
     
@@ -5013,7 +5013,7 @@ function isBookmarked(candidateId) {
     }
     
     // Then try originalId match (for cross-session matching)
-    const currentCandidate = currentCandidates.find(c => c.id === candidateId);
+    const currentCandidate = window.currentCandidates?.find(c => c.id === candidateId);
     if (currentCandidate && currentCandidate.originalId) {
         return savedCandidates.some(candidate => 
             candidate.originalId === currentCandidate.originalId || 
