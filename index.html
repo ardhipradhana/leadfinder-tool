@@ -2854,6 +2854,8 @@ function processSearchResults(data, searchParams) {
     setTimeout(() => {
         setupResultFilters();
     }, 100);
+
+	updateBookmarkIcons();
 }
 
 function showHistorySearchResult(searchData) {
@@ -5026,12 +5028,15 @@ function isBookmarked(candidateId) {
 
 // Toggle bookmark status
 function toggleBookmark(candidateId) {
-    const candidate = currentCandidates.find(c => c.id === candidateId);
+    const candidate = window.currentCandidates?.find(c => c.id === candidateId);
     if (!candidate) return;
+    
+    // Read from localStorage directly
+    let saved = JSON.parse(localStorage.getItem('leadfinder_saved_candidates') || '[]');
     
     if (isBookmarked(candidateId)) {
         // Remove bookmark - check both id and originalId
-        savedCandidates = savedCandidates.filter(c => 
+        saved = saved.filter(c => 
             c.id !== candidateId && 
             c.originalId !== candidate.originalId &&
             c.id !== candidate.originalId
@@ -5039,7 +5044,7 @@ function toggleBookmark(candidateId) {
         showCustomToast('Removed', `${candidate.name} removed from saved candidates`, 'info');
     } else {
         // Add bookmark
-        if (savedCandidates.length >= 50) {
+        if (saved.length >= 50) {
             showCustomToast('Limit Reached', 'Maximum 50 candidates can be saved. Remove some candidates first.', 'error');
             return;
         }
@@ -5049,12 +5054,12 @@ function toggleBookmark(candidateId) {
             savedAt: new Date().toISOString()
         };
         
-        savedCandidates.unshift(candidateWithTimestamp);
+        saved.unshift(candidateWithTimestamp);
         showCustomToast('Saved', `${candidate.name} added to saved candidates`, 'success');
     }
     
-    // Update localStorage
-    localStorage.setItem('leadfinder_saved_candidates', JSON.stringify(savedCandidates));
+    // Write back to localStorage directly
+    localStorage.setItem('leadfinder_saved_candidates', JSON.stringify(saved));
     
     // Update UI
     updateBookmarkCounter();
