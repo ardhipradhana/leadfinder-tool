@@ -6560,8 +6560,8 @@ setTimeout(() => {
 	});
 	// LinkedIn button click handler
 	document.getElementById('viewLinkedInBtn').addEventListener('click', function() {
-	    if (activeCandidate && activeCandidate.profileUrl) {
-	        window.open(activeCandidate.profileUrl, '_blank');
+	    if (activeCandidate && activeCandidate.url) {
+	        window.open(activeCandidate.url, '_blank');
 	    } else {
 	        showCustomToast('Not Available', 'LinkedIn profile URL not available for this candidate', 'info');
 	    }
