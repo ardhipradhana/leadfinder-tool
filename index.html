@@ -5060,6 +5060,8 @@ function toggleBookmark(candidateId) {
     
     // Write back to localStorage directly
     localStorage.setItem('leadfinder_saved_candidates', JSON.stringify(saved));
+    // Keep global variable in sync
+    savedCandidates = saved;
     
     // Update UI
     updateBookmarkCounter();
