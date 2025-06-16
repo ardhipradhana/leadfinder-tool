@@ -4837,30 +4837,30 @@ function exportCandidateToPDF(candidate) {
     function addSubSection(title, content, borderColor) {
         if (!content) return;
         
-        checkNewPage(25);
+        checkNewPage(30);
         
-        // Subsection header
+        // Subsection header with better spacing
         doc.setFontSize(10);
         doc.setFont(undefined, "bold");
         doc.setTextColor(...borderColor);
         doc.text(title, margin, yPos);
         
-        yPos += 6;
+        yPos += 8;
         
-        // Content with left border
+        // Content with left border and better formatting
         doc.setDrawColor(...borderColor);
         doc.setLineWidth(2);
-        doc.line(margin + 3, yPos - 2, margin + 3, yPos + 15);
+        doc.line(margin + 3, yPos - 2, margin + 3, yPos + 20);
         
         doc.setFontSize(9);
         doc.setFont(undefined, "normal");
         doc.setTextColor(...colors.dark);
         
         const cleanContent = content.replace(/<br>/g, '\n').replace(/&nbsp;/g, ' ');
-        const wrappedContent = doc.splitTextToSize(cleanContent, contentWidth - 15);
-        doc.text(wrappedContent, margin + 8, yPos);
+        const wrappedContent = doc.splitTextToSize(cleanContent, contentWidth - 20);
+        doc.text(wrappedContent, margin + 10, yPos + 2);
         
-        yPos += Math.max(15, wrappedContent.length * 4 + 5);
+        yPos += Math.max(20, wrappedContent.length * 4 + 8);
     }
     
     // ===== HEADER =====
@@ -5115,18 +5115,19 @@ function exportCandidateToPDF(candidate) {
             if (sections.executiveSummary) {
                 addSectionHeader('Executive Summary', colors.purple);
                 
-                doc.setFillColor(147, 51, 234, 0.1);
+                // WHITE background with purple border
+                doc.setFillColor(255, 255, 255);
                 doc.setDrawColor(147, 51, 234, 0.3);
                 doc.setLineWidth(1);
-                doc.rect(margin, yPos, contentWidth, 15, 'FD');
+                doc.rect(margin, yPos, contentWidth, 18, 'FD');
                 
                 doc.setFontSize(9);
                 doc.setFont(undefined, "normal");
                 doc.setTextColor(...colors.dark);
-                const wrappedSummary = doc.splitTextToSize(sections.executiveSummary, contentWidth - 6);
-                doc.text(wrappedSummary, margin + 3, yPos + 5);
+                const wrappedSummary = doc.splitTextToSize(sections.executiveSummary, contentWidth - 8);
+                doc.text(wrappedSummary, margin + 4, yPos + 6);
                 
-                yPos += Math.max(15, wrappedSummary.length * 4 + 10);
+                yPos += Math.max(18, wrappedSummary.length * 4 + 12);
             }
             
             // Current Strengths
@@ -5178,18 +5179,19 @@ function exportCandidateToPDF(candidate) {
             if (sections.riskAssessment) {
                 addSectionHeader('Risk Assessment', colors.red);
                 
-                doc.setFillColor(239, 68, 68, 0.1);
+                // WHITE background with red border
+                doc.setFillColor(255, 255, 255);
                 doc.setDrawColor(239, 68, 68, 0.3);
                 doc.setLineWidth(1);
-                doc.rect(margin, yPos, contentWidth, 15, 'FD');
+                doc.rect(margin, yPos, contentWidth, 18, 'FD');
                 
                 doc.setFontSize(9);
                 doc.setFont(undefined, "normal");
                 doc.setTextColor(...colors.dark);
-                const wrappedRisk = doc.splitTextToSize(sections.riskAssessment, contentWidth - 6);
-                doc.text(wrappedRisk, margin + 3, yPos + 5);
+                const wrappedRisk = doc.splitTextToSize(sections.riskAssessment, contentWidth - 8);
+                doc.text(wrappedRisk, margin + 4, yPos + 6);
                 
-                yPos += Math.max(15, wrappedRisk.length * 4 + 10);
+                yPos += Math.max(18, wrappedRisk.length * 4 + 12);
             }
         }
     }
@@ -5205,23 +5207,24 @@ function exportCandidateToPDF(candidate) {
         
         yPos += 12;
         
+        // Better spacing and formatting for AI Recommendation box
         doc.setFillColor(0, 212, 170, 0.1);
         doc.setDrawColor(0, 212, 170, 0.3);
         doc.setLineWidth(1);
-        doc.rect(margin, yPos, contentWidth, 20, 'FD');
+        doc.rect(margin, yPos, contentWidth, 25, 'FD');
         
         const priority = candidate.priority || 'medium';
         doc.setFontSize(10);
         doc.setFont(undefined, "bold");
         doc.setTextColor(...colors.primary);
-        doc.text(`${priority.charAt(0).toUpperCase() + priority.slice(1)} Priority Contact:`, margin + 3, yPos + 6);
+        doc.text(`${priority.charAt(0).toUpperCase() + priority.slice(1)} Priority Contact:`, margin + 4, yPos + 8);
         
         doc.setFont(undefined, "normal");
         doc.setTextColor(...colors.dark);
-        const recText = doc.splitTextToSize(candidate.recommendation, contentWidth - 6);
-        doc.text(recText, margin + 3, yPos + 12);
+        const recText = doc.splitTextToSize(candidate.recommendation, contentWidth - 10);
+        doc.text(recText, margin + 4, yPos + 15);
         
-        yPos += Math.max(20, recText.length * 4 + 15);
+        yPos += Math.max(25, recText.length * 4 + 18);
     }
     
     // ===== FOOTER =====
@@ -5242,6 +5245,102 @@ function exportCandidateToPDF(candidate) {
     const cleanName = candidate.name.replace(/[^a-zA-Z0-9]/g, '_');
     const fileName = `Leadfinder_${cleanName}_${new Date().toISOString().split('T')[0]}.pdf`;
     doc.save(fileName);
+}
+
+// Helper functions for parsing analytics (matching web logic)
+function parseCareerAnalyticsForPDF(rawText) {
+    if (!rawText) return null;
+    
+    const sections = {
+        executiveSummary: '',
+        currentStrengths: '',
+        growthPotential: '',
+        careerTrajectory: '',
+        riskAssessment: '',
+        hiringRecommendation: ''
+    };
+    
+    // Split by emoji headers (matching web parsing)
+    const parts = rawText.split(/(?=🏆|📈|💰|🎯|🌐|🔍|📊|⚡)/);
+    
+    parts.forEach(part => {
+        if (part.includes('🏆 Potential Rating')) {
+            const potentialMatch = part.match(/Potential Rating: (\d+\/100)/);
+            const levelMatch = part.match(/Current Level: (\d+\/100)/);
+            const speedMatch = part.match(/Development Speed: ([^)]+\))/);
+            
+            if (potentialMatch && levelMatch && speedMatch) {
+                sections.executiveSummary = `${potentialMatch[1]} potential rating with ${levelMatch[1]} current performance level. ${speedMatch[1]} development timeline.`;
+            }
+        }
+        
+        if (part.includes('📈 Career Trajectory') || part.includes('💰 Compensation')) {
+            sections.careerTrajectory += part;
+        }
+        
+        if (part.includes('🎯 Strategic Development') || part.includes('⚡ Acceleration Strategies')) {
+            sections.growthPotential += part;
+        }
+        
+        if (part.includes('📊 Peer Benchmarking') || part.includes('🌐 Market Intelligence')) {
+            sections.currentStrengths += part;
+        }
+        
+        if (part.includes('🔍 Risk Assessment')) {
+            sections.riskAssessment = part;
+        }
+    });
+    
+    // Clean up sections
+    Object.keys(sections).forEach(key => {
+        if (sections[key]) {
+            sections[key] = cleanAndFormatSectionForPDF(sections[key]);
+        }
+    });
+    
+    return sections;
+}
+
+function cleanAndFormatSectionForPDF(text) {
+    if (!text) return '';
+    
+    return text
+        .replace(/^🏆.*?\n/gm, '')
+        .replace(/^📈.*?\n/gm, '')
+        .replace(/^💰.*?\n/gm, '')
+        .replace(/^🎯.*?\n/gm, '')
+        .replace(/^🌐.*?\n/gm, '')
+        .replace(/^🔍.*?\n/gm, '')
+        .replace(/^📊.*?\n/gm, '')
+        .replace(/^⚡.*?\n/gm, '')
+        .replace(/\n\n\n+/g, '\n\n')
+        .trim();
+}
+
+function formatSubSectionForPDF(text, sectionType) {
+    if (!text) return '';
+    
+    const paragraphs = text.split('\n\n');
+    
+    if (sectionType === 'Market Intelligence') {
+        return paragraphs[0] ? paragraphs[0].replace(/\n/g, ' ') : '';
+    } else if (sectionType === 'Peer Benchmarking') {
+        return paragraphs[1] ? paragraphs[1].replace(/\n/g, ' ') : '';
+    } else if (sectionType === 'Career Trajectory') {
+        return paragraphs[0] ? paragraphs[0].replace(/\n/g, ' ') : '';
+    } else if (sectionType === 'Compensation') {
+        return paragraphs[1] ? paragraphs[1].replace(/\n/g, ' ') : '';
+    } else if (sectionType === 'Strategic Development') {
+        const lines = text.split('\n');
+        const strategicLines = lines.slice(0, 3);
+        return strategicLines.join(' ');
+    } else if (sectionType === 'Acceleration') {
+        const lines = text.split('\n');
+        const accelerationLines = lines.filter(line => line.startsWith('- '));
+        return accelerationLines.join(' ');
+    }
+    
+    return text.replace(/\n/g, ' ');
 }
 
 // Helper functions for parsing analytics (matching web logic)
