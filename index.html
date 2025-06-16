@@ -4780,7 +4780,7 @@ function exportCandidateToCSV(candidate) {
     document.body.removeChild(a);
 }
 
-// Professional PDF Export - Fixed Layout & Stellar Analytics Section
+// Professional PDF Export - Clean Design Without Icons
 function exportCandidateToPDF(candidate) {
     if (!candidate) return;
     
@@ -4975,7 +4975,7 @@ function exportCandidateToPDF(candidate) {
         candidate.strengths.forEach(strength => {
             checkNewPage(10);
             
-            // Bullet point
+            // Simple bullet point (no special characters)
             doc.setFillColor(...colors.success);
             doc.circle(margin + 3, yPos - 2, 1.5, 'F');
             
@@ -5007,7 +5007,7 @@ function exportCandidateToPDF(candidate) {
         candidate.concerns.forEach(concern => {
             checkNewPage(10);
             
-            // Warning icon
+            // Simple triangle (no special characters)
             doc.setFillColor(...colors.warning);
             doc.triangle(margin + 1, yPos + 1, margin + 3, yPos - 2, margin + 5, yPos + 1, 'F');
             
@@ -5025,31 +5025,34 @@ function exportCandidateToPDF(candidate) {
         addDivider();
     }
     
-    // ===== STELLAR CAREER ANALYTICS SECTION =====
+    // ===== CLEAN CAREER ANALYTICS SECTION =====
     const hasAnalytics = candidate.careerAnalytics || candidate.growthPotential;
     
     if (hasAnalytics) {
         checkNewPage(80);
         
-        // Section header with special styling
+        // Section header with clean styling (NO ICONS)
         doc.setFillColor(...colors.secondary);
         doc.rect(margin - 5, yPos - 5, contentWidth + 10, 15, 'F');
         
         doc.setFontSize(16);
         doc.setFont(undefined, "bold");
         doc.setTextColor(255, 255, 255);
-        doc.text('🚀 CAREER PREDICTIVE ANALYTICS', margin, yPos + 6);
+        doc.text('CAREER PREDICTIVE ANALYTICS', margin, yPos + 6);
         
         yPos += 20;
         
-        // Parse and structure analytics data
+        // Parse analytics data
         if (candidate.careerAnalytics) {
-            const analyticsText = candidate.careerAnalytics.toString();
+            const analyticsText = candidate.careerAnalytics.toString()
+                .replace(/[^\w\s\-.,()%/:]/g, '') // Remove ALL special characters
+                .replace(/\s+/g, ' ')
+                .trim();
             
             // Extract key metrics with improved parsing
             const extractMetric = (text, pattern) => {
                 const match = text.match(pattern);
-                return match ? match[1] : 'Not specified';
+                return match ? match[1].trim() : 'Not specified';
             };
             
             const potentialRating = extractMetric(analyticsText, /Potential Rating[:\s]*(\d+\/100[^)]*\)?)/) || '75/100';
@@ -5059,15 +5062,14 @@ function exportCandidateToPDF(candidate) {
             const marketValue = extractMetric(analyticsText, /Current Market Value[:\s]*([^N]*?)(?=Next|$)/) || 'IDR 20-30M/month';
             const nextValue = extractMetric(analyticsText, /Next Role Value[:\s]*([^P]*?)(?=Peak|$)/) || 'IDR 35-50M/month';
             
-            // Key Metrics Cards
+            // Key Metrics Cards (2x2 grid)
             const metricsData = [
                 { label: 'Potential Rating', value: potentialRating, color: colors.success },
                 { label: 'Current Level', value: currentLevel, color: colors.primary },
-                { label: 'Market Value', value: marketValue.trim(), color: colors.accent },
-                { label: 'Next Role Value', value: nextValue.trim(), color: colors.warning }
+                { label: 'Market Value', value: marketValue, color: colors.accent },
+                { label: 'Next Role Value', value: nextValue, color: colors.warning }
             ];
             
-            // Draw metrics in a 2x2 grid
             metricsData.forEach((metric, index) => {
                 const col = index % 2;
                 const row = Math.floor(index / 2);
@@ -5096,11 +5098,11 @@ function exportCandidateToPDF(candidate) {
             
             yPos += 60;
             
-            // Career Trajectory Section
+            // Career Trajectory Section (NO ICONS)
             doc.setFontSize(12);
             doc.setFont(undefined, "bold");
             doc.setTextColor(...colors.secondary);
-            doc.text('🎯 CAREER TRAJECTORY', margin, yPos);
+            doc.text('CAREER TRAJECTORY', margin, yPos);
             
             addSpace(10);
             
@@ -5117,7 +5119,7 @@ function exportCandidateToPDF(candidate) {
             
             doc.setFont(undefined, "bold");
             doc.setTextColor(...colors.secondary);
-            const nextPosText = doc.splitTextToSize(nextPosition.trim(), contentWidth - 40);
+            const nextPosText = doc.splitTextToSize(nextPosition, contentWidth - 40);
             doc.text(nextPosText, margin + 3, yPos + 11);
             
             yPos += 20;
@@ -5130,12 +5132,12 @@ function exportCandidateToPDF(candidate) {
             
             yPos += 15;
             
-            // Growth Areas Section
+            // Growth Areas Section (NO ICONS)
             if (analyticsText.includes('Growth Areas') || analyticsText.includes('Strategic Development')) {
                 doc.setFontSize(12);
                 doc.setFont(undefined, "bold");
                 doc.setTextColor(...colors.accent);
-                doc.text('⚡ KEY GROWTH AREAS', margin, yPos);
+                doc.text('KEY GROWTH AREAS', margin, yPos);
                 
                 addSpace(10);
                 
@@ -5151,7 +5153,7 @@ function exportCandidateToPDF(candidate) {
                     growthAreas.forEach((area, index) => {
                         checkNewPage(8);
                         
-                        // Growth area bullet
+                        // Simple bullet point
                         doc.setFillColor(...colors.accent);
                         doc.circle(margin + 3, yPos - 1, 1.5, 'F');
                         
@@ -5169,12 +5171,12 @@ function exportCandidateToPDF(candidate) {
                 addSpace(10);
             }
             
-            // Risk Assessment
+            // Risk Assessment (NO ICONS)
             if (analyticsText.includes('Risk Assessment')) {
                 doc.setFontSize(12);
                 doc.setFont(undefined, "bold");
                 doc.setTextColor(...colors.danger);
-                doc.text('🛡️ RISK ASSESSMENT', margin, yPos);
+                doc.text('RISK ASSESSMENT', margin, yPos);
                 
                 addSpace(8);
                 
@@ -5299,7 +5301,7 @@ function exportCandidateToPDF(candidate) {
     const fileName = `Leadfinder_${cleanName}_${new Date().toISOString().split('T')[0]}.pdf`;
     doc.save(fileName);
 }
-
+	
 // Export one candidate to Clipboard
 function exportCandidateToClipboard(candidate) {
     if (!candidate) return;
