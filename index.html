@@ -5071,22 +5071,13 @@ function toggleBookmark(candidateId) {
 
 // Update bookmark counter (FIXED VERSION)
 function updateBookmarkCounter() {
-    // Update both possible elements
-    const headerText = document.getElementById('savedCandidatesHeaderText');
     const savedCount = document.getElementById('savedCount');
     const count = savedCandidates.length;
-    
-    // Update the span in the header button
+
     if (savedCount) {
         savedCount.textContent = count.toString();
     }
-    
-    // Keep the old one for backward compatibility
-    if (headerText) {
-        headerText.textContent = count === 0 ? '0 saved' : 
-                                 count === 1 ? '1 saved' : 
-                                 `${count} saved`;
-    }
+
     console.log('Bookmarks updated:', savedCandidates.length);
 }
 
