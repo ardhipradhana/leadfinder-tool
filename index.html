@@ -4780,36 +4780,35 @@ function exportCandidateToCSV(candidate) {
     document.body.removeChild(a);
 }
 
-// Professional PDF Export - Clean Design Without Icons
+// PDF Export that EXACTLY matches the web candidate modal
 function exportCandidateToPDF(candidate) {
     if (!candidate) return;
     
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
     
-    // Professional color palette
+    // Colors matching web interface
     const colors = {
-        primary: [0, 150, 136],      
-        secondary: [63, 81, 181],    
-        accent: [255, 193, 7],       
-        success: [76, 175, 80],      
-        warning: [255, 152, 0],      
-        danger: [244, 67, 54],       
-        dark: [33, 33, 33],          
-        medium: [117, 117, 117],     
-        light: [189, 189, 189],      
-        background: [250, 250, 250]  
+        primary: [0, 212, 170],      // accent-cyan from web
+        secondary: [99, 102, 241],   // indigo from web
+        dark: [31, 41, 55],          // gray-800 from web  
+        medium: [107, 114, 128],     // gray-500 from web
+        light: [209, 213, 219],      // gray-300 from web
+        success: [34, 197, 94],      // green-500 from web
+        warning: [245, 158, 11],     // amber-500 from web
+        danger: [239, 68, 68],       // red-500 from web
+        blue: [59, 130, 246],        // blue-500 from web
+        purple: [147, 51, 234],      // purple-600 from web
+        background: [17, 24, 39]     // dark-primary from web
     };
     
     let yPos = 20;
     const margin = 20;
-    const pageWidth = 210;
-    const contentWidth = pageWidth - (margin * 2);
+    const contentWidth = 170;
     
-    // Helper functions
     function addSpace(space = 8) { yPos += space; }
-    function checkNewPage(requiredSpace = 30) {
-        if (yPos + requiredSpace > 280) {
+    function checkNewPage(space = 30) {
+        if (yPos + space > 280) {
             doc.addPage();
             yPos = 20;
             return true;
@@ -4817,115 +4816,81 @@ function exportCandidateToPDF(candidate) {
         return false;
     }
     
-    function addDivider() {
-        addSpace(5);
-        doc.setDrawColor(...colors.light);
-        doc.setLineWidth(0.5);
-        doc.line(margin, yPos, margin + contentWidth, yPos);
-        addSpace(5);
-    }
-    
-    // ===== HEADER SECTION =====
+    // ===== HEADER - Matching Web =====
+    // Header background
     doc.setFillColor(...colors.primary);
-    doc.rect(margin, yPos, contentWidth, 25, 'F');
+    doc.rect(margin, yPos, contentWidth, 20, 'F');
     
-    // Logo circle
+    // LF Logo
     doc.setFillColor(255, 255, 255);
-    doc.circle(margin + 12, yPos + 12.5, 8, 'F');
-    
-    // Logo text
-    doc.setFontSize(14);
+    doc.circle(margin + 10, yPos + 10, 6, 'F');
+    doc.setFontSize(10);
     doc.setFont(undefined, "bold");
     doc.setTextColor(...colors.primary);
-    doc.text('LF', margin + 8, yPos + 16);
+    doc.text('LF', margin + 7, yPos + 13);
     
     // Title
-    doc.setFontSize(18);
+    doc.setFontSize(16);
     doc.setFont(undefined, "bold");
     doc.setTextColor(255, 255, 255);
-    doc.text('CANDIDATE PROFILE', margin + 30, yPos + 16);
+    doc.text('CANDIDATE PROFILE', margin + 25, yPos + 13);
     
-    yPos += 35;
-    addSpace(10);
+    yPos += 30;
     
-    // ===== CANDIDATE INFO SECTION =====
+    // ===== CANDIDATE HEADER - Exactly like web modal =====
     // Name
-    doc.setFontSize(22);
+    doc.setFontSize(20);
     doc.setFont(undefined, "bold");
     doc.setTextColor(...colors.dark);
     doc.text(candidate.name, margin, yPos);
     
-    // AI Score badge (properly centered)
-    const scoreColor = candidate.aiScore >= 80 ? colors.success : 
-                      candidate.aiScore >= 60 ? colors.warning : colors.danger;
+    // AI Score circle (top right) - exactly like web
+    const scoreRadius = 15;
+    const scoreX = margin + contentWidth - 30;
+    const scoreY = yPos - 5;
     
-    const badgeWidth = 35;
-    const badgeHeight = 18;
-    const badgeX = margin + contentWidth - badgeWidth;
-    const badgeY = yPos - 8;
+    // Score background circle
+    doc.setFillColor(...colors.primary);
+    doc.circle(scoreX, scoreY, scoreRadius, 'F');
     
-    doc.setFillColor(...scoreColor);
-    doc.roundedRect(badgeX, badgeY, badgeWidth, badgeHeight, 4, 4, 'F');
-    
-    // Score number (centered)
-    doc.setFontSize(16);
+    // Score text
+    doc.setFontSize(14);
     doc.setFont(undefined, "bold");
     doc.setTextColor(255, 255, 255);
-    const scoreText = candidate.aiScore.toString();
-    const scoreWidth = doc.getTextWidth(scoreText);
-    doc.text(scoreText, badgeX + (badgeWidth - scoreWidth) / 2, badgeY + 11);
+    doc.text(candidate.aiScore.toString(), scoreX - 6, scoreY + 2);
     
-    // "SCORE" label (centered)
-    doc.setFontSize(7);
-    const labelText = 'SCORE';
-    const labelWidth = doc.getTextWidth(labelText);
-    doc.text(labelText, badgeX + (badgeWidth - labelWidth) / 2, badgeY + 16);
+    yPos += 8;
     
-    addSpace(8);
-    
-    // Title
-    doc.setFontSize(14);
+    // Title and Experience (matching web subtitle)
+    doc.setFontSize(12);
     doc.setFont(undefined, "normal");
-    doc.setTextColor(...colors.secondary);
-    doc.text(candidate.title, margin, yPos);
+    doc.setTextColor(...colors.medium);
+    doc.text(`${candidate.title} • ${candidate.experience || 'Experienced professional'}`, margin, yPos);
     
-    addSpace(20);
+    yPos += 6;
     
-    // Info grid - FIXED ALIGNMENT (all left-aligned, proper spacing)
-    doc.setFontSize(11);
+    // Location and verification status (matching web)
+    const contactStatus = candidate.verificationStatus === 'Verified' ? 'Verified Profile' : 'Profile Available';
+    doc.text(`${candidate.location} • ${contactStatus}`, margin, yPos);
     
-    const infoItems = [
-        ['Experience:', candidate.experience || 'Not specified'],
-        ['Location:', candidate.location || 'Not specified'],
-        ['Source:', candidate.source || 'LinkedIn']
-    ];
+    yPos += 15;
     
-    infoItems.forEach(([label, value], index) => {
-        const yOffset = index * 8;
-        
-        // Label (bold, gray)
-        doc.setTextColor(...colors.medium);
-        doc.setFont(undefined, "bold");
-        doc.text(label, margin, yPos + yOffset);
-        
-        // Value (normal, dark) - positioned after label with consistent spacing
-        doc.setTextColor(...colors.dark);
-        doc.setFont(undefined, "normal");
-        doc.text(value, margin + 35, yPos + yOffset);
-    });
+    // Divider
+    doc.setDrawColor(...colors.light);
+    doc.setLineWidth(0.5);
+    doc.line(margin, yPos, margin + contentWidth, yPos);
+    yPos += 10;
     
-    yPos += 30;
-    addDivider();
-    
-    // ===== AI METRICS SECTION =====
+    // ===== AI ANALYSIS SECTION - Exactly like web =====
     if (candidate.scoreBreakdown && Object.keys(candidate.scoreBreakdown).length > 0) {
         doc.setFontSize(14);
         doc.setFont(undefined, "bold");
-        doc.setTextColor(...colors.primary);
-        doc.text('AI ANALYSIS', margin, yPos);
+        doc.setTextColor(...colors.dark);
+        doc.text('AI Analysis', margin, yPos);
         
-        addSpace(15);
+        yPos += 12;
         
+        // Score breakdown bars - exactly like web interface
         const metrics = [
             ['Role Relevance', candidate.scoreBreakdown.roleRelevance || 0],
             ['Experience Match', candidate.scoreBreakdown.experienceMatch || 0],
@@ -4937,49 +4902,49 @@ function exportCandidateToPDF(candidate) {
             // Label
             doc.setFontSize(10);
             doc.setFont(undefined, "normal");
-            doc.setTextColor(...colors.dark);
+            doc.setTextColor(...colors.medium);
             doc.text(label, margin, yPos);
             
-            // Score (right-aligned)
+            // Score percentage
             doc.setFont(undefined, "bold");
             const scoreColor = score >= 80 ? colors.success : 
                               score >= 60 ? colors.warning : colors.danger;
             doc.setTextColor(...scoreColor);
-            doc.text(`${score}%`, margin + 150, yPos);
+            doc.text(`${score}%`, margin + 140, yPos);
             
-            // Progress bar background
-            doc.setFillColor(240, 240, 240);
-            doc.rect(margin + 60, yPos - 3, 80, 6, 'F');
+            // Progress bar background (matching web gray)
+            doc.setFillColor(229, 231, 235);
+            doc.rect(margin + 50, yPos - 3, 80, 5, 'F');
             
             // Progress bar fill
             doc.setFillColor(...scoreColor);
-            doc.rect(margin + 60, yPos - 3, (80 * score) / 100, 6, 'F');
+            doc.rect(margin + 50, yPos - 3, (80 * score) / 100, 5, 'F');
             
-            addSpace(12);
+            yPos += 10;
         });
         
-        addDivider();
+        yPos += 10;
     }
     
-    // ===== STRENGTHS SECTION =====
+    // ===== KEY STRENGTHS - Exactly like web =====
     if (candidate.strengths && candidate.strengths.length > 0) {
         checkNewPage(30);
         
         doc.setFontSize(14);
         doc.setFont(undefined, "bold");
         doc.setTextColor(...colors.success);
-        doc.text('KEY STRENGTHS', margin, yPos);
+        doc.text('Key Strengths', margin, yPos);
         
-        addSpace(12);
+        yPos += 12;
         
         candidate.strengths.forEach(strength => {
-            checkNewPage(10);
+            checkNewPage(8);
             
-            // Simple bullet point (no special characters)
+            // Green dot (matching web)
             doc.setFillColor(...colors.success);
-            doc.circle(margin + 3, yPos - 2, 1.5, 'F');
+            doc.circle(margin + 3, yPos - 1, 1, 'F');
             
-            // Text
+            // Strength text
             doc.setFontSize(10);
             doc.setFont(undefined, "normal");
             doc.setTextColor(...colors.dark);
@@ -4987,31 +4952,74 @@ function exportCandidateToPDF(candidate) {
             const wrappedText = doc.splitTextToSize(strength, contentWidth - 10);
             doc.text(wrappedText, margin + 8, yPos);
             
-            yPos += wrappedText.length * 5 + 3;
+            yPos += wrappedText.length * 5 + 2;
         });
         
-        addDivider();
+        yPos += 10;
     }
     
-    // ===== CONCERNS SECTION =====
+    // ===== CURRENT SKILLS - Exactly like web tags =====
+    if (candidate.currentSkills && candidate.currentSkills.length > 0) {
+        checkNewPage(30);
+        
+        doc.setFontSize(14);
+        doc.setFont(undefined, "bold");
+        doc.setTextColor(...colors.blue);
+        doc.text('Current Skills', margin, yPos);
+        
+        yPos += 12;
+        
+        // Skills as tags (matching web blue tags)
+        let currentX = margin;
+        let currentY = yPos;
+        
+        candidate.currentSkills.slice(0, 8).forEach((skill, index) => {
+            doc.setFontSize(9);
+            const textWidth = doc.getTextWidth(skill);
+            const tagWidth = textWidth + 8;
+            
+            // New line if needed
+            if (currentX + tagWidth > margin + contentWidth) {
+                currentX = margin;
+                currentY += 12;
+            }
+            
+            // Tag background (blue like web)
+            doc.setFillColor(59, 130, 246, 0.2);
+            doc.setDrawColor(59, 130, 246, 0.3);
+            doc.setLineWidth(0.5);
+            doc.roundedRect(currentX, currentY - 5, tagWidth, 8, 2, 2, 'FD');
+            
+            // Tag text
+            doc.setFont(undefined, "medium");
+            doc.setTextColor(...colors.blue);
+            doc.text(skill, currentX + 4, currentY);
+            
+            currentX += tagWidth + 4;
+        });
+        
+        yPos = currentY + 15;
+    }
+    
+    // ===== CONSIDERATIONS - Exactly like web =====
     if (candidate.concerns && candidate.concerns.length > 0) {
         checkNewPage(30);
         
         doc.setFontSize(14);
         doc.setFont(undefined, "bold");
         doc.setTextColor(...colors.warning);
-        doc.text('CONSIDERATIONS', margin, yPos);
+        doc.text('Considerations', margin, yPos);
         
-        addSpace(12);
+        yPos += 12;
         
         candidate.concerns.forEach(concern => {
-            checkNewPage(10);
+            checkNewPage(8);
             
-            // Simple triangle (no special characters)
+            // Warning bullet (yellow dot like web)
             doc.setFillColor(...colors.warning);
-            doc.triangle(margin + 1, yPos + 1, margin + 3, yPos - 2, margin + 5, yPos + 1, 'F');
+            doc.circle(margin + 3, yPos - 1, 1, 'F');
             
-            // Text
+            // Concern text
             doc.setFontSize(10);
             doc.setFont(undefined, "normal");
             doc.setTextColor(...colors.dark);
@@ -5019,270 +5027,153 @@ function exportCandidateToPDF(candidate) {
             const wrappedText = doc.splitTextToSize(concern, contentWidth - 10);
             doc.text(wrappedText, margin + 8, yPos);
             
-            yPos += wrappedText.length * 5 + 3;
+            yPos += wrappedText.length * 5 + 2;
         });
         
-        addDivider();
+        yPos += 10;
     }
     
-    // ===== CLEAN CAREER ANALYTICS SECTION =====
-    const hasAnalytics = candidate.careerAnalytics || candidate.growthPotential;
-    
-    if (hasAnalytics) {
-        checkNewPage(80);
+    // ===== CAREER ANALYTICS - Matching web structured layout =====
+    if (candidate.careerAnalytics) {
+        checkNewPage(60);
         
-        // Section header with clean styling (NO ICONS)
-        doc.setFillColor(...colors.secondary);
-        doc.rect(margin - 5, yPos - 5, contentWidth + 10, 15, 'F');
+        // Section header with purple background (matching web)
+        doc.setFillColor(...colors.purple);
+        doc.rect(margin - 5, yPos - 5, contentWidth + 10, 12, 'F');
         
-        doc.setFontSize(16);
+        doc.setFontSize(14);
         doc.setFont(undefined, "bold");
         doc.setTextColor(255, 255, 255);
-        doc.text('CAREER PREDICTIVE ANALYTICS', margin, yPos + 6);
+        doc.text('Career Predictive Analytics', margin, yPos + 4);
         
         yPos += 20;
         
-        // Parse analytics data
-        if (candidate.careerAnalytics) {
-            const analyticsText = candidate.careerAnalytics.toString()
-                .replace(/[^\w\s\-.,()%/:]/g, '') // Remove ALL special characters
-                .replace(/\s+/g, ' ')
-                .trim();
-            
-            // Extract key metrics with improved parsing
-            const extractMetric = (text, pattern) => {
-                const match = text.match(pattern);
-                return match ? match[1].trim() : 'Not specified';
-            };
-            
-            const potentialRating = extractMetric(analyticsText, /Potential Rating[:\s]*(\d+\/100[^)]*\)?)/) || '75/100';
-            const currentLevel = extractMetric(analyticsText, /Current Level[:\s]*(\d+\/100)/) || '65/100';
-            const nextPosition = extractMetric(analyticsText, /Next Position[:\s]*([^P]*?)(?=Probability|$)/) || 'Senior role advancement';
-            const probability = extractMetric(analyticsText, /Probability[:\s]*(\d+%[^)]*\))/) || '70% within 24 months';
-            const marketValue = extractMetric(analyticsText, /Current Market Value[:\s]*([^N]*?)(?=Next|$)/) || 'IDR 20-30M/month';
-            const nextValue = extractMetric(analyticsText, /Next Role Value[:\s]*([^P]*?)(?=Peak|$)/) || 'IDR 35-50M/month';
-            
-            // Key Metrics Cards (2x2 grid)
-            const metricsData = [
-                { label: 'Potential Rating', value: potentialRating, color: colors.success },
-                { label: 'Current Level', value: currentLevel, color: colors.primary },
-                { label: 'Market Value', value: marketValue, color: colors.accent },
-                { label: 'Next Role Value', value: nextValue, color: colors.warning }
-            ];
-            
-            metricsData.forEach((metric, index) => {
-                const col = index % 2;
-                const row = Math.floor(index / 2);
-                const cardX = margin + (col * 85);
-                const cardY = yPos + (row * 25);
-                
-                // Card background
-                doc.setFillColor(248, 249, 250);
-                doc.setDrawColor(...metric.color);
-                doc.setLineWidth(1);
-                doc.rect(cardX, cardY, 80, 20, 'FD');
-                
-                // Label
-                doc.setFontSize(8);
-                doc.setFont(undefined, "bold");
-                doc.setTextColor(...colors.medium);
-                doc.text(metric.label, cardX + 3, cardY + 6);
-                
-                // Value
-                doc.setFontSize(10);
-                doc.setFont(undefined, "bold");
-                doc.setTextColor(...metric.color);
-                const valueText = doc.splitTextToSize(metric.value, 74);
-                doc.text(valueText, cardX + 3, cardY + 12);
-            });
-            
-            yPos += 60;
-            
-            // Career Trajectory Section (NO ICONS)
-            doc.setFontSize(12);
-            doc.setFont(undefined, "bold");
-            doc.setTextColor(...colors.secondary);
-            doc.text('CAREER TRAJECTORY', margin, yPos);
-            
-            addSpace(10);
-            
-            // Next Position Box
-            doc.setFillColor(240, 248, 255);
-            doc.setDrawColor(...colors.secondary);
+        // Parse analytics data like the web interface does
+        let analyticsText = candidate.careerAnalytics;
+        if (typeof analyticsText === 'object' && analyticsText.output) {
+            const parsed = JSON.parse(analyticsText.output);
+            analyticsText = parsed.careerAnalytics;
+        }
+        
+        // Executive Summary Box (matching web gradient)
+        doc.setFillColor(147, 51, 234, 0.1);
+        doc.setDrawColor(147, 51, 234, 0.3);
+        doc.setLineWidth(1);
+        doc.rect(margin, yPos, contentWidth, 20, 'FD');
+        
+        doc.setFontSize(11);
+        doc.setFont(undefined, "bold");
+        doc.setTextColor(...colors.purple);
+        doc.text('Executive Summary', margin + 3, yPos + 6);
+        
+        doc.setFontSize(9);
+        doc.setFont(undefined, "normal");
+        doc.setTextColor(...colors.dark);
+        
+        // Extract key metrics like web interface
+        const potentialMatch = analyticsText.match(/Potential Rating[:\s]*(\d+\/100)/);
+        const levelMatch = analyticsText.match(/Current Level[:\s]*(\d+\/100)/);
+        const speedMatch = analyticsText.match(/Development Speed[:\s]*([^)]+\))/);
+        
+        let summaryText = 'AI-powered career analysis based on market trends and profile assessment.';
+        if (potentialMatch && levelMatch) {
+            summaryText = `${potentialMatch[1]} potential rating with ${levelMatch[1]} current performance level.`;
+        }
+        
+        const wrappedSummary = doc.splitTextToSize(summaryText, contentWidth - 6);
+        doc.text(wrappedSummary, margin + 3, yPos + 12);
+        
+        yPos += 30;
+        
+        // Career Trajectory (matching web blue section)
+        doc.setFillColor(59, 130, 246, 0.1);
+        doc.setDrawColor(59, 130, 246, 0.3);
+        doc.setLineWidth(1);
+        doc.rect(margin, yPos, contentWidth, 20, 'FD');
+        
+        doc.setFontSize(11);
+        doc.setFont(undefined, "bold");
+        doc.setTextColor(...colors.blue);
+        doc.text('Career Trajectory', margin + 3, yPos + 6);
+        
+        doc.setFontSize(9);
+        doc.setFont(undefined, "normal");
+        doc.setTextColor(...colors.dark);
+        
+        // Extract trajectory info
+        const nextPosMatch = analyticsText.match(/Next Position[:\s]*([^P]*?)(?=Probability|$)/);
+        const probabilityMatch = analyticsText.match(/Probability[:\s]*(\d+%[^)]*\))/);
+        
+        let trajectoryText = 'Career advancement potential based on current experience and market demand.';
+        if (nextPosMatch) {
+            trajectoryText = `Next Role: ${nextPosMatch[1].trim()}`;
+        }
+        if (probabilityMatch) {
+            trajectoryText += ` (${probabilityMatch[1]})`;
+        }
+        
+        const wrappedTrajectory = doc.splitTextToSize(trajectoryText, contentWidth - 6);
+        doc.text(wrappedTrajectory, margin + 3, yPos + 12);
+        
+        yPos += 30;
+        
+        // Growth Potential (matching web green section)
+        if (analyticsText.includes('Growth Areas') || analyticsText.includes('Strategic Development')) {
+            doc.setFillColor(34, 197, 94, 0.1);
+            doc.setDrawColor(34, 197, 94, 0.3);
             doc.setLineWidth(1);
             doc.rect(margin, yPos, contentWidth, 15, 'FD');
             
-            doc.setFontSize(10);
-            doc.setFont(undefined, "normal");
-            doc.setTextColor(...colors.dark);
-            doc.text('Next Position:', margin + 3, yPos + 6);
-            
+            doc.setFontSize(11);
             doc.setFont(undefined, "bold");
-            doc.setTextColor(...colors.secondary);
-            const nextPosText = doc.splitTextToSize(nextPosition, contentWidth - 40);
-            doc.text(nextPosText, margin + 3, yPos + 11);
+            doc.setTextColor(...colors.success);
+            doc.text('Growth Potential', margin + 3, yPos + 6);
             
-            yPos += 20;
-            
-            // Probability indicator
             doc.setFontSize(9);
             doc.setFont(undefined, "normal");
-            doc.setTextColor(...colors.success);
-            doc.text(`Probability: ${probability}`, margin, yPos);
+            doc.setTextColor(...colors.dark);
+            doc.text('Strategic development opportunities identified for career advancement.', margin + 3, yPos + 11);
             
-            yPos += 15;
-            
-            // Growth Areas Section (NO ICONS)
-            if (analyticsText.includes('Growth Areas') || analyticsText.includes('Strategic Development')) {
-                doc.setFontSize(12);
-                doc.setFont(undefined, "bold");
-                doc.setTextColor(...colors.accent);
-                doc.text('KEY GROWTH AREAS', margin, yPos);
-                
-                addSpace(10);
-                
-                // Extract growth areas
-                const growthSection = analyticsText.match(/High-Impact Growth Areas[:\s]*([^S]*?)(?=Skill|$)/);
-                if (growthSection) {
-                    const growthAreas = growthSection[1]
-                        .split(/[,;]/)
-                        .map(area => area.trim())
-                        .filter(area => area.length > 10)
-                        .slice(0, 3);
-                    
-                    growthAreas.forEach((area, index) => {
-                        checkNewPage(8);
-                        
-                        // Simple bullet point
-                        doc.setFillColor(...colors.accent);
-                        doc.circle(margin + 3, yPos - 1, 1.5, 'F');
-                        
-                        doc.setFontSize(9);
-                        doc.setFont(undefined, "normal");
-                        doc.setTextColor(...colors.dark);
-                        
-                        const wrappedArea = doc.splitTextToSize(area, contentWidth - 10);
-                        doc.text(wrappedArea, margin + 8, yPos);
-                        
-                        yPos += wrappedArea.length * 4 + 3;
-                    });
-                }
-                
-                addSpace(10);
-            }
-            
-            // Risk Assessment (NO ICONS)
-            if (analyticsText.includes('Risk Assessment')) {
-                doc.setFontSize(12);
-                doc.setFont(undefined, "bold");
-                doc.setTextColor(...colors.danger);
-                doc.text('RISK ASSESSMENT', margin, yPos);
-                
-                addSpace(8);
-                
-                const stability = extractMetric(analyticsText, /Career Stability[:\s]*(\d+%[^R]*?)(?=Reasoning|$)/) || '80% - Stable';
-                
-                // Risk meter background
-                doc.setFillColor(240, 240, 240);
-                doc.rect(margin, yPos, 100, 8, 'F');
-                
-                // Extract percentage for meter
-                const stabilityNum = parseInt(stability.match(/(\d+)%/)?.[1] || '80');
-                const riskColor = stabilityNum >= 80 ? colors.success : 
-                                 stabilityNum >= 60 ? colors.warning : colors.danger;
-                
-                // Risk meter fill
-                doc.setFillColor(...riskColor);
-                doc.rect(margin, yPos, (100 * stabilityNum) / 100, 8, 'F');
-                
-                // Risk text
-                doc.setFontSize(9);
-                doc.setFont(undefined, "bold");
-                doc.setTextColor(...riskColor);
-                doc.text(stability, margin + 105, yPos + 5);
-                
-                yPos += 15;
-            }
+            yPos += 25;
         }
         
-        addDivider();
-        
-    } else {
-        // Enhanced skills section for non-analytics candidates
-        if (candidate.currentSkills && candidate.currentSkills.length > 0) {
-            checkNewPage(30);
-            
-            doc.setFillColor(...colors.secondary);
-            doc.rect(margin - 5, yPos - 5, contentWidth + 10, 12, 'F');
-            
-            doc.setFontSize(14);
-            doc.setFont(undefined, "bold");
-            doc.setTextColor(255, 255, 255);
-            doc.text('CORE SKILLS & EXPERTISE', margin, yPos + 5);
-            
-            yPos += 15;
-            
-            // Skills as clean tags
-            let currentX = margin;
-            let currentY = yPos;
-            
-            candidate.currentSkills.slice(0, 6).forEach((skill, index) => {
-                doc.setFontSize(9);
-                const textWidth = doc.getTextWidth(skill);
-                const tagWidth = textWidth + 10;
-                
-                // New line if needed
-                if (currentX + tagWidth > margin + contentWidth) {
-                    currentX = margin;
-                    currentY += 14;
-                }
-                
-                // Tag background
-                const tagColor = [colors.primary, colors.secondary, colors.accent][index % 3];
-                doc.setFillColor(...tagColor);
-                doc.roundedRect(currentX, currentY - 6, tagWidth, 10, 3, 3, 'F');
-                
-                // Tag text
-                doc.setFont(undefined, "bold");
-                doc.setTextColor(255, 255, 255);
-                doc.text(skill, currentX + 5, currentY);
-                
-                currentX += tagWidth + 5;
-            });
-            
-            yPos = currentY + 15;
-            addDivider();
-        }
+        yPos += 10;
     }
     
-    // ===== RECOMMENDATION SECTION =====
+    // ===== AI RECOMMENDATION - Exactly like web =====
     if (candidate.recommendation) {
         checkNewPage(25);
         
         doc.setFontSize(14);
         doc.setFont(undefined, "bold");
         doc.setTextColor(...colors.primary);
-        doc.text('AI RECOMMENDATION', margin, yPos);
+        doc.text('AI Recommendation', margin, yPos);
         
-        addSpace(12);
+        yPos += 12;
         
-        // Recommendation box
-        doc.setFillColor(248, 255, 248);
-        doc.setDrawColor(...colors.success);
-        doc.setLineWidth(2);
-        doc.rect(margin, yPos - 5, contentWidth, 20, 'FD');
+        // Recommendation box (matching web cyan background)
+        doc.setFillColor(0, 212, 170, 0.1);
+        doc.setDrawColor(0, 212, 170, 0.3);
+        doc.setLineWidth(1);
+        doc.rect(margin, yPos, contentWidth, 20, 'FD');
         
-        doc.setFontSize(11);
+        // Priority level
+        const priority = candidate.priority || 'medium';
+        doc.setFontSize(10);
+        doc.setFont(undefined, "bold");
+        doc.setTextColor(...colors.primary);
+        doc.text(`${priority.charAt(0).toUpperCase() + priority.slice(1)} Priority Contact:`, margin + 3, yPos + 6);
+        
+        // Recommendation text
         doc.setFont(undefined, "normal");
         doc.setTextColor(...colors.dark);
+        const recText = doc.splitTextToSize(candidate.recommendation, contentWidth - 6);
+        doc.text(recText, margin + 3, yPos + 12);
         
-        const wrappedRec = doc.splitTextToSize(candidate.recommendation, contentWidth - 8);
-        doc.text(wrappedRec, margin + 4, yPos + 2);
-        
-        yPos += Math.max(20, wrappedRec.length * 5 + 10);
+        yPos += Math.max(20, recText.length * 4 + 15);
     }
     
-    // ===== CLEAN FOOTER =====
+    // ===== FOOTER - Matching web styling =====
     const footerY = 280;
     
     doc.setDrawColor(...colors.light);
@@ -5293,10 +5184,10 @@ function exportCandidateToPDF(candidate) {
     doc.setFont(undefined, "normal");
     doc.setTextColor(...colors.medium);
     
-    doc.text('Generated by Leadfinder AI', margin, footerY + 6);
-    doc.text(new Date().toLocaleDateString(), margin + contentWidth - 30, footerY + 6);
+    doc.text('Generated by Leadfinder AI • Professional Talent Discovery Platform', margin, footerY + 6);
+    doc.text(new Date().toLocaleDateString(), margin + contentWidth - 30, footerY + 10);
     
-    // Save with clean filename
+    // Save file
     const cleanName = candidate.name.replace(/[^a-zA-Z0-9]/g, '_');
     const fileName = `Leadfinder_${cleanName}_${new Date().toISOString().split('T')[0]}.pdf`;
     doc.save(fileName);
