@@ -4780,32 +4780,35 @@ function exportCandidateToCSV(candidate) {
     document.body.removeChild(a);
 }
 
-// PDF Export that EXACTLY matches the web candidate modal
+// Complete PDF Export that shows ALL sections from web modal
 function exportCandidateToPDF(candidate) {
     if (!candidate) return;
     
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
     
-    // Colors matching web interface
+    // Colors exactly matching web interface
     const colors = {
-        primary: [0, 212, 170],      // accent-cyan from web
-        secondary: [99, 102, 241],   // indigo from web
-        dark: [31, 41, 55],          // gray-800 from web  
-        medium: [107, 114, 128],     // gray-500 from web
-        light: [209, 213, 219],      // gray-300 from web
-        success: [34, 197, 94],      // green-500 from web
-        warning: [245, 158, 11],     // amber-500 from web
-        danger: [239, 68, 68],       // red-500 from web
-        blue: [59, 130, 246],        // blue-500 from web
-        purple: [147, 51, 234],      // purple-600 from web
-        background: [17, 24, 39]     // dark-primary from web
+        primary: [0, 212, 170],      // accent-cyan
+        secondary: [99, 102, 241],   // indigo  
+        dark: [31, 41, 55],          // gray-800
+        medium: [107, 114, 128],     // gray-500
+        light: [209, 213, 219],      // gray-300
+        success: [34, 197, 94],      // green-500
+        warning: [245, 158, 11],     // amber-500
+        danger: [239, 68, 68],       // red-500
+        blue: [59, 130, 246],        // blue-500
+        purple: [147, 51, 234],      // purple-600
+        yellow: [234, 179, 8],       // yellow-500
+        red: [239, 68, 68],          // red-500
+        background: [17, 24, 39]     // dark-primary
     };
     
     let yPos = 20;
     const margin = 20;
     const contentWidth = 170;
     
+    // Helper functions
     function addSpace(space = 8) { yPos += space; }
     function checkNewPage(space = 30) {
         if (yPos + space > 280) {
@@ -4816,8 +4819,51 @@ function exportCandidateToPDF(candidate) {
         return false;
     }
     
-    // ===== HEADER - Matching Web =====
-    // Header background
+    function addSectionHeader(title, color, emoji = '') {
+        checkNewPage(20);
+        
+        // Section background
+        doc.setFillColor(...color);
+        doc.rect(margin - 5, yPos - 5, contentWidth + 10, 12, 'F');
+        
+        doc.setFontSize(13);
+        doc.setFont(undefined, "bold");
+        doc.setTextColor(255, 255, 255);
+        doc.text(`${emoji} ${title}`, margin, yPos + 4);
+        
+        yPos += 15;
+    }
+    
+    function addSubSection(title, content, borderColor) {
+        if (!content) return;
+        
+        checkNewPage(25);
+        
+        // Subsection header
+        doc.setFontSize(10);
+        doc.setFont(undefined, "bold");
+        doc.setTextColor(...borderColor);
+        doc.text(title, margin, yPos);
+        
+        yPos += 6;
+        
+        // Content with left border
+        doc.setDrawColor(...borderColor);
+        doc.setLineWidth(2);
+        doc.line(margin + 3, yPos - 2, margin + 3, yPos + 15);
+        
+        doc.setFontSize(9);
+        doc.setFont(undefined, "normal");
+        doc.setTextColor(...colors.dark);
+        
+        const cleanContent = content.replace(/<br>/g, '\n').replace(/&nbsp;/g, ' ');
+        const wrappedContent = doc.splitTextToSize(cleanContent, contentWidth - 15);
+        doc.text(wrappedContent, margin + 8, yPos);
+        
+        yPos += Math.max(15, wrappedContent.length * 4 + 5);
+    }
+    
+    // ===== HEADER =====
     doc.setFillColor(...colors.primary);
     doc.rect(margin, yPos, contentWidth, 20, 'F');
     
@@ -4837,23 +4883,21 @@ function exportCandidateToPDF(candidate) {
     
     yPos += 30;
     
-    // ===== CANDIDATE HEADER - Exactly like web modal =====
+    // ===== CANDIDATE HEADER =====
     // Name
     doc.setFontSize(20);
     doc.setFont(undefined, "bold");
     doc.setTextColor(...colors.dark);
     doc.text(candidate.name, margin, yPos);
     
-    // AI Score circle (top right) - exactly like web
+    // AI Score circle
     const scoreRadius = 15;
     const scoreX = margin + contentWidth - 30;
     const scoreY = yPos - 5;
     
-    // Score background circle
     doc.setFillColor(...colors.primary);
     doc.circle(scoreX, scoreY, scoreRadius, 'F');
     
-    // Score text
     doc.setFontSize(14);
     doc.setFont(undefined, "bold");
     doc.setTextColor(255, 255, 255);
@@ -4861,7 +4905,7 @@ function exportCandidateToPDF(candidate) {
     
     yPos += 8;
     
-    // Title and Experience (matching web subtitle)
+    // Title and Experience
     doc.setFontSize(12);
     doc.setFont(undefined, "normal");
     doc.setTextColor(...colors.medium);
@@ -4869,7 +4913,7 @@ function exportCandidateToPDF(candidate) {
     
     yPos += 6;
     
-    // Location and verification status (matching web)
+    // Location and verification
     const contactStatus = candidate.verificationStatus === 'Verified' ? 'Verified Profile' : 'Profile Available';
     doc.text(`${candidate.location} • ${contactStatus}`, margin, yPos);
     
@@ -4881,7 +4925,7 @@ function exportCandidateToPDF(candidate) {
     doc.line(margin, yPos, margin + contentWidth, yPos);
     yPos += 10;
     
-    // ===== AI ANALYSIS SECTION - Exactly like web =====
+    // ===== AI ANALYSIS SECTION =====
     if (candidate.scoreBreakdown && Object.keys(candidate.scoreBreakdown).length > 0) {
         doc.setFontSize(14);
         doc.setFont(undefined, "bold");
@@ -4890,7 +4934,6 @@ function exportCandidateToPDF(candidate) {
         
         yPos += 12;
         
-        // Score breakdown bars - exactly like web interface
         const metrics = [
             ['Role Relevance', candidate.scoreBreakdown.roleRelevance || 0],
             ['Experience Match', candidate.scoreBreakdown.experienceMatch || 0],
@@ -4899,24 +4942,20 @@ function exportCandidateToPDF(candidate) {
         ];
         
         metrics.forEach(([label, score]) => {
-            // Label
             doc.setFontSize(10);
             doc.setFont(undefined, "normal");
             doc.setTextColor(...colors.medium);
             doc.text(label, margin, yPos);
             
-            // Score percentage
             doc.setFont(undefined, "bold");
             const scoreColor = score >= 80 ? colors.success : 
                               score >= 60 ? colors.warning : colors.danger;
             doc.setTextColor(...scoreColor);
             doc.text(`${score}%`, margin + 140, yPos);
             
-            // Progress bar background (matching web gray)
             doc.setFillColor(229, 231, 235);
             doc.rect(margin + 50, yPos - 3, 80, 5, 'F');
             
-            // Progress bar fill
             doc.setFillColor(...scoreColor);
             doc.rect(margin + 50, yPos - 3, (80 * score) / 100, 5, 'F');
             
@@ -4926,7 +4965,7 @@ function exportCandidateToPDF(candidate) {
         yPos += 10;
     }
     
-    // ===== KEY STRENGTHS - Exactly like web =====
+    // ===== KEY STRENGTHS =====
     if (candidate.strengths && candidate.strengths.length > 0) {
         checkNewPage(30);
         
@@ -4940,11 +4979,9 @@ function exportCandidateToPDF(candidate) {
         candidate.strengths.forEach(strength => {
             checkNewPage(8);
             
-            // Green dot (matching web)
             doc.setFillColor(...colors.success);
             doc.circle(margin + 3, yPos - 1, 1, 'F');
             
-            // Strength text
             doc.setFontSize(10);
             doc.setFont(undefined, "normal");
             doc.setTextColor(...colors.dark);
@@ -4958,7 +4995,7 @@ function exportCandidateToPDF(candidate) {
         yPos += 10;
     }
     
-    // ===== CURRENT SKILLS - Exactly like web tags =====
+    // ===== CURRENT SKILLS =====
     if (candidate.currentSkills && candidate.currentSkills.length > 0) {
         checkNewPage(30);
         
@@ -4969,28 +5006,24 @@ function exportCandidateToPDF(candidate) {
         
         yPos += 12;
         
-        // Skills as tags (matching web blue tags)
         let currentX = margin;
         let currentY = yPos;
         
-        candidate.currentSkills.slice(0, 8).forEach((skill, index) => {
+        candidate.currentSkills.forEach((skill, index) => {
             doc.setFontSize(9);
             const textWidth = doc.getTextWidth(skill);
             const tagWidth = textWidth + 8;
             
-            // New line if needed
             if (currentX + tagWidth > margin + contentWidth) {
                 currentX = margin;
                 currentY += 12;
             }
             
-            // Tag background (blue like web)
             doc.setFillColor(59, 130, 246, 0.2);
             doc.setDrawColor(59, 130, 246, 0.3);
             doc.setLineWidth(0.5);
             doc.roundedRect(currentX, currentY - 5, tagWidth, 8, 2, 2, 'FD');
             
-            // Tag text
             doc.setFont(undefined, "medium");
             doc.setTextColor(...colors.blue);
             doc.text(skill, currentX + 4, currentY);
@@ -5001,7 +5034,37 @@ function exportCandidateToPDF(candidate) {
         yPos = currentY + 15;
     }
     
-    // ===== CONSIDERATIONS - Exactly like web =====
+    // ===== GROWTH OPPORTUNITIES =====
+    if (candidate.growthOpportunities && candidate.growthOpportunities.length > 0) {
+        checkNewPage(30);
+        
+        doc.setFontSize(14);
+        doc.setFont(undefined, "bold");
+        doc.setTextColor(...colors.primary);
+        doc.text('Growth Opportunities', margin, yPos);
+        
+        yPos += 12;
+        
+        candidate.growthOpportunities.forEach(opportunity => {
+            checkNewPage(8);
+            
+            doc.setFillColor(...colors.primary);
+            doc.circle(margin + 3, yPos - 1, 1, 'F');
+            
+            doc.setFontSize(10);
+            doc.setFont(undefined, "normal");
+            doc.setTextColor(...colors.dark);
+            
+            const wrappedText = doc.splitTextToSize(opportunity, contentWidth - 10);
+            doc.text(wrappedText, margin + 8, yPos);
+            
+            yPos += wrappedText.length * 5 + 2;
+        });
+        
+        yPos += 10;
+    }
+    
+    // ===== CONSIDERATIONS =====
     if (candidate.concerns && candidate.concerns.length > 0) {
         checkNewPage(30);
         
@@ -5015,11 +5078,9 @@ function exportCandidateToPDF(candidate) {
         candidate.concerns.forEach(concern => {
             checkNewPage(8);
             
-            // Warning bullet (yellow dot like web)
             doc.setFillColor(...colors.warning);
             doc.circle(margin + 3, yPos - 1, 1, 'F');
             
-            // Concern text
             doc.setFontSize(10);
             doc.setFont(undefined, "normal");
             doc.setTextColor(...colors.dark);
@@ -5033,114 +5094,107 @@ function exportCandidateToPDF(candidate) {
         yPos += 10;
     }
     
-    // ===== CAREER ANALYTICS - Matching web structured layout =====
+    // ===== COMPLETE CAREER ANALYTICS SECTION =====
     if (candidate.careerAnalytics) {
         checkNewPage(60);
         
-        // Section header with purple background (matching web)
-        doc.setFillColor(...colors.purple);
-        doc.rect(margin - 5, yPos - 5, contentWidth + 10, 12, 'F');
+        addSectionHeader('Career Predictive Analytics', colors.purple);
         
-        doc.setFontSize(14);
-        doc.setFont(undefined, "bold");
-        doc.setTextColor(255, 255, 255);
-        doc.text('Career Predictive Analytics', margin, yPos + 4);
-        
-        yPos += 20;
-        
-        // Parse analytics data like the web interface does
+        // Parse analytics exactly like web
         let analyticsText = candidate.careerAnalytics;
         if (typeof analyticsText === 'object' && analyticsText.output) {
             const parsed = JSON.parse(analyticsText.output);
             analyticsText = parsed.careerAnalytics;
         }
         
-        // Executive Summary Box (matching web gradient)
-        doc.setFillColor(147, 51, 234, 0.1);
-        doc.setDrawColor(147, 51, 234, 0.3);
-        doc.setLineWidth(1);
-        doc.rect(margin, yPos, contentWidth, 20, 'FD');
+        // Parse into sections like the web interface
+        const sections = parseCareerAnalyticsForPDF(analyticsText);
         
-        doc.setFontSize(11);
-        doc.setFont(undefined, "bold");
-        doc.setTextColor(...colors.purple);
-        doc.text('Executive Summary', margin + 3, yPos + 6);
-        
-        doc.setFontSize(9);
-        doc.setFont(undefined, "normal");
-        doc.setTextColor(...colors.dark);
-        
-        // Extract key metrics like web interface
-        const potentialMatch = analyticsText.match(/Potential Rating[:\s]*(\d+\/100)/);
-        const levelMatch = analyticsText.match(/Current Level[:\s]*(\d+\/100)/);
-        const speedMatch = analyticsText.match(/Development Speed[:\s]*([^)]+\))/);
-        
-        let summaryText = 'AI-powered career analysis based on market trends and profile assessment.';
-        if (potentialMatch && levelMatch) {
-            summaryText = `${potentialMatch[1]} potential rating with ${levelMatch[1]} current performance level.`;
-        }
-        
-        const wrappedSummary = doc.splitTextToSize(summaryText, contentWidth - 6);
-        doc.text(wrappedSummary, margin + 3, yPos + 12);
-        
-        yPos += 30;
-        
-        // Career Trajectory (matching web blue section)
-        doc.setFillColor(59, 130, 246, 0.1);
-        doc.setDrawColor(59, 130, 246, 0.3);
-        doc.setLineWidth(1);
-        doc.rect(margin, yPos, contentWidth, 20, 'FD');
-        
-        doc.setFontSize(11);
-        doc.setFont(undefined, "bold");
-        doc.setTextColor(...colors.blue);
-        doc.text('Career Trajectory', margin + 3, yPos + 6);
-        
-        doc.setFontSize(9);
-        doc.setFont(undefined, "normal");
-        doc.setTextColor(...colors.dark);
-        
-        // Extract trajectory info
-        const nextPosMatch = analyticsText.match(/Next Position[:\s]*([^P]*?)(?=Probability|$)/);
-        const probabilityMatch = analyticsText.match(/Probability[:\s]*(\d+%[^)]*\))/);
-        
-        let trajectoryText = 'Career advancement potential based on current experience and market demand.';
-        if (nextPosMatch) {
-            trajectoryText = `Next Role: ${nextPosMatch[1].trim()}`;
-        }
-        if (probabilityMatch) {
-            trajectoryText += ` (${probabilityMatch[1]})`;
-        }
-        
-        const wrappedTrajectory = doc.splitTextToSize(trajectoryText, contentWidth - 6);
-        doc.text(wrappedTrajectory, margin + 3, yPos + 12);
-        
-        yPos += 30;
-        
-        // Growth Potential (matching web green section)
-        if (analyticsText.includes('Growth Areas') || analyticsText.includes('Strategic Development')) {
-            doc.setFillColor(34, 197, 94, 0.1);
-            doc.setDrawColor(34, 197, 94, 0.3);
-            doc.setLineWidth(1);
-            doc.rect(margin, yPos, contentWidth, 15, 'FD');
+        if (sections) {
+            // Executive Summary
+            if (sections.executiveSummary) {
+                addSectionHeader('Executive Summary', colors.purple);
+                
+                doc.setFillColor(147, 51, 234, 0.1);
+                doc.setDrawColor(147, 51, 234, 0.3);
+                doc.setLineWidth(1);
+                doc.rect(margin, yPos, contentWidth, 15, 'FD');
+                
+                doc.setFontSize(9);
+                doc.setFont(undefined, "normal");
+                doc.setTextColor(...colors.dark);
+                const wrappedSummary = doc.splitTextToSize(sections.executiveSummary, contentWidth - 6);
+                doc.text(wrappedSummary, margin + 3, yPos + 5);
+                
+                yPos += Math.max(15, wrappedSummary.length * 4 + 10);
+            }
             
-            doc.setFontSize(11);
-            doc.setFont(undefined, "bold");
-            doc.setTextColor(...colors.success);
-            doc.text('Growth Potential', margin + 3, yPos + 6);
+            // Current Strengths
+            if (sections.currentStrengths) {
+                addSectionHeader('Current Strengths', colors.success);
+                
+                // Market Intelligence subsection
+                addSubSection('Market Intelligence & Positioning', 
+                    formatSubSectionForPDF(sections.currentStrengths, 'Market Intelligence'), 
+                    colors.success);
+                
+                // Peer Benchmarking subsection  
+                addSubSection('Peer Benchmarking',
+                    formatSubSectionForPDF(sections.currentStrengths, 'Peer Benchmarking'),
+                    colors.success);
+            }
             
-            doc.setFontSize(9);
-            doc.setFont(undefined, "normal");
-            doc.setTextColor(...colors.dark);
-            doc.text('Strategic development opportunities identified for career advancement.', margin + 3, yPos + 11);
+            // Career Trajectory & Compensation
+            if (sections.careerTrajectory) {
+                addSectionHeader('Career Trajectory & Compensation', colors.blue);
+                
+                // Career Trajectory subsection
+                addSubSection('Career Trajectory Forecast',
+                    formatSubSectionForPDF(sections.careerTrajectory, 'Career Trajectory'),
+                    colors.blue);
+                
+                // Compensation subsection
+                addSubSection('Compensation Progression Analysis',
+                    formatSubSectionForPDF(sections.careerTrajectory, 'Compensation'),
+                    colors.blue);
+            }
             
-            yPos += 25;
+            // Growth Potential & Development
+            if (sections.growthPotential) {
+                addSectionHeader('Growth Potential & Development', colors.yellow);
+                
+                // Strategic Development subsection
+                addSubSection('Strategic Development Roadmap',
+                    formatSubSectionForPDF(sections.growthPotential, 'Strategic Development'),
+                    colors.yellow);
+                
+                // Acceleration Strategies subsection
+                addSubSection('Acceleration Strategies',
+                    formatSubSectionForPDF(sections.growthPotential, 'Acceleration'),
+                    colors.yellow);
+            }
+            
+            // Risk Assessment
+            if (sections.riskAssessment) {
+                addSectionHeader('Risk Assessment', colors.red);
+                
+                doc.setFillColor(239, 68, 68, 0.1);
+                doc.setDrawColor(239, 68, 68, 0.3);
+                doc.setLineWidth(1);
+                doc.rect(margin, yPos, contentWidth, 15, 'FD');
+                
+                doc.setFontSize(9);
+                doc.setFont(undefined, "normal");
+                doc.setTextColor(...colors.dark);
+                const wrappedRisk = doc.splitTextToSize(sections.riskAssessment, contentWidth - 6);
+                doc.text(wrappedRisk, margin + 3, yPos + 5);
+                
+                yPos += Math.max(15, wrappedRisk.length * 4 + 10);
+            }
         }
-        
-        yPos += 10;
     }
     
-    // ===== AI RECOMMENDATION - Exactly like web =====
+    // ===== AI RECOMMENDATION =====
     if (candidate.recommendation) {
         checkNewPage(25);
         
@@ -5151,20 +5205,17 @@ function exportCandidateToPDF(candidate) {
         
         yPos += 12;
         
-        // Recommendation box (matching web cyan background)
         doc.setFillColor(0, 212, 170, 0.1);
         doc.setDrawColor(0, 212, 170, 0.3);
         doc.setLineWidth(1);
         doc.rect(margin, yPos, contentWidth, 20, 'FD');
         
-        // Priority level
         const priority = candidate.priority || 'medium';
         doc.setFontSize(10);
         doc.setFont(undefined, "bold");
         doc.setTextColor(...colors.primary);
         doc.text(`${priority.charAt(0).toUpperCase() + priority.slice(1)} Priority Contact:`, margin + 3, yPos + 6);
         
-        // Recommendation text
         doc.setFont(undefined, "normal");
         doc.setTextColor(...colors.dark);
         const recText = doc.splitTextToSize(candidate.recommendation, contentWidth - 6);
@@ -5173,7 +5224,7 @@ function exportCandidateToPDF(candidate) {
         yPos += Math.max(20, recText.length * 4 + 15);
     }
     
-    // ===== FOOTER - Matching web styling =====
+    // ===== FOOTER =====
     const footerY = 280;
     
     doc.setDrawColor(...colors.light);
@@ -5191,6 +5242,102 @@ function exportCandidateToPDF(candidate) {
     const cleanName = candidate.name.replace(/[^a-zA-Z0-9]/g, '_');
     const fileName = `Leadfinder_${cleanName}_${new Date().toISOString().split('T')[0]}.pdf`;
     doc.save(fileName);
+}
+
+// Helper functions for parsing analytics (matching web logic)
+function parseCareerAnalyticsForPDF(rawText) {
+    if (!rawText) return null;
+    
+    const sections = {
+        executiveSummary: '',
+        currentStrengths: '',
+        growthPotential: '',
+        careerTrajectory: '',
+        riskAssessment: '',
+        hiringRecommendation: ''
+    };
+    
+    // Split by emoji headers (matching web parsing)
+    const parts = rawText.split(/(?=🏆|📈|💰|🎯|🌐|🔍|📊|⚡)/);
+    
+    parts.forEach(part => {
+        if (part.includes('🏆 Potential Rating')) {
+            const potentialMatch = part.match(/Potential Rating: (\d+\/100)/);
+            const levelMatch = part.match(/Current Level: (\d+\/100)/);
+            const speedMatch = part.match(/Development Speed: ([^)]+\))/);
+            
+            if (potentialMatch && levelMatch && speedMatch) {
+                sections.executiveSummary = `${potentialMatch[1]} potential rating with ${levelMatch[1]} current performance level. ${speedMatch[1]} development timeline.`;
+            }
+        }
+        
+        if (part.includes('📈 Career Trajectory') || part.includes('💰 Compensation')) {
+            sections.careerTrajectory += part;
+        }
+        
+        if (part.includes('🎯 Strategic Development') || part.includes('⚡ Acceleration Strategies')) {
+            sections.growthPotential += part;
+        }
+        
+        if (part.includes('📊 Peer Benchmarking') || part.includes('🌐 Market Intelligence')) {
+            sections.currentStrengths += part;
+        }
+        
+        if (part.includes('🔍 Risk Assessment')) {
+            sections.riskAssessment = part;
+        }
+    });
+    
+    // Clean up sections
+    Object.keys(sections).forEach(key => {
+        if (sections[key]) {
+            sections[key] = cleanAndFormatSectionForPDF(sections[key]);
+        }
+    });
+    
+    return sections;
+}
+
+function cleanAndFormatSectionForPDF(text) {
+    if (!text) return '';
+    
+    return text
+        .replace(/^🏆.*?\n/gm, '')
+        .replace(/^📈.*?\n/gm, '')
+        .replace(/^💰.*?\n/gm, '')
+        .replace(/^🎯.*?\n/gm, '')
+        .replace(/^🌐.*?\n/gm, '')
+        .replace(/^🔍.*?\n/gm, '')
+        .replace(/^📊.*?\n/gm, '')
+        .replace(/^⚡.*?\n/gm, '')
+        .replace(/\n\n\n+/g, '\n\n')
+        .trim();
+}
+
+function formatSubSectionForPDF(text, sectionType) {
+    if (!text) return '';
+    
+    const paragraphs = text.split('\n\n');
+    
+    if (sectionType === 'Market Intelligence') {
+        return paragraphs[0] ? paragraphs[0].replace(/\n/g, ' ') : '';
+    } else if (sectionType === 'Peer Benchmarking') {
+        return paragraphs[1] ? paragraphs[1].replace(/\n/g, ' ') : '';
+    } else if (sectionType === 'Career Trajectory') {
+        return paragraphs[0] ? paragraphs[0].replace(/\n/g, ' ') : '';
+    } else if (sectionType === 'Compensation') {
+        return paragraphs[1] ? paragraphs[1].replace(/\n/g, ' ') : '';
+    } else if (sectionType === 'Strategic Development') {
+        const lines = text.split('\n');
+        const strategicLines = lines.slice(0, 3);
+        return strategicLines.join(' ');
+    } else if (sectionType === 'Acceleration') {
+        const lines = text.split('\n');
+        const accelerationLines = lines.filter(line => line.startsWith('- '));
+        return accelerationLines.join(' ');
+    }
+    
+    return text.replace(/\n/g, ' ');
 }
 	
 // Export one candidate to Clipboard
