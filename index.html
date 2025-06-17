@@ -4865,21 +4865,31 @@ function exportCandidateToPDF(candidate) {
     
     // ===== HEADER =====
     doc.setFillColor(...colors.primary);
-    doc.rect(margin, yPos, contentWidth, 20, 'F');
-    
-    // LF Logo
-    doc.setFillColor(255, 255, 255);
-    doc.circle(margin + 10, yPos + 10, 6, 'F');
-    doc.setFontSize(10);
-    doc.setFont(undefined, "bold");
-    doc.setTextColor(...colors.primary);
-    doc.text('LF', margin + 7, yPos + 13);
-    
-    // Title
-    doc.setFontSize(16);
-    doc.setFont(undefined, "bold");
-    doc.setTextColor(255, 255, 255);
-    doc.text('CANDIDATE PROFILE', margin + 25, yPos + 13);
+	doc.rect(margin, yPos, contentWidth, 20, 'F');
+	
+	// Candidate initials circle (properly centered)
+	const initials = candidate.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+	
+	doc.setFillColor(255, 255, 255);
+	doc.circle(margin + 10, yPos + 10, 6, 'F');
+	
+	// Calculate text positioning for perfect centering
+	doc.setFontSize(10);
+	doc.setFont(undefined, "bold");
+	doc.setTextColor(...colors.primary);
+	
+	const initialsWidth = doc.getTextWidth(initials);
+	const circleX = margin + 10;
+	const circleY = yPos + 10;
+	
+	// Center the initials in the circle
+	doc.text(initials, circleX - (initialsWidth / 2), circleY + 3);
+	
+	// Title
+	doc.setFontSize(16);
+	doc.setFont(undefined, "bold");
+	doc.setTextColor(255, 255, 255);
+	doc.text('CANDIDATE PROFILE', margin + 25, yPos + 13);
     
     yPos += 30;
     
@@ -4891,17 +4901,21 @@ function exportCandidateToPDF(candidate) {
     doc.text(candidate.name, margin, yPos);
     
     // AI Score circle
-    const scoreRadius = 15;
-    const scoreX = margin + contentWidth - 30;
-    const scoreY = yPos - 5;
+    const scoreRadius = 12;  
+	const scoreX = margin + contentWidth - 25;  
+	const scoreY = yPos + 5;
     
-    doc.setFillColor(...colors.primary);
-    doc.circle(scoreX, scoreY, scoreRadius, 'F');
-    
-    doc.setFontSize(14);
-    doc.setFont(undefined, "bold");
-    doc.setTextColor(255, 255, 255);
-    doc.text(candidate.aiScore.toString(), scoreX - 6, scoreY + 2);
+    doc.setFillColor(...colors.secondary);
+	doc.circle(scoreX, scoreY, scoreRadius, 'F');
+	
+	doc.setFontSize(12);
+	doc.setFont(undefined, "bold");
+	doc.setTextColor(255, 255, 255);
+	
+	const scoreText = candidate.aiScore.toString();
+	const scoreTextWidth = doc.getTextWidth(scoreText);
+	
+	doc.text(scoreText, scoreX - (scoreTextWidth / 2), scoreY + 4);
     
     yPos += 8;
     
