@@ -4830,7 +4830,7 @@ function exportCandidateToPDF(candidate) {
     doc.setFont(undefined, "bold");
     doc.setTextColor(...colors.primary);
     const initialsWidth = doc.getTextWidth(initials);
-    doc.text(initials, circleX - (initialsWidth / 2), circleY + 0);
+    doc.text(initials, circleX - (initialsWidth / 2), circleY + 1.5);
     
     // Title
     doc.setFontSize(16);
@@ -4856,12 +4856,12 @@ function exportCandidateToPDF(candidate) {
     doc.setFillColor(...colors.secondary);
     doc.circle(scoreX, scoreY, 12, 'F');
     
-    doc.setFontSize(14);
+    doc.setFontSize(16);
     doc.setFont(undefined, "bold");
     doc.setTextColor(255, 255, 255);
     const scoreText = candidate.aiScore.toString();
     const scoreTextWidth = doc.getTextWidth(scoreText);
-    doc.text(scoreText, scoreX - (scoreTextWidth / 2), scoreY + 0);
+    doc.text(scoreText, scoreX - (scoreTextWidth / 2), scoreY + 1);
     
     yPos += 8;
     
@@ -4885,7 +4885,7 @@ function exportCandidateToPDF(candidate) {
     doc.setDrawColor(...colors.light);
     doc.setLineWidth(0.5);
     doc.line(margin, yPos, margin + contentWidth, yPos);
-    yPos += 10;
+    yPos += 6;
     
     // ===== AI ANALYSIS =====
     if (candidate.scoreBreakdown && Object.keys(candidate.scoreBreakdown).length > 0) {
