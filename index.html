@@ -7,7 +7,6 @@
     <link rel="icon" type="image/png" href="LinkedIn_Image_Template__15_-removebg-preview.png">
     <script src="https://cdn.tailwindcss.com"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 	<script src="https://app.midtrans.com/snap/snap.js" data-client-key="Mid-client-CNEBcdeUWpDvMVXD"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
@@ -4785,19 +4784,141 @@ function exportCandidateToCSV(candidate) {
 function exportCandidateToPDF(candidate) {
     if (!candidate) return;
 
-    const modal = document.getElementById('candidateModal');
-    if (!modal) return;
-    const container = modal.querySelector('div');
-
     const { jsPDF } = window.jspdf;
-    html2canvas(container, { backgroundColor: '#ffffff', scale: 2 }).then(canvas => {
-        const imgData = canvas.toDataURL('image/png');
-        const pdf = new jsPDF('p', 'px', [canvas.width, canvas.height]);
-        pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
-        const cleanName = candidate.name.replace(/[^a-zA-Z0-9]/g, '_');
-        const fileName = `Leadfinder_${cleanName}_${new Date().toISOString().split('T')[0]}.pdf`;
-        pdf.save(fileName);
-    });
+    const doc = new jsPDF('p', 'pt', 'a4');
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+
+    // Draw white background for clean printing
+    doc.setFillColor(255, 255, 255);
+    doc.rect(0, 0, pageWidth, pageHeight, 'F');
+
+    let y = 40;
+    const left = 40;
+
+    doc.setFontSize(18);
+    doc.setTextColor(0, 0, 0);
+    doc.text('Leadfinder Candidate Report', pageWidth / 2, y, { align: 'center' });
+
+    y += 30;
+    doc.setFontSize(14);
+    doc.text(candidate.name, left, y);
+    y += 18;
+    doc.setFontSize(12);
+    const titleLine = `${candidate.title || ''} • ${candidate.experience || ''}`.trim();
+    doc.text(titleLine, left, y);
+    y += 16;
+    if (candidate.location) {
+        doc.text(candidate.location, left, y);
+        y += 16;
+    }
+
+    if (candidate.aiScore !== undefined) {
+        doc.text(`AI Score: ${candidate.aiScore}`, left, y);
+        y += 20;
+    }
+
+    const wrapWidth = pageWidth - left * 2;
+
+    if (candidate.strengths && candidate.strengths.length) {
+        doc.setFontSize(13);
+        doc.text('Strengths:', left, y);
+        y += 12;
+        doc.setFontSize(11);
+        candidate.strengths.forEach(str => {
+            const lines = doc.splitTextToSize(`• ${str}`, wrapWidth - 10);
+            doc.text(lines, left + 10, y);
+            y += lines.length * 14;
+            if (y > pageHeight - 40) { doc.addPage(); y = 40; }
+        });
+        y += 10;
+    }
+
+    if (candidate.concerns && candidate.concerns.length) {
+        doc.setFontSize(13);
+        doc.text('Concerns:', left, y);
+        y += 12;
+        doc.setFontSize(11);
+        candidate.concerns.forEach(c => {
+            const lines = doc.splitTextToSize(`• ${c}`, wrapWidth - 10);
+            doc.text(lines, left + 10, y);
+            y += lines.length * 14;
+            if (y > pageHeight - 40) { doc.addPage(); y = 40; }
+        });
+        y += 10;
+    }
+
+    if (candidate.recommendation) {
+        doc.setFontSize(13);
+        doc.text('Recommendation:', left, y);
+        y += 12;
+        doc.setFontSize(11);
+        const recLines = doc.splitTextToSize(candidate.recommendation, wrapWidth);
+        doc.text(recLines, left, y);
+        y += recLines.length * 14;
+        y += 10;
+    }
+
+    if (candidate.careerAnalytics) {
+        const analytics = parseCareerAnalyticsForPDF(candidate.careerAnalytics);
+        if (analytics) {
+            doc.setFontSize(13);
+            doc.text('Executive Summary:', left, y);
+            y += 12;
+            doc.setFontSize(11);
+            const execLines = doc.splitTextToSize(analytics.executiveSummary, wrapWidth);
+            doc.text(execLines, left, y);
+            y += execLines.length * 14 + 10;
+
+            doc.setFontSize(13);
+            doc.text('Current Strengths:', left, y);
+            y += 12;
+            doc.setFontSize(11);
+            const csLines = doc.splitTextToSize(analytics.currentStrengths, wrapWidth);
+            doc.text(csLines, left, y);
+            y += csLines.length * 14 + 10;
+
+            doc.setFontSize(13);
+            doc.text('Growth Potential:', left, y);
+            y += 12;
+            doc.setFontSize(11);
+            const gpLines = doc.splitTextToSize(analytics.growthPotential, wrapWidth);
+            doc.text(gpLines, left, y);
+            y += gpLines.length * 14 + 10;
+
+            doc.setFontSize(13);
+            doc.text('Career Trajectory:', left, y);
+            y += 12;
+            doc.setFontSize(11);
+            const ctLines = doc.splitTextToSize(analytics.careerTrajectory, wrapWidth);
+            doc.text(ctLines, left, y);
+            y += ctLines.length * 14 + 10;
+
+            if (analytics.riskAssessment) {
+                doc.setFontSize(13);
+                doc.text('Risk Assessment:', left, y);
+                y += 12;
+                doc.setFontSize(11);
+                const raLines = doc.splitTextToSize(analytics.riskAssessment, wrapWidth);
+                doc.text(raLines, left, y);
+                y += raLines.length * 14 + 10;
+            }
+
+            if (analytics.hiringRecommendation) {
+                doc.setFontSize(13);
+                doc.text('Hiring Recommendation:', left, y);
+                y += 12;
+                doc.setFontSize(11);
+                const hrLines = doc.splitTextToSize(analytics.hiringRecommendation, wrapWidth);
+                doc.text(hrLines, left, y);
+                y += hrLines.length * 14 + 10;
+            }
+        }
+    }
+
+    const cleanName = candidate.name.replace(/[^a-zA-Z0-9]/g, '_');
+    const fileName = `Leadfinder_${cleanName}_${new Date().toISOString().split('T')[0]}.pdf`;
+    doc.save(fileName);
 }
 	
 // Helper functions for parsing analytics (matching web logic)
