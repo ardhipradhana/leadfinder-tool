@@ -4856,7 +4856,7 @@ function exportCandidateToPDF(candidate) {
     doc.setFillColor(...colors.secondary);
     doc.circle(scoreX, scoreY, 12, 'F');
     
-    doc.setFontSize(16);
+    doc.setFontSize(20);
     doc.setFont(undefined, "bold");
     doc.setTextColor(255, 255, 255);
     const scoreText = candidate.aiScore.toString();
@@ -4981,13 +4981,13 @@ function exportCandidateToPDF(candidate) {
                 currentY += 12;
             }
             
-            doc.setFillColor(59, 130, 246, 0.2);
-            doc.setDrawColor(59, 130, 246, 0.3);
+            doc.setFillColor(219, 234, 254);
+            doc.setDrawColor(147, 197, 253);
             doc.setLineWidth(0.5);
             doc.roundedRect(currentX, currentY - 5, tagWidth, 8, 2, 2, 'FD');
             
-            doc.setFont(undefined, "medium");
-            doc.setTextColor(...colors.blue);
+            doc.setFont(undefined, "normal");
+            doc.setTextColor(59, 130, 246);
             doc.text(skill, currentX + 4, currentY);
             
             currentX += tagWidth + 4;
