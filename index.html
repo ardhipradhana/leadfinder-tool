@@ -485,6 +485,33 @@
 		    animation: subtle-pulse 2s infinite;
 		}
 
+	    	#individualAnalyticsModal .transition-all {
+		    transition: all 0.3s ease;
+		}
+		
+		#individualAnalyticsTip {
+		    transition: opacity 0.3s ease;
+		}
+		
+		#individualAnalyticsProgressBar {
+		    background: linear-gradient(90deg, #8b5cf6, #3b82f6);
+		    box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+		}
+		
+		/* Pulsing animation for processing steps */
+		@keyframes pulse-glow {
+		    0%, 100% {
+		        box-shadow: 0 0 5px rgba(234, 179, 8, 0.4);
+		    }
+		    50% {
+		        box-shadow: 0 0 20px rgba(234, 179, 8, 0.6);
+		    }
+		}
+		
+		.animate-pulse-glow {
+		    animation: pulse-glow 2s infinite;
+		}
+
     </style>
 
 <!-- Enhanced Payment Loading Modal -->
@@ -1831,6 +1858,8 @@ let isSearching = false;
 let isAnalyzing = false;
 let loadingCancelled = false;
 let savedCandidates = JSON.parse(localStorage.getItem('leadfinder_saved_candidates') || '[]');
+let individualAnalyticsInterval;
+let individualAnalyticsCancelled = false;
 window.showPricingPage = showPricingPage;
 window.showPrivacyPolicy = showPrivacyPolicy;
 window.showHowItWorks = showHowItWorks;
@@ -6141,60 +6170,50 @@ async function upgradeIndividualCandidate(candidateId) {
     console.log('Found candidate:', candidate ? candidate.name : 'NOT FOUND');
     
     if (!candidate) {
-        isAnalyzing = false; // Reset flag on early return
+        isAnalyzing = false;
         throw new Error('Candidate not found');
     }
+
+    // SHOW ANIMATION MODAL INSTEAD OF JUST BUTTON LOADING
+    showIndividualAnalyticsAnimation(candidate.name);
     
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 minutes
+    const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 minutes timeout
     
     const requestBody = {
         candidate: candidate,
-        userId: 'test-user-123',
+        userId: currentUser?.id || 'test-user-123',
         timestamp: new Date().toISOString(),
         type: 'individual'
     };
     
     const requestUrl = 'https://montpro.app.n8n.cloud/webhook/leadfinder-individual-analytics';
     
-    // DETAILED DEBUG LOGGING
-    console.log('=== INDIVIDUAL ANALYTICS REQUEST DEBUG ===');
-    console.log('Request URL:', requestUrl);
-    console.log('Request Body:', JSON.stringify(requestBody, null, 2));
-    console.log('Candidate being sent:', candidate.name);
-    console.log('==========================================');
+    console.log('Making individual analytics request...');
     
     try {
-        console.log('Making fetch request...');
-        
         const response = await fetch(requestUrl, {
             method: 'POST',
             signal: controller.signal,
             headers: { 
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer leadfinder_secretkey123`,
-                'X-User-ID': 'test-user-123'
+                'X-User-ID': currentUser?.id || 'test-user-123'
             },
             body: JSON.stringify(requestBody)
         });
         
         clearTimeout(timeoutId);
-        console.log('Response received. Status:', response.status);
-        console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+        console.log('Individual response received:', response.status);
         
-        // Log response text regardless of status for debugging
-        const responseText = await response.text();
-        console.log('Raw response text:', responseText);
-        
-        const data = JSON.parse(responseText);
-        console.log('Parsed response data:', data);
-        
-        // Handle both success (200) and server errors (500) that still return valid data
-        if (!response.ok && response.status !== 500) {
-            throw new Error(`HTTP error! status: ${response.status}, response: ${responseText}`);
+        if (!response.ok) {
+            const responseText = await response.text();
+            console.error('Analytics API error:', responseText);
+            throw new Error(`Analytics failed. Server responded with status: ${response.status}, response: ${responseText}`);
         }
         
         // Handle the standardized response format (direct object, not wrapped in array)
+        const data = await response.json();
         if (data && data.success && data.results && data.results.length > 0) {
             const result = data.results[0];
             console.log('=== INDIVIDUAL ANALYTICS RESULT ===');
@@ -6216,13 +6235,6 @@ async function upgradeIndividualCandidate(candidateId) {
 
                 console.log('After update - has analytics:', !!currentCandidates[candidateIndex].careerAnalytics);
                 
-                // Check if other candidates got contaminated
-                currentCandidates.forEach((c, i) => {
-                    if (i !== candidateIndex && c.careerAnalytics) {
-                        console.log(`🚨 CONTAMINATION: Candidate ${i} (${c.name}) has analytics but shouldn't!`);
-                    }
-                });
-                
                 // Refresh the UI
                 updateCandidateCards(currentCandidates);
                 attachCandidateCardHandlers(currentCandidates);
@@ -6241,6 +6253,8 @@ async function upgradeIndividualCandidate(candidateId) {
                     type: 'individual'
                 }, 1, [currentCandidates[candidateIndex]]);
                 
+                // HIDE ANIMATION MODAL AND SHOW SUCCESS
+                hideIndividualAnalyticsModal();
                 showCustomToast('Success', `Analytics completed for ${result.candidateName}!`, 'success');
                 console.log('Individual analytics completed successfully');
             }
@@ -6255,10 +6269,188 @@ async function upgradeIndividualCandidate(candidateId) {
         clearTimeout(timeoutId);
         console.error('Individual analytics failed:', error);
         
+        // HIDE ANIMATION MODAL ON ERROR
+        hideIndividualAnalyticsModal();
+        
         // Reset flag on error
         isAnalyzing = false;
         throw error;
     }
+}
+
+function showIndividualAnalyticsAnimation(candidateName) {
+    individualAnalyticsCancelled = false;
+    
+    // Update candidate name
+    document.getElementById('individualAnalyticsCandidate').textContent = `Analyzing ${candidateName}'s career potential...`;
+    
+    // Reset all steps
+    for (let i = 1; i <= 4; i++) {
+        const step = document.getElementById(`analytics-step-${i}`);
+        const status = document.getElementById(`status-${i}`);
+        const circle = step.querySelector('.w-6.h-6');
+        
+        // Reset to pending state
+        circle.className = 'w-6 h-6 rounded-full bg-gray-600 flex items-center justify-center';
+        circle.innerHTML = `<span class="text-xs text-gray-400">${i}</span>`;
+        status.textContent = 'Pending';
+        status.className = 'text-xs text-gray-400';
+    }
+    
+    // Reset progress
+    document.getElementById('individualAnalyticsProgress').textContent = '0%';
+    document.getElementById('individualAnalyticsProgressBar').style.width = '0%';
+    
+    // Show modal
+    document.getElementById('individualAnalyticsModal').classList.remove('hidden');
+    
+    // Start animation
+    runIndividualAnalyticsAnimation();
+}
+
+// Run the analysis animation
+async function runIndividualAnalyticsAnimation() {
+    const steps = [
+        { 
+            step: 1, 
+            text: 'Processing candidate profile', 
+            delay: 2000, 
+            progress: 25,
+            tip: '📊 Analyzing work history, skills, and achievements'
+        },
+        { 
+            step: 2, 
+            text: 'Analyzing market trends', 
+            delay: 8000, 
+            progress: 50,
+            tip: '📈 Comparing against industry benchmarks and salary data'
+        },
+        { 
+            step: 3, 
+            text: 'Calculating growth potential', 
+            delay: 12000, 
+            progress: 75,
+            tip: '🚀 Predicting career advancement and future opportunities'
+        },
+        { 
+            step: 4, 
+            text: 'Generating insights report', 
+            delay: 16000, 
+            progress: 100,
+            tip: '✨ Creating comprehensive analytics summary'
+        }
+    ];
+
+    let lastProgress = 0;
+    
+    for (let stepData of steps) {
+        if (individualAnalyticsCancelled) {
+            console.log('Individual analytics animation cancelled');
+            return;
+        }
+        
+        // Animate progress smoothly to target
+        await animateIndividualProgress(lastProgress, stepData.progress, stepData.delay - (lastProgress === 0 ? 0 : 4000));
+        
+        if (individualAnalyticsCancelled) return;
+        
+        // Update step status to processing
+        updateIndividualStepStatus(stepData.step, 'processing');
+        updateIndividualAnalyticsTip(stepData.tip);
+        
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        if (individualAnalyticsCancelled) return;
+        
+        // Complete the step
+        updateIndividualStepStatus(stepData.step, 'complete');
+        
+        lastProgress = stepData.progress;
+    }
+    
+    if (!individualAnalyticsCancelled) {
+        await new Promise(resolve => setTimeout(resolve, 500));
+        updateIndividualAnalyticsTip('🎉 Analysis completed successfully!');
+    }
+}
+
+// Animate progress bar smoothly
+async function animateIndividualProgress(startProgress, targetProgress, duration) {
+    const steps = 60; // 60 FPS
+    const increment = (targetProgress - startProgress) / steps;
+    const stepDuration = duration / steps;
+    
+    for (let i = 0; i <= steps; i++) {
+        if (individualAnalyticsCancelled) return;
+        
+        const currentProgress = startProgress + (increment * i);
+        document.getElementById('individualAnalyticsProgress').textContent = `${Math.round(currentProgress)}%`;
+        document.getElementById('individualAnalyticsProgressBar').style.width = `${currentProgress}%`;
+        
+        await new Promise(resolve => setTimeout(resolve, stepDuration));
+    }
+}
+
+// Update step status with visual feedback
+function updateIndividualStepStatus(stepNumber, status) {
+    const step = document.getElementById(`analytics-step-${stepNumber}`);
+    const statusElement = document.getElementById(`status-${stepNumber}`);
+    const circle = step.querySelector('.w-6.h-6');
+    
+    if (status === 'processing') {
+        circle.className = 'w-6 h-6 rounded-full bg-yellow-500/20 border-2 border-yellow-500 flex items-center justify-center animate-pulse';
+        circle.innerHTML = `
+            <svg class="w-3 h-3 text-yellow-400 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+            </svg>
+        `;
+        statusElement.textContent = 'Processing...';
+        statusElement.className = 'text-xs text-yellow-400';
+    } else if (status === 'complete') {
+        circle.className = 'w-6 h-6 rounded-full bg-purple-500 flex items-center justify-center';
+        circle.innerHTML = `
+            <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+            </svg>
+        `;
+        statusElement.textContent = 'Complete';
+        statusElement.className = 'text-xs text-purple-400';
+    }
+}
+
+// Update tip with fade animation
+function updateIndividualAnalyticsTip(tip) {
+    const tipElement = document.getElementById('individualAnalyticsTip');
+    if (tipElement) {
+        tipElement.style.opacity = '0';
+        setTimeout(() => {
+            tipElement.textContent = tip;
+            tipElement.style.opacity = '1';
+        }, 200);
+    }
+}
+
+// Hide individual analytics modal
+function hideIndividualAnalyticsModal() {
+    document.getElementById('individualAnalyticsModal').classList.add('hidden');
+    individualAnalyticsCancelled = true;
+}
+
+// Cancel analysis
+function cancelIndividualAnalytics() {
+    individualAnalyticsCancelled = true;
+    hideIndividualAnalyticsModal();
+    
+    // Reset any loading states
+    const upgradeButtons = document.querySelectorAll('.upgrade-analytics-btn');
+    upgradeButtons.forEach(btn => {
+        btn.disabled = false;
+        btn.classList.remove('opacity-75');
+        // Reset button text (you'll need to store original text)
+    });
+    
+    console.log('Individual analytics cancelled by user');
 }
 
 // Bulk candidates upgrade  
@@ -7089,30 +7281,13 @@ setTimeout(() => {
 	            return;
 	        }
 	        
-	        // Disable button and show loading
-	        upgradeBtn.disabled = true;
-	        const originalHTML = upgradeBtn.innerHTML;
-	        upgradeBtn.innerHTML = `
-	            <div class="flex items-center space-x-2">
-	                <svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-	                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-	                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-	                </svg>
-	                <span>Analyzing...</span>
-	            </div>
-	        `;
-	        upgradeBtn.classList.add('opacity-75');
+	        // DON'T MODIFY BUTTON STATE - THE ANIMATION MODAL HANDLES THE UI
 	        
 	        try {
 	            await upgradeIndividualCandidate(candidateId);
 	        } catch (error) {
 	            console.error('Individual upgrade failed:', error);
 	            showCustomToast('Analysis Failed', 'Please try again.', 'error');
-	            
-	            // Re-enable button on error
-	            upgradeBtn.disabled = false;
-	            upgradeBtn.innerHTML = originalHTML;
-	            upgradeBtn.classList.remove('opacity-75');
 	        } finally {
 	            window.upgradingCandidate = false;
 	        }
@@ -8622,6 +8797,94 @@ setTimeout(() => {
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Individual Analytics Loading Modal -->
+<div id="individualAnalyticsModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-dark-secondary rounded-xl max-w-2xl w-full p-8 text-center">
+        <!-- Header -->
+        <div class="mb-8">
+            <div class="w-16 h-16 bg-gradient-to-r from-purple-500/20 to-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                </svg>
+            </div>
+            <h3 class="text-2xl font-bold text-white mb-2">Career Predictive Analytics</h3>
+            <p class="text-gray-400" id="individualAnalyticsCandidate">Analyzing candidate potential...</p>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="mb-8">
+            <div class="flex justify-between text-sm text-gray-400 mb-2">
+                <span>Analysis Progress</span>
+                <span id="individualAnalyticsProgress">0%</span>
+            </div>
+            <div class="w-full bg-dark-primary rounded-full h-3 overflow-hidden">
+                <div id="individualAnalyticsProgressBar" class="h-full bg-gradient-to-r from-purple-500 to-blue-500 transition-all duration-1000 ease-out" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Analysis Steps -->
+        <div class="space-y-4 mb-8 text-left">
+            <div class="flex items-center space-x-3" id="analytics-step-1">
+                <div class="w-6 h-6 rounded-full bg-gray-600 flex items-center justify-center">
+                    <span class="text-xs text-gray-400">1</span>
+                </div>
+                <div class="flex-1">
+                    <div class="text-sm text-white">Processing candidate profile</div>
+                    <div class="text-xs text-gray-500">Extracting skills, experience, and career trajectory</div>
+                </div>
+                <span class="text-xs text-gray-400" id="status-1">Pending</span>
+            </div>
+            
+            <div class="flex items-center space-x-3" id="analytics-step-2">
+                <div class="w-6 h-6 rounded-full bg-gray-600 flex items-center justify-center">
+                    <span class="text-xs text-gray-400">2</span>
+                </div>
+                <div class="flex-1">
+                    <div class="text-sm text-white">Analyzing market trends</div>
+                    <div class="text-xs text-gray-500">Comparing against industry standards and benchmarks</div>
+                </div>
+                <span class="text-xs text-gray-400" id="status-2">Pending</span>
+            </div>
+            
+            <div class="flex items-center space-x-3" id="analytics-step-3">
+                <div class="w-6 h-6 rounded-full bg-gray-600 flex items-center justify-center">
+                    <span class="text-xs text-gray-400">3</span>
+                </div>
+                <div class="flex-1">
+                    <div class="text-sm text-white">Calculating growth potential</div>
+                    <div class="text-xs text-gray-500">Predicting career advancement opportunities</div>
+                </div>
+                <span class="text-xs text-gray-400" id="status-3">Pending</span>
+            </div>
+            
+            <div class="flex items-center space-x-3" id="analytics-step-4">
+                <div class="w-6 h-6 rounded-full bg-gray-600 flex items-center justify-center">
+                    <span class="text-xs text-gray-400">4</span>
+                </div>
+                <div class="flex-1">
+                    <div class="text-sm text-white">Generating insights report</div>
+                    <div class="text-xs text-gray-500">Creating comprehensive analytics summary</div>
+                </div>
+                <span class="text-xs text-gray-400" id="status-4">Pending</span>
+            </div>
+        </div>
+
+        <!-- Dynamic Tip -->
+        <div class="bg-gradient-to-r from-purple-900/30 to-blue-900/30 rounded-lg p-4 border border-purple-500/20">
+            <p class="text-sm text-purple-300" id="individualAnalyticsTip">
+                🧠 Our AI analyzes 50+ data points to predict career potential
+            </p>
+        </div>
+
+        <!-- Cancel Button -->
+        <div class="mt-6">
+            <button onclick="cancelIndividualAnalytics()" class="px-6 py-2 text-gray-400 hover:text-white transition-colors">
+                Cancel Analysis
+            </button>
         </div>
     </div>
 </div>
