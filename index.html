@@ -4861,7 +4861,7 @@ function exportCandidateToPDF(candidate) {
     doc.setTextColor(255, 255, 255);
     const scoreText = candidate.aiScore.toString();
     const scoreTextWidth = doc.getTextWidth(scoreText);
-    doc.text(scoreText, scoreX - (scoreTextWidth / 2), scoreY + 2);
+    doc.text(scoreText, scoreX - (scoreTextWidth / 2), scoreY + 2.5);
     
     yPos += 8;
     
@@ -5028,42 +5028,297 @@ function exportCandidateToPDF(candidate) {
     
     // ===== CAREER ANALYTICS (Clean, No Symbols) =====
     if (candidate.careerAnalytics) {
-        checkNewPage(60);
-        
-        // Clean section header
-        doc.setFillColor(...colors.secondary);
-        doc.rect(margin - 5, yPos - 5, contentWidth + 10, 15, 'F');
-        
-        doc.setFontSize(16);
-        doc.setFont(undefined, "bold");
-        doc.setTextColor(255, 255, 255);
-        doc.text('Career Predictive Analytics', margin, yPos + 6);
-        
-        yPos += 20;
-        
-        // Parse analytics (clean text only)
-        let analyticsText = candidate.careerAnalytics;
-        if (typeof analyticsText === 'object' && analyticsText.output) {
-            const parsed = JSON.parse(analyticsText.output);
-            analyticsText = parsed.careerAnalytics;
-        }
-        
-        // Clean up text - remove ALL special characters
-        analyticsText = analyticsText.toString()
-            .replace(/[^\w\s\-.,()%/:]/g, ' ')
-            .replace(/\s+/g, ' ')
-            .trim();
-        
-        // Show clean analytics content
-        doc.setFontSize(10);
-        doc.setFont(undefined, "normal");
-        doc.setTextColor(...colors.dark);
-        
-        const wrappedAnalytics = doc.splitTextToSize(analyticsText, contentWidth);
-        doc.text(wrappedAnalytics, margin, yPos);
-        
-        yPos += wrappedAnalytics.length * 5 + 10;
-    }
+	    checkNewPage(60);
+	    
+	    // Main section header with icon
+	    doc.setFillColor(...colors.secondary);
+	    doc.rect(margin - 5, yPos - 5, contentWidth + 10, 15, 'F');
+	    
+	    doc.setFontSize(16);
+	    doc.setFont(undefined, "bold");
+	    doc.setTextColor(255, 255, 255);
+	    doc.text('💡 Career Predictive Analytics', margin, yPos + 6);
+	    
+	    yPos += 25;
+	    
+	    // Parse analytics text like the web does
+	    let analyticsText = candidate.careerAnalytics;
+	    if (typeof analyticsText === 'object' && analyticsText.output) {
+	        const parsed = JSON.parse(analyticsText.output);
+	        analyticsText = parsed.careerAnalytics;
+	    }
+	    
+	    // Parse into structured sections (like web interface)
+	    const sections = parseAnalyticsForPDF(analyticsText);
+	    
+	    // ===== EXECUTIVE SUMMARY CARD =====
+	    if (sections.executiveSummary) {
+	        // Card background (purple like web)
+	        doc.setFillColor(139, 92, 246, 0.1); // Light purple
+	        doc.setDrawColor(139, 92, 246);
+	        doc.setLineWidth(1);
+	        doc.roundedRect(margin, yPos, contentWidth, 25, 3, 3, 'FD');
+	        
+	        // Trophy icon and title
+	        doc.setFontSize(12);
+	        doc.setFont(undefined, "bold");
+	        doc.setTextColor(139, 92, 246);
+	        doc.text('🏆 Executive Summary', margin + 5, yPos + 8);
+	        
+	        // Summary content
+	        doc.setFontSize(10);
+	        doc.setFont(undefined, "normal");
+	        doc.setTextColor(...colors.dark);
+	        const wrappedSummary = doc.splitTextToSize(sections.executiveSummary, contentWidth - 12);
+	        doc.text(wrappedSummary, margin + 5, yPos + 16);
+	        
+	        yPos += Math.max(25, wrappedSummary.length * 4 + 20);
+	        checkNewPage(30);
+	    }
+	    
+	    // ===== CURRENT STRENGTHS CARD =====
+	    if (sections.currentStrengths) {
+	        // Card background (green like web)
+	        doc.setFillColor(34, 197, 94, 0.1); // Light green
+	        doc.setDrawColor(34, 197, 94);
+	        doc.setLineWidth(1);
+	        doc.roundedRect(margin, yPos, contentWidth, 45, 3, 3, 'FD');
+	        
+	        // Muscle icon and title
+	        doc.setFontSize(12);
+	        doc.setFont(undefined, "bold");
+	        doc.setTextColor(34, 197, 94);
+	        doc.text('💪 Current Strengths', margin + 5, yPos + 8);
+	        
+	        yPos += 12;
+	        
+	        // Market Intelligence subsection
+	        if (sections.marketIntelligence) {
+	            doc.setFontSize(10);
+	            doc.setFont(undefined, "bold");
+	            doc.setTextColor(34, 197, 94);
+	            doc.text('Market Intelligence & Positioning', margin + 8, yPos + 5);
+	            
+	            doc.setFontSize(9);
+	            doc.setFont(undefined, "normal");
+	            doc.setTextColor(...colors.dark);
+	            const wrappedMarket = doc.splitTextToSize(sections.marketIntelligence, contentWidth - 16);
+	            doc.text(wrappedMarket, margin + 8, yPos + 12);
+	            
+	            yPos += wrappedMarket.length * 4 + 8;
+	        }
+	        
+	        // Peer Benchmarking subsection
+	        if (sections.peerBenchmarking) {
+	            doc.setFontSize(10);
+	            doc.setFont(undefined, "bold");
+	            doc.setTextColor(34, 197, 94);
+	            doc.text('Peer Benchmarking', margin + 8, yPos + 5);
+	            
+	            doc.setFontSize(9);
+	            doc.setFont(undefined, "normal");
+	            doc.setTextColor(...colors.dark);
+	            const wrappedPeer = doc.splitTextToSize(sections.peerBenchmarking, contentWidth - 16);
+	            doc.text(wrappedPeer, margin + 8, yPos + 12);
+	            
+	            yPos += wrappedPeer.length * 4 + 15;
+	        }
+	        
+	        checkNewPage(30);
+	    }
+	    
+	    // ===== CAREER TRAJECTORY CARD =====
+	    if (sections.careerTrajectory || sections.compensation) {
+	        // Card background (blue like web)
+	        doc.setFillColor(59, 130, 246, 0.1); // Light blue
+	        doc.setDrawColor(59, 130, 246);
+	        doc.setLineWidth(1);
+	        doc.roundedRect(margin, yPos, contentWidth, 45, 3, 3, 'FD');
+	        
+	        // Chart icon and title
+	        doc.setFontSize(12);
+	        doc.setFont(undefined, "bold");
+	        doc.setTextColor(59, 130, 246);
+	        doc.text('📈 Career Trajectory & Compensation', margin + 5, yPos + 8);
+	        
+	        yPos += 12;
+	        
+	        // Career Trajectory subsection
+	        if (sections.careerTrajectory) {
+	            doc.setFontSize(10);
+	            doc.setFont(undefined, "bold");
+	            doc.setTextColor(59, 130, 246);
+	            doc.text('Career Trajectory Forecast', margin + 8, yPos + 5);
+	            
+	            doc.setFontSize(9);
+	            doc.setFont(undefined, "normal");
+	            doc.setTextColor(...colors.dark);
+	            const wrappedCareer = doc.splitTextToSize(sections.careerTrajectory, contentWidth - 16);
+	            doc.text(wrappedCareer, margin + 8, yPos + 12);
+	            
+	            yPos += wrappedCareer.length * 4 + 8;
+	        }
+	        
+	        // Compensation subsection
+	        if (sections.compensation) {
+	            doc.setFontSize(10);
+	            doc.setFont(undefined, "bold");
+	            doc.setTextColor(59, 130, 246);
+	            doc.text('Compensation Progression Analysis', margin + 8, yPos + 5);
+	            
+	            doc.setFontSize(9);
+	            doc.setFont(undefined, "normal");
+	            doc.setTextColor(...colors.dark);
+	            const wrappedComp = doc.splitTextToSize(sections.compensation, contentWidth - 16);
+	            doc.text(wrappedComp, margin + 8, yPos + 12);
+	            
+	            yPos += wrappedComp.length * 4 + 15;
+	        }
+	        
+	        checkNewPage(30);
+	    }
+	    
+	    // ===== GROWTH POTENTIAL CARD =====
+	    if (sections.growthPotential || sections.acceleration) {
+	        // Card background (yellow like web)
+	        doc.setFillColor(245, 158, 11, 0.1); // Light yellow
+	        doc.setDrawColor(245, 158, 11);
+	        doc.setLineWidth(1);
+	        doc.roundedRect(margin, yPos, contentWidth, 45, 3, 3, 'FD');
+	        
+	        // Target icon and title
+	        doc.setFontSize(12);
+	        doc.setFont(undefined, "bold");
+	        doc.setTextColor(245, 158, 11);
+	        doc.text('🎯 Growth Potential & Development', margin + 5, yPos + 8);
+	        
+	        yPos += 12;
+	        
+	        // Strategic Development subsection
+	        if (sections.growthPotential) {
+	            doc.setFontSize(10);
+	            doc.setFont(undefined, "bold");
+	            doc.setTextColor(245, 158, 11);
+	            doc.text('Strategic Development Roadmap', margin + 8, yPos + 5);
+	            
+	            doc.setFontSize(9);
+	            doc.setFont(undefined, "normal");
+	            doc.setTextColor(...colors.dark);
+	            const wrappedGrowth = doc.splitTextToSize(sections.growthPotential, contentWidth - 16);
+	            doc.text(wrappedGrowth, margin + 8, yPos + 12);
+	            
+	            yPos += wrappedGrowth.length * 4 + 8;
+	        }
+	        
+	        // Acceleration Strategies subsection
+	        if (sections.acceleration) {
+	            doc.setFontSize(10);
+	            doc.setFont(undefined, "bold");
+	            doc.setTextColor(245, 158, 11);
+	            doc.text('Acceleration Strategies', margin + 8, yPos + 5);
+	            
+	            doc.setFontSize(9);
+	            doc.setFont(undefined, "normal");
+	            doc.setTextColor(...colors.dark);
+	            const wrappedAccel = doc.splitTextToSize(sections.acceleration, contentWidth - 16);
+	            doc.text(wrappedAccel, margin + 8, yPos + 12);
+	            
+	            yPos += wrappedAccel.length * 4 + 15;
+	        }
+	        
+	        checkNewPage(30);
+	    }
+	    
+	    // ===== RISK ASSESSMENT CARD =====
+	    if (sections.riskAssessment) {
+	        // Card background (red like web)
+	        doc.setFillColor(239, 68, 68, 0.1); // Light red
+	        doc.setDrawColor(239, 68, 68);
+	        doc.setLineWidth(1);
+	        doc.roundedRect(margin, yPos, contentWidth, 25, 3, 3, 'FD');
+	        
+	        // Shield icon and title
+	        doc.setFontSize(12);
+	        doc.setFont(undefined, "bold");
+	        doc.setTextColor(239, 68, 68);
+	        doc.text('🛡️ Risk Assessment', margin + 5, yPos + 8);
+	        
+	        // Risk content
+	        doc.setFontSize(10);
+	        doc.setFont(undefined, "normal");
+	        doc.setTextColor(...colors.dark);
+	        const wrappedRisk = doc.splitTextToSize(sections.riskAssessment, contentWidth - 12);
+	        doc.text(wrappedRisk, margin + 5, yPos + 16);
+	        
+	        yPos += Math.max(25, wrappedRisk.length * 4 + 20);
+	    }
+	}
+	
+	// Helper function to parse analytics into structured sections
+	function parseAnalyticsForPDF(rawText) {
+	    if (!rawText) return {};
+	    
+	    // Clean the text first
+	    const cleanText = rawText.toString()
+	        .replace(/[^\w\s\-.,()%/:]/g, ' ')
+	        .replace(/\s+/g, ' ')
+	        .trim();
+	    
+	    const sections = {};
+	    
+	    // Extract Executive Summary (potential rating info)
+	    const potentialMatch = cleanText.match(/Potential Rating[:\s]*(\d+\/100[^.]*)/);
+	    const levelMatch = cleanText.match(/Current Level[:\s]*(\d+\/100)/);
+	    const speedMatch = cleanText.match(/Development Speed[:\s]*([^)]+\))/);
+	    
+	    if (potentialMatch || levelMatch) {
+	        sections.executiveSummary = `${potentialMatch?.[1] || '65/100'} potential rating with ${levelMatch?.[1] || '30/100'} current performance level. ${speedMatch?.[1] || 'Standard (3-5 years to peak in current trajectory)'} development timeline.`;
+	    }
+	    
+	    // Extract Market Intelligence
+	    const marketMatch = cleanText.match(/Industry Demand[:\s]*([^C]*?)(?=Competition|$)/);
+	    if (marketMatch) {
+	        sections.marketIntelligence = marketMatch[1].trim();
+	    }
+	    
+	    // Extract Peer Benchmarking
+	    const peerMatch = cleanText.match(/Market Position[:\s]*([^C]*?)(?=Competitive|$)/);
+	    if (peerMatch) {
+	        sections.peerBenchmarking = peerMatch[1].trim();
+	    }
+	    
+	    // Extract Career Trajectory
+	    const trajectoryMatch = cleanText.match(/Next Position[:\s]*([^P]*?)(?=Probability|Peak|$)/);
+	    if (trajectoryMatch) {
+	        sections.careerTrajectory = trajectoryMatch[1].trim();
+	    }
+	    
+	    // Extract Compensation
+	    const compMatch = cleanText.match(/Current Market Value[:\s]*([^N]*?)(?=Next|Peak|$)/);
+	    if (compMatch) {
+	        sections.compensation = compMatch[1].trim();
+	    }
+	    
+	    // Extract Growth Potential
+	    const growthMatch = cleanText.match(/Critical Skills Gap[:\s]*([^H]*?)(?=High-Impact|Skill|$)/);
+	    if (growthMatch) {
+	        sections.growthPotential = growthMatch[1].trim();
+	    }
+	    
+	    // Extract Acceleration Strategies
+	    const accelMatch = cleanText.match(/Pursue[^-]*-[^-]*-[^-]*-[^-]*-/);
+	    if (accelMatch) {
+	        sections.acceleration = accelMatch[0].replace(/-/g, '\n•').trim();
+	    }
+	    
+	    // Extract Risk Assessment
+	    const riskMatch = cleanText.match(/Career Stability[:\s]*([^R]*?)(?=Reasoning|$)/);
+	    if (riskMatch) {
+	        sections.riskAssessment = riskMatch[1].trim();
+	    }
+	    
+	    return sections;
+	}
     
     // ===== AI RECOMMENDATION =====
     if (candidate.recommendation) {
