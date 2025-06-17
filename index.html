@@ -4869,21 +4869,22 @@ function exportCandidateToPDF(candidate) {
 	
 	// Candidate initials circle (properly centered)
 	const initials = candidate.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-	
+
 	doc.setFillColor(255, 255, 255);
-	doc.circle(margin + 10, yPos + 10, 6, 'F');
+	const circleX = margin + 10;
+	const circleY = yPos + 10;
+	doc.circle(circleX, circleY, 6, 'F');
 	
-	// Calculate text positioning for perfect centering
+	// Perfect centering calculation
 	doc.setFontSize(10);
 	doc.setFont(undefined, "bold");
 	doc.setTextColor(...colors.primary);
 	
 	const initialsWidth = doc.getTextWidth(initials);
-	const circleX = margin + 10;
-	const circleY = yPos + 10;
 	
-	// Center the initials in the circle
-	doc.text(initials, circleX - (initialsWidth / 2), circleY + 3);
+	// Center horizontally: circle center - half text width
+	// Center vertically: circle center + (font size / 3) for baseline adjustment
+	doc.text(initials, circleX - (initialsWidth / 2), circleY + 3.5);
 	
 	// Title
 	doc.setFontSize(16);
@@ -4895,43 +4896,56 @@ function exportCandidateToPDF(candidate) {
     
     // ===== CANDIDATE HEADER =====
     // Name
-    doc.setFontSize(20);
-    doc.setFont(undefined, "bold");
-    doc.setTextColor(...colors.dark);
-    doc.text(candidate.name, margin, yPos);
+    const textAreaWidth = contentWidth - 45;  // Leave space for score circle
+
+	// Name
+	doc.setFontSize(20);
+	doc.setFont(undefined, "bold");
+	doc.setTextColor(...colors.dark);
+	doc.text(candidate.name, margin, yPos);
+	
+	yPos += 8;
     
     // AI Score circle
-    const scoreRadius = 12;  
-	const scoreX = margin + contentWidth - 25;  
-	const scoreY = yPos + 5;
-    
-    doc.setFillColor(...colors.secondary);
+    const scoreRadius = 12;
+	const scoreX = margin + contentWidth - 25;
+	const scoreY = yPos - 20;  // Position relative to candidate info
+	
+	// Circle background
+	doc.setFillColor(...colors.secondary);
 	doc.circle(scoreX, scoreY, scoreRadius, 'F');
 	
-	doc.setFontSize(12);
+	// Score text - bigger and perfectly centered
+	doc.setFontSize(14);  // Increased from 12
 	doc.setFont(undefined, "bold");
 	doc.setTextColor(255, 255, 255);
 	
 	const scoreText = candidate.aiScore.toString();
 	const scoreTextWidth = doc.getTextWidth(scoreText);
 	
-	doc.text(scoreText, scoreX - (scoreTextWidth / 2), scoreY + 4);
+	// Perfect centering both horizontally and vertically
+	// Horizontal: center minus half width
+	// Vertical: center plus font adjustment for baseline
+	doc.text(scoreText, scoreX - (scoreTextWidth / 2), scoreY + 5);
     
     yPos += 8;
     
     // Title and Experience
     doc.setFontSize(12);
-    doc.setFont(undefined, "normal");
-    doc.setTextColor(...colors.medium);
-    doc.text(`${candidate.title} • ${candidate.experience || 'Experienced professional'}`, margin, yPos);
-    
-    yPos += 6;
+	doc.setFont(undefined, "normal");
+	doc.setTextColor(...colors.medium);
+	
+	const titleExperience = `${candidate.title} • ${candidate.experience || 'Experienced professional'}`;
+	const wrappedTitle = doc.splitTextToSize(titleExperience, textAreaWidth);
+	doc.text(wrappedTitle, margin, yPos);
+	
+	yPos += wrappedTitle.length * 6;
     
     // Location and verification
     const contactStatus = candidate.verificationStatus === 'Verified' ? 'Verified Profile' : 'Profile Available';
-    doc.text(`${candidate.location} • ${contactStatus}`, margin, yPos);
-    
-    yPos += 15;
+	const locationStatus = `${candidate.location} • ${contactStatus}`;
+	const wrappedLocation = doc.splitTextToSize(locationStatus, textAreaWidth);
+	doc.text(wrappedLocation, margin, yPos);
     
     // Divider
     doc.setDrawColor(...colors.light);
