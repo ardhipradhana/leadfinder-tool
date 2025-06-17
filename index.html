@@ -5116,35 +5116,76 @@ function formatSubSectionForPDF(text, sectionType) {
 // Export one candidate to Clipboard
 function exportCandidateToClipboard(candidate) {
     if (!candidate) return;
-    const m = candidate.scoreBreakdown || {};
-    const text = `
-Candidate Profile - ${candidate.name}
----------------------------------------
 
-Title: ${candidate.title}
-Experience: ${candidate.experience || ''}
-Location: ${candidate.location}
-AI Score: ${candidate.aiScore}
-Source: ${candidate.source}
+    const lines = [];
+    lines.push('Leadfinder Candidate Report');
+    lines.push('');
 
-AI Analysis Metrics:
-- Role Relevance: ${m.roleRelevance ?? 'N/A'}%
-- Experience Match: ${m.experienceMatch ?? 'N/A'}%
-- Location Fit: ${m.locationFit ?? 'N/A'}%
-- Profile Quality: ${m.profileQuality ?? 'N/A'}%
+    lines.push(candidate.name);
+    const titleLine = `${candidate.title || ''} • ${candidate.experience || ''}`.trim();
+    if (titleLine) lines.push(titleLine);
+    if (candidate.location) lines.push(candidate.location);
+    if (candidate.aiScore !== undefined) lines.push(`AI Score: ${candidate.aiScore}`);
+    lines.push('');
 
-Company Context:
-${candidate.companyContext || "No company context provided."}
+    if (candidate.strengths && candidate.strengths.length) {
+        lines.push('Strengths:');
+        candidate.strengths.forEach(s => lines.push(`- ${s}`));
+        lines.push('');
+    }
 
-Key Strengths:
-${(candidate.strengths || []).map(s => `- ${s}`).join('\n')}
+    if (candidate.concerns && candidate.concerns.length) {
+        lines.push('Concerns:');
+        candidate.concerns.forEach(c => lines.push(`- ${c}`));
+        lines.push('');
+    }
 
-${candidate.concerns && candidate.concerns.length > 0 ? "Concerns:\n" + candidate.concerns.map(c => `- ${c}`).join('\n') + "\n" : ""}
-${candidate.recommendation ? "AI Recommendation:\n" + candidate.recommendation : ""}
-    `.trim();
+    if (candidate.recommendation) {
+        lines.push('Recommendation:');
+        lines.push(candidate.recommendation);
+        lines.push('');
+    }
+
+    if (candidate.careerAnalytics) {
+        const analytics = parseCareerAnalyticsForPDF(candidate.careerAnalytics);
+        if (analytics) {
+            if (analytics.executiveSummary) {
+                lines.push('Executive Summary:');
+                lines.push(analytics.executiveSummary);
+                lines.push('');
+            }
+            if (analytics.currentStrengths) {
+                lines.push('Current Strengths:');
+                lines.push(analytics.currentStrengths);
+                lines.push('');
+            }
+            if (analytics.growthPotential) {
+                lines.push('Growth Potential:');
+                lines.push(analytics.growthPotential);
+                lines.push('');
+            }
+            if (analytics.careerTrajectory) {
+                lines.push('Career Trajectory:');
+                lines.push(analytics.careerTrajectory);
+                lines.push('');
+            }
+            if (analytics.riskAssessment) {
+                lines.push('Risk Assessment:');
+                lines.push(analytics.riskAssessment);
+                lines.push('');
+            }
+            if (analytics.hiringRecommendation) {
+                lines.push('Hiring Recommendation:');
+                lines.push(analytics.hiringRecommendation);
+                lines.push('');
+            }
+        }
+    }
+
+    const text = lines.join("\n").trim();
 
     navigator.clipboard.writeText(text).then(() => {
-        showExportToast("Copied to clipboard!");
+        showExportToast('Copied to clipboard!');
         setTimeout(hideExportToast, 1200);
     }).catch(() => {
         showCustomToast('Copy Failed', 'Failed to copy to clipboard.', 'error');
