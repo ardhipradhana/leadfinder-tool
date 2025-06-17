@@ -4830,7 +4830,7 @@ function exportCandidateToPDF(candidate) {
     doc.setFont(undefined, "bold");
     doc.setTextColor(...colors.primary);
     const initialsWidth = doc.getTextWidth(initials);
-    doc.text(initials, circleX - (initialsWidth / 2), circleY + 3.5);
+    doc.text(initials, circleX - (initialsWidth / 2), circleY + 5);
     
     // Title
     doc.setFontSize(16);
