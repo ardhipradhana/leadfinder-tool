@@ -4861,7 +4861,7 @@ function exportCandidateToPDF(candidate) {
     doc.setTextColor(255, 255, 255);
     const scoreText = candidate.aiScore.toString();
     const scoreTextWidth = doc.getTextWidth(scoreText);
-    doc.text(scoreText, scoreX - (scoreTextWidth / 2), scoreY + 1);
+    doc.text(scoreText, scoreX - (scoreTextWidth / 2), scoreY + 2);
     
     yPos += 8;
     
@@ -4879,13 +4879,13 @@ function exportCandidateToPDF(candidate) {
     const locationStatus = `${candidate.location} • ${contactStatus}`;
     const wrappedLocation = doc.splitTextToSize(locationStatus, textAreaWidth);
     doc.text(wrappedLocation, margin, yPos);
-    yPos += wrappedLocation.length * 6 + 15;
+    yPos += wrappedLocation.length * 6 + 6;
     
     // Divider
     doc.setDrawColor(...colors.light);
     doc.setLineWidth(0.5);
     doc.line(margin, yPos, margin + contentWidth, yPos);
-    yPos += 6;
+    yPos += 10;
     
     // ===== AI ANALYSIS =====
     if (candidate.scoreBreakdown && Object.keys(candidate.scoreBreakdown).length > 0) {
