@@ -6675,24 +6675,25 @@ async function generateOutreachMessages(candidateData) {
         
         if (data.success) {
             populateMessages(data.messages);
-
-			if (activeCandidate && activeCandidate.email) {
-	        setTimeout(() => {
-	            const shortEmailBox = document.getElementById('emailShortMessage');
-	            const elaborateEmailBox = document.getElementById('emailElaborateMessage');
-	            
-	            if (shortEmailBox && !shortEmailBox.innerHTML.includes('To:')) {
-	                const currentContent = shortEmailBox.innerHTML;
-	                shortEmailBox.innerHTML = `<div class="text-accent-cyan font-medium mb-2">To: ${activeCandidate.email}</div>${currentContent}`;
-	            }
-	            
-	            if (elaborateEmailBox && !elaborateEmailBox.innerHTML.includes('To:')) {
-	                const currentContent = elaborateEmailBox.innerHTML;
-	                elaborateEmailBox.innerHTML = `<div class="text-accent-cyan font-medium mb-2">To: ${activeCandidate.email}</div>${currentContent}`;
-	            }
-	        }, 100); // Small delay to ensure messages are populated first
-	    }
-			
+            
+            // Add email headers if candidate has email
+            if (activeCandidate && activeCandidate.email) {
+                setTimeout(() => {
+                    const shortEmailBox = document.getElementById('emailShortMessage');
+                    const elaborateEmailBox = document.getElementById('emailElaborateMessage');
+                    
+                    if (shortEmailBox && !shortEmailBox.innerHTML.includes('To:')) {
+                        const currentContent = shortEmailBox.innerHTML;
+                        shortEmailBox.innerHTML = `<div class="text-accent-cyan font-medium mb-2">To: ${activeCandidate.email}</div>${currentContent}`;
+                    }
+                    
+                    if (elaborateEmailBox && !elaborateEmailBox.innerHTML.includes('To:')) {
+                        const currentContent = elaborateEmailBox.innerHTML;
+                        elaborateEmailBox.innerHTML = `<div class="text-accent-cyan font-medium mb-2">To: ${activeCandidate.email}</div>${currentContent}`;
+                    }
+                }, 100); // Small delay to ensure messages are populated first
+            }
+            
         } else {
             throw new Error(data.error || 'Failed to generate messages');
         }
@@ -6702,7 +6703,7 @@ async function generateOutreachMessages(candidateData) {
         showMessageError();
     }
 }
-
+	
 // Show loading state for messages
 function showMessageLoading() {
     const messageIds = [
