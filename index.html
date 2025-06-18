@@ -7556,40 +7556,32 @@ setTimeout(() => {
 	        console.log('Generate button clicked!');
 	        const popup = document.getElementById('aiOutreachPopup');
 	        popup.classList.remove('hidden');
+	        
+	        // Initialize LinkedIn tab as active
+	        document.getElementById('linkedinTab').classList.add('active');
+	        document.getElementById('linkedinMessages').classList.add('active');
+	        
+	        // CHECK IF CURRENT CANDIDATE HAS EMAIL
+	        if (activeCandidate && activeCandidate.email) {
+	            displayFoundEmail(activeCandidate.email);
+	        } else {
+	            // Hide email section if no email
+	            document.getElementById('foundEmailSection').classList.add('hidden');
+	        }
+	        
+	        // CHECK IF CURRENT CANDIDATE HAS MESSAGES
+	        if (activeCandidate && activeCandidate.outreachMessages) {
+	            populateMessages(activeCandidate.outreachMessages);
+	        } else {
+	            // RESET TO DEFAULT STATE FOR NEW CANDIDATE
+	            resetMessageBoxes();
+	        }
 	    }
 	    
 	    if (e.target.closest('#closeOutreachPopup') || e.target.closest('#closeOutreachPopupBtn')) {
 	        console.log('Close button clicked!');
 	        const popup = document.getElementById('aiOutreachPopup');
 	        popup.classList.add('hidden');
-	    }
-	});
-
-	// When popup opens, check for existing messages
-	document.addEventListener('click', (e) => {
-	    if (e.target.closest('#generateOutreachBtn')) {
-		const popup = document.getElementById('aiOutreachPopup');
-		popup.classList.remove('hidden');
-		
-		// Initialize LinkedIn tab as active
-		document.getElementById('linkedinTab').classList.add('active');
-		document.getElementById('linkedinMessages').classList.add('active');
-
-		// CHECK IF CURRENT CANDIDATE HAS EMAIL - ADD THIS
-        if (activeCandidate && activeCandidate.email) {
-            displayFoundEmail(activeCandidate.email);
-        } else {
-            // Hide email section if no email
-            document.getElementById('foundEmailSection').classList.add('hidden');
-        }
-		
-		// CHECK IF CURRENT CANDIDATE HAS MESSAGES
-		if (activeCandidate && activeCandidate.outreachMessages) {
-		    populateMessages(activeCandidate.outreachMessages);
-		} else {
-		    // RESET TO DEFAULT STATE FOR NEW CANDIDATE
-		    resetMessageBoxes();
-		}
 	    }
 	});
 	
