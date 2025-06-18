@@ -1485,20 +1485,22 @@
 				    <!-- Popup Container -->
 				    <div class="absolute bottom-8 right-8 w-[800px] max-h-[650px] bg-dark-secondary rounded-xl border border-accent-cyan/30 shadow-2xl flex flex-col z-10 overflow-hidden">
 					<!-- Header -->
-					<div class="flex items-center justify-between p-4 border-b border-gray-700">
-					    <h3 class="text-lg font-semibold text-white flex items-center">
-						<svg class="w-5 h-5 text-accent-cyan mr-2" fill="currentColor" viewBox="0 0 20 20">
-						    <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
-						    <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
-						</svg>
-						AI Outreach Messages
-					    </h3>
-					    <button id="closeOutreachPopup" class="text-gray-400 hover:text-white transition-colors">
-						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-						</svg>
-					    </button>
-					</div>
+					<div class="flex items-center justify-between p-4 border-b border-gray-700 flex-shrink-0">
+				            <h3 class="text-lg font-semibold text-white flex items-center">
+				                <svg class="w-5 h-5 text-accent-cyan mr-2" fill="currentColor" viewBox="0 0 20 20">
+				                    <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
+				                    <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
+				                </svg>
+				                AI Outreach Messages
+				            </h3>
+				            <button id="closeOutreachPopup" class="text-gray-400 hover:text-white transition-colors">
+				                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+				                </svg>
+				            </button>
+				        </div>
+
+				    <div class="flex-1 overflow-y-auto">
 					
 					<!-- Platform Tabs -->
 					<div class="flex bg-dark-primary m-4 mb-0 rounded-lg p-1">
@@ -1626,9 +1628,10 @@
 						</div>
 					    </div>
 					</div>
+				    </div>
 					
 						<!-- Footer Actions -->
-						<div class="p-4 border-t border-gray-700 flex justify-between items-center">
+						<div class="p-4 border-t border-gray-700 flex justify-between flex-shrink-0">
 						    <div class="flex space-x-2">
 						        <button id="generateNewMessages" class="px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm rounded-lg transition-colors flex items-center">
 						            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
