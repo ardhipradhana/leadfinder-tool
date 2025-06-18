@@ -512,6 +512,25 @@
 		    animation: pulse-glow 2s infinite;
 		}
 
+		/* Add this to your main <style> block */
+		.delete-history-btn {
+		    position: absolute;
+		    top: 0.75rem; /* 12px */
+		    right: 0.75rem; /* 12px */
+		    z-index: 10;
+		    padding: 0.25rem; /* 4px */
+		    color: #6b7280; /* gray-500 */
+		    background-color: transparent;
+		    border-radius: 9999px;
+		    transition: all 0.2s ease-in-out;
+		}
+		
+		.delete-history-btn:hover {
+		    color: #ef4444; /* red-500 */
+		    background-color: rgba(239, 68, 68, 0.1);
+		    transform: scale(1.1);
+		}
+
     </style>
 
 <!-- Enhanced Payment Loading Modal -->
@@ -2956,11 +2975,19 @@ function processSearchResults(data, searchParams) {
 
     // Make candidate IDs unique by adding timestamp
     const searchTimestamp = Date.now();
-    responseData.candidates = responseData.candidates.map((candidate, index) => ({
-        ...candidate,
-        id: `${candidate.id}_${searchTimestamp}`,
-        originalId: candidate.id // Keep original for reference
-    }));
+	responseData.candidates = responseData.candidates.map((candidate, index) => {
+	    // Create a more reliable unique key for a person based on their properties.
+	    // This is more stable than a simple index from the backend.
+	    const cleanName = (candidate.name || '').replace(/\s/g, '').toLowerCase();
+	    const cleanTitle = (candidate.title || '').replace(/\s/g, '').toLowerCase();
+	    const personKey = `${cleanName}_${cleanTitle}`;
+	
+	    return {
+	        ...candidate,
+	        id: `${personKey}_${searchTimestamp}`, // The session-unique ID
+	        originalId: personKey                 // The cross-session identifier for this person
+	    };
+	});
     
     // Store candidates globally for modal access
     window.currentCandidates = responseData.candidates;
@@ -5489,22 +5516,19 @@ function switchHistoryTab(tabType) {
 // Check if candidate is bookmarked
 function isBookmarked(candidateId) {
     const saved = JSON.parse(localStorage.getItem('leadfinder_saved_candidates') || '[]');
-    
-    // First try exact match (for current session)
-    if (saved.some(candidate => candidate.id === candidateId)) {
-        return true;
-    }
-    
-    // Then try originalId match (for cross-session matching)
     const currentCandidate = window.currentCandidates?.find(c => c.id === candidateId);
-    if (currentCandidate && currentCandidate.originalId) {
-        return saved.some(candidate => 
-            candidate.originalId === currentCandidate.originalId || 
-            candidate.id === currentCandidate.originalId
-        );
+
+    // If the candidate isn't in the current view, we can't check their originalId
+    if (!currentCandidate) {
+        return saved.some(savedCandidate => savedCandidate.id === candidateId);
     }
-    
-    return false;
+
+    // Check if any saved candidate has the same unique person identifier (originalId)
+    // or if the exact instance of this candidate was saved.
+    return saved.some(savedCandidate => 
+        (savedCandidate.originalId && savedCandidate.originalId === currentCandidate.originalId) ||
+        (savedCandidate.id === candidateId)
+    );
 }
 
 // Toggle bookmark status
@@ -5759,7 +5783,12 @@ function renderBasicSearchHistory(history) {
 
     container.innerHTML = history.map((item, index) => `
         <div class="bg-dark-primary rounded-lg p-4 hover:bg-dark-tertiary transition-colors cursor-pointer search-history-item" data-search-index="${index}" data-history-type="basic">
-            <div class="flex items-center justify-between mb-2">
+            <button class="delete-history-btn" title="Delete entry">
+	            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+	                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+	            </svg>
+	        </button>
+			<div class="flex items-center justify-between mb-2">
                 <h3 class="font-semibold text-white">${item.jobTitle || 'Search'} in ${item.location || 'Any Location'}</h3>
                 <div class="flex items-center space-x-3">
                     <span class="text-sm text-gray-400">${getRelativeTime(item.timestamp)}</span>
@@ -5802,7 +5831,12 @@ function renderAnalyticsHistory(history) {
         
         return `
             <div class="bg-gradient-to-r from-purple-900/20 to-blue-900/20 border border-purple-500/30 rounded-lg p-4 hover:from-purple-500/20 hover:to-blue-500/20 transition-colors cursor-pointer analytics-history-item" data-analytics-index="${index}">
-			    <div class="flex items-center justify-between mb-2">
+			    <button class="delete-history-btn" title="Delete entry">
+	                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+	                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+	                </svg>
+	            </button>
+	   			<div class="flex items-center justify-between mb-2">
 			        <div class="flex items-center space-x-2">
 			            <h3 class="font-semibold text-white">${isIndividual ? `${item.candidateName} - Predictive Analytics` : isBulk ? `${item.candidateCount} Candidates - ${item.candidateNames ? item.candidateNames.join(', ') : 'Bulk Analytics'}` : item.jobTitle}</h3>
 			            <span class="px-2 py-1 bg-purple-500/30 text-purple-300 text-xs rounded-full font-medium">
@@ -7364,6 +7398,51 @@ function updateCandidateInHistory(candidateId, updatedData) {
         console.log('Updated candidate in analytics history:', candidateId);
     }
 }
+
+document.getElementById('historyModal').addEventListener('click', function(e) {
+    const deleteBtn = e.target.closest('.delete-history-btn');
+
+    // Check if a delete button was clicked
+    if (!deleteBtn) {
+        return;
+    }
+
+    // Prevent the modal from closing or the history item from being clicked
+    e.stopPropagation();
+    e.preventDefault();
+
+    const historyItemCard = deleteBtn.closest('.search-history-item, .analytics-history-item');
+    if (!historyItemCard) return;
+
+    // Get the index and type from the data attributes
+    const indexToDelete = parseInt(historyItemCard.dataset.searchIndex || historyItemCard.dataset.analyticsIndex);
+    const historyType = historyItemCard.dataset.historyType;
+
+    const storageKey = historyType === 'basic' 
+        ? 'leadfinder_basic_history' 
+        : 'leadfinder_analytics_history';
+
+    // Get the history from localStorage
+    let history = JSON.parse(localStorage.getItem(storageKey) || '[]');
+    
+    // Remove the item at the specified index
+    if (indexToDelete >= 0 && indexToDelete < history.length) {
+        history.splice(indexToDelete, 1);
+    }
+    
+    // Save the modified history back to localStorage
+    localStorage.setItem(storageKey, JSON.stringify(history));
+
+    // Animate the card removal for a smooth UX
+    historyItemCard.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+    historyItemCard.style.opacity = '0';
+    historyItemCard.style.transform = 'translateX(-20px)';
+    
+    setTimeout(() => {
+        // Re-render the entire history UI from the updated storage
+        updateSearchHistoryUI();
+    }, 300); // Wait for the animation to finish
+});
 
 // Copy email button functionality
 document.addEventListener('click', (e) => {
