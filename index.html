@@ -7968,81 +7968,99 @@ setTimeout(() => {
 	            });
 	            
 	            const result = await response.json();
-			console.log('Backend result:', result);
-			
-			if (result.success) {
-			    // Check for direct personal email first
-			    if (result.email) {
-					// Direct personal email found
-					const emailData = {
-						email: result.email,
-						emailType: 'personal',
-						emailFoundAt: new Date().toISOString()
-					};
-					
-					// Update active candidate
-					Object.assign(activeCandidate, emailData);
-					
-					// Save to history
-					updateCandidateInHistory(activeCandidate.id, emailData);
-					
-					const creditDeducted = await deductCredit(1);
-					if (creditDeducted) {
-						await logCreditTransaction(-1, 'email_search', `Personal email found: ${activeCandidate.name}`);
-					}
-					
-					showCustomToast('Email Found', `Found: ${result.email}`, 'success');
-					displayFoundEmail(result.email, 'personal');
-					
-				} else if (emailData && emailData.findings && emailData.findings.length > 0) {
-					// Company/related emails found
-					const allEmails = [];
-					emailData.findings.forEach(finding => {
-						if (finding.emails && Array.isArray(finding.emails)) {
-							finding.emails.forEach(email => {
-								if (!allEmails.includes(email)) {
-									allEmails.push(email);
-								}
-							});
-						}
-					});
-					
-					if (allEmails.length > 0) {
-						const companyEmailData = {
-							email: allEmails[0],
-							emailType: 'company',
-							allFoundEmails: allEmails,
-							emailContext: emailData.status,
-							companyName: emailData.company_name,
-							emailFoundAt: new Date().toISOString()
-						};
-						
-						// Update active candidate
-						Object.assign(activeCandidate, companyEmailData);
-						
-						// Save to history
-						updateCandidateInHistory(activeCandidate.id, companyEmailData);
-						
-						const creditDeducted = await deductCredit(1);
-						if (creditDeducted) {
-							await logCreditTransaction(-1, 'email_search', `Company emails found: ${activeCandidate.name}`);
-						}
-						
-						showCustomToast('Company Emails Found', `Found ${allEmails.length} email(s) for ${emailData.company_name}`, 'info');
-						displayFoundEmail(allEmails[0], 'company', {
-							allEmails: allEmails,
-							context: emailData.status,
-							companyName: emailData.company_name
-						});
-					} else {
-						showCustomToast('No Email Found', 'No emails found in results', 'warning');
-					}
+				console.log('🔍 Raw result from backend:', result);
+				
+				if (result.success) {
+				    console.log('✅ Success condition met');
+				    
+				    // Parse the AI response if it's a string - DECLARE emailData HERE
+				    let emailData;
+				    try {
+				        emailData = typeof result.data === 'string' ? JSON.parse(result.data) : result.data;
+				        console.log('🔍 Parsed emailData:', emailData);
+				    } catch (e) {
+				        console.error('❌ Parse error:', e);
+				        emailData = result.data || result;
+				    }
+				    
+				    // Check for direct personal email first
+				    if (result.email) {
+				        console.log('📧 Direct email found:', result.email);
+				        
+				        const emailDataToSave = {
+				            email: result.email,
+				            emailType: 'personal',
+				            emailFoundAt: new Date().toISOString()
+				        };
+				        
+				        Object.assign(activeCandidate, emailDataToSave);
+				        updateCandidateInHistory(activeCandidate.id, emailDataToSave);
+				        
+				        const creditDeducted = await deductCredit(1);
+				        if (creditDeducted) {
+				            await logCreditTransaction(-1, 'email_search', `Personal email found: ${activeCandidate.name}`);
+				        }
+				        
+				        showCustomToast('Email Found', `Found: ${result.email}`, 'success');
+				        displayFoundEmail(result.email, 'personal');
+				        
+				    } else if (emailData && emailData.findings && emailData.findings.length > 0) {
+				        console.log('🏢 Company emails path - emailData:', emailData);
+				        
+				        // Company/related emails found
+				        const allEmails = [];
+				        emailData.findings.forEach(finding => {
+				            console.log('🔍 Processing finding:', finding);
+				            if (finding.emails && Array.isArray(finding.emails)) {
+				                console.log('📧 Emails in this finding:', finding.emails);
+				                finding.emails.forEach(email => {
+				                    if (!allEmails.includes(email)) {
+				                        allEmails.push(email);
+				                    }
+				                });
+				            }
+				        });
+				        
+				        console.log('📧 All collected emails:', allEmails);
+				        
+				        if (allEmails.length > 0) {
+				            console.log('✅ Processing company emails...');
+				            
+				            const companyEmailData = {
+				                email: allEmails[0],
+				                emailType: 'company',
+				                allFoundEmails: allEmails,
+				                emailContext: emailData.status,
+				                companyName: emailData.company_name,
+				                emailFoundAt: new Date().toISOString()
+				            };
+				            
+				            Object.assign(activeCandidate, companyEmailData);
+				            updateCandidateInHistory(activeCandidate.id, companyEmailData);
+				            
+				            const creditDeducted = await deductCredit(1);
+				            if (creditDeducted) {
+				                await logCreditTransaction(-1, 'email_search', `Company emails found: ${activeCandidate.name}`);
+				            }
+				            
+				            showCustomToast('Company Emails Found', `Found ${allEmails.length} email(s) for ${emailData.company_name}`, 'info');
+				            displayFoundEmail(allEmails[0], 'company', {
+				                allEmails: allEmails,
+				                context: emailData.status,
+				                companyName: emailData.company_name
+				            });
+				        } else {
+				            console.log('❌ No emails found in results');
+				            showCustomToast('No Email Found', 'No emails found in results', 'warning');
+				        }
+				    } else {
+				        console.log('❌ No findings or empty findings');
+				        showCustomToast('No Email Found', emailData?.status || 'No email found for this candidate', 'warning');
+				    }
 				} else {
-					showCustomToast('No Email Found', emailData?.status || 'No email found for this candidate', 'warning');
+				    console.log('❌ result.success is false or undefined');
+				    showCustomToast('Email Not Found', result.message || 'Email search failed', 'warning');
 				}
-			} else {
-				showCustomToast('Email Not Found', result.message || 'Email search failed', 'warning');
-			}
 	            
 	        } catch (error) {
 	            console.error('Email search failed:', error);
