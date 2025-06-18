@@ -8361,118 +8361,102 @@ setTimeout(() => {
 </body>
 
 <!-- Simple Pricing Page Modal -->
-<div id="pricingPage" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
-    <div class="bg-dark-secondary rounded-xl max-w-lg w-full border border-gray-700">
-        <div class="p-6 border-b border-gray-700">
-            <div class="flex items-center justify-between">
-                <h2 class="text-2xl font-bold text-white">Upgrade Your Toolkit</h2>
-                <button id="closePricingPage" class="text-gray-400 hover:text-white">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                </button>
+<div id="pricingPage" class="fixed inset-0 bg-dark-primary bg-opacity-95 backdrop-blur-lg flex items-center justify-center p-4 z-50 hidden">
+    <button id="closePricingPage" class="absolute top-6 right-6 text-gray-500 hover:text-white transition-colors z-10">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+    </button>
+    
+    <div class="bg-dark-secondary rounded-2xl max-w-6xl w-full h-auto max-h-[90vh] overflow-y-auto grid grid-cols-1 lg:grid-cols-2 shadow-2xl border border-gray-700">
+        
+        <div class="p-8 lg:p-12 flex flex-col">
+            <h2 class="text-4xl font-bold text-white">Get More Credits</h2>
+            <p class="text-lg text-gray-400 mt-2 mb-8">Unlock the full potential of AI-powered recruiting.</p>
+            
+            <div class="bg-dark-primary text-center p-8 rounded-xl border border-gray-700 mb-8">
+                <h3 class="text-2xl font-bold text-white">30 Credits</h3>
+                <p class="text-5xl font-bold text-accent-cyan my-2">Rp 599.000</p>
+                <p class="text-gray-400">One-time payment, credits never expire.</p>
             </div>
-        </div>
-
-        <div class="p-6">
-            <div class="text-center mb-6">
-                <div class="w-16 h-16 bg-accent-cyan/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                     <svg class="w-8 h-8 text-accent-cyan" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4zM18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z"/>
-                    </svg>
-                </div>
-                
-                <h3 class="text-3xl font-bold text-white mb-2">30 Credits</h3>
-                <p class="text-gray-400 text-sm mb-4">The perfect package to scale your hiring efforts.</p>
-                
-                <div class="text-4xl font-bold text-accent-cyan mb-2">Rp 599.000</div>
-                <div class="text-sm text-gray-400">Credits never expire.</div>
-            </div>
-
-            <div class="mt-8 pt-6 border-t border-gray-700/50">
-                <h3 class="text-xl font-bold text-white text-center mb-6">Your All-in-One Recruiting Toolkit</h3>
-                <div class="space-y-4">
-
-                    <div class="flex items-center justify-between p-4 bg-dark-primary rounded-lg border-l-4 border-accent-cyan">
-                        <div class="flex items-center space-x-4">
-                            <div class="bg-accent-cyan/10 p-2 rounded-lg">
-                                <svg class="w-6 h-6 text-accent-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold text-white">AI Candidate Search</h4>
-                                <p class="text-sm text-gray-400">Find top-tier talent in seconds</p>
-                            </div>
-                        </div>
-                        <span class="text-lg font-bold text-accent-cyan text-right whitespace-nowrap">1 Credit</span>
-                    </div>
-
-                    <div class="p-4 bg-dark-primary rounded-lg border-l-4 border-purple-400">
-                        <div class="flex items-center space-x-4 mb-4">
-                            <div class="bg-purple-400/10 p-2 rounded-lg">
-                                <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold text-white">Career Predictive Analytics</h4>
-                                <p class="text-sm text-gray-400">Uncover a candidate's true potential</p>
-                            </div>
-                        </div>
-                        <div class="space-y-2 pt-3 border-t border-gray-700/50">
-                            <div class="flex justify-between items-center">
-                                <span class="text-gray-300">Individual Candidate</span>
-                                <span class="text-md font-bold text-purple-400">5 Credits</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-gray-300">Bulk Analysis (2+ candidates)</span>
-                                <div>
-                                    <span class="text-xs font-semibold bg-green-500 text-white px-2 py-1 rounded-full">40% OFF</span>
-                                    <span class="text-gray-500 line-through ml-2">5</span>
-                                    <span class="text-lg font-bold text-green-400 ml-1">3</span>
-                                    <span class="text-gray-400"> Credits / each</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center justify-between p-4 bg-dark-primary rounded-lg border-l-4 border-orange-400">
-                        <div class="flex items-center space-x-4">
-                            <div class="bg-orange-400/10 p-2 rounded-lg">
-                                <svg class="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path></svg>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold text-white">Generate Outreach Message</h4>
-                                <p class="text-sm text-gray-400">Instantly create personalized messages</p>
-                            </div>
-                        </div>
-                        <span class="text-lg font-bold text-orange-400 text-right whitespace-nowrap">2 Credits</span>
-                    </div>
-
-                    <div class="flex items-center justify-between p-4 bg-dark-primary rounded-lg border-l-4 border-yellow-400">
-                        <div class="flex items-center space-x-4">
-                            <div class="bg-yellow-400/10 p-2 rounded-lg">
-                                <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold text-white">[BETA] Find Candidate Email</h4>
-                                <p class="text-sm text-gray-400">Discover verified contact information</p>
-                            </div>
-                        </div>
-                        <span class="text-lg font-bold text-yellow-400 text-right whitespace-nowrap">1 Credit</span>
-                    </div>
-
-                </div>
-            </div>
-
-            <button id="buyCreditsBtn" class="w-full bg-gradient-to-r from-accent-cyan to-accent-teal hover:from-accent-teal hover:to-accent-cyan text-dark-primary font-bold py-4 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 mt-8 shadow-lg hover:shadow-cyan-500/20">
+            
+            <ul class="space-y-3 text-gray-300 mb-10 flex-grow">
+                <li class="flex items-center space-x-3">
+                    <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                    <span>Full access to 1M+ candidate profiles</span>
+                </li>
+                 <li class="flex items-center space-x-3">
+                    <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                    <span>Advanced AI matching & scoring</span>
+                </li>
+                 <li class="flex items-center space-x-3">
+                    <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                    <span>All future feature updates included</span>
+                </li>
+            </ul>
+            
+            <button id="buyCreditsBtn" class="w-full bg-gradient-to-r from-accent-cyan to-accent-teal hover:from-accent-teal hover:to-accent-cyan text-dark-primary font-bold py-4 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-cyan-500/20">
                 Purchase 30 Credits
             </button>
+            <p class="text-xs text-gray-500 text-center mt-4">Secure payment via Midtrans</p>
+        </div>
+        
+        <div class="bg-dark-primary p-8 lg:p-12 rounded-r-2xl">
+            <h3 class="text-2xl font-bold text-white text-center mb-8">Your All-in-One Recruiting Toolkit</h3>
+            <div class="space-y-4">
 
-            <div class="flex items-center justify-center space-x-2 text-xs text-gray-400 mt-4">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"/>
-                </svg>
-                <span>Secure payment via Midtrans</span>
+                <div class="flex items-center justify-between p-4 bg-dark-secondary rounded-lg border-l-4 border-accent-cyan">
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-accent-cyan/10 p-2 rounded-lg"><svg class="w-6 h-6 text-accent-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></div>
+                        <div>
+                            <h4 class="font-semibold text-white">AI Candidate Search</h4>
+                            <p class="text-sm text-gray-400">Find top-tier talent in seconds</p>
+                        </div>
+                    </div>
+                    <span class="text-lg font-bold text-accent-cyan text-right whitespace-nowrap">1 Credit</span>
+                </div>
+
+                <div class="p-4 bg-dark-secondary rounded-lg border-l-4 border-purple-400">
+                    <div class="flex items-center space-x-4 mb-4">
+                        <div class="bg-purple-400/10 p-2 rounded-lg"><svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg></div>
+                        <div>
+                            <h4 class="font-semibold text-white">Career Predictive Analytics</h4>
+                            <p class="text-sm text-gray-400">Uncover a candidate's true potential</p>
+                        </div>
+                    </div>
+                    <div class="space-y-2 pt-3 border-t border-gray-700/50">
+                        <div class="flex justify-between items-center"><span class="text-gray-300">Individual Candidate</span><span class="text-md font-bold text-purple-400">5 Credits</span></div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-300">Bulk Analysis (2+ candidates)</span>
+                            <div><span class="text-xs font-semibold bg-green-500 text-white px-2 py-1 rounded-full">40% OFF</span><span class="text-gray-500 line-through ml-2">5</span><span class="text-lg font-bold text-green-400 ml-1">3</span><span class="text-gray-400"> Credits / each</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between p-4 bg-dark-secondary rounded-lg border-l-4 border-orange-400">
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-orange-400/10 p-2 rounded-lg"><svg class="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path></svg></div>
+                        <div>
+                            <h4 class="font-semibold text-white">Generate Outreach Message</h4>
+                            <p class="text-sm text-gray-400">Instantly create personalized messages</p>
+                        </div>
+                    </div>
+                    <span class="text-lg font-bold text-orange-400 text-right whitespace-nowrap">2 Credits</span>
+                </div>
+
+                <div class="flex items-center justify-between p-4 bg-dark-secondary rounded-lg border-l-4 border-yellow-400">
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-yellow-400/10 p-2 rounded-lg"><svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg></div>
+                        <div>
+                            <h4 class="font-semibold text-white">[BETA] Find Candidate Email</h4>
+                            <p class="text-sm text-gray-400">Discover verified contact information</p>
+                        </div>
+                    </div>
+                    <span class="text-lg font-bold text-yellow-400 text-right whitespace-nowrap">1 Credit</span>
+                </div>
             </div>
         </div>
+        
     </div>
 </div>
 
