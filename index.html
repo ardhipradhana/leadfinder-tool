@@ -514,16 +514,15 @@
 
 		/* Add this to your main <style> block */
 		.delete-history-btn {
-		    position: absolute;
-		    top: 0.75rem; /* 12px */
-		    right: 0.75rem; /* 12px */
-		    z-index: 10;
+		    /* No longer needs absolute positioning */
 		    padding: 0.25rem; /* 4px */
 		    color: #6b7280; /* gray-500 */
 		    background-color: transparent;
 		    border-radius: 9999px;
 		    transition: all 0.2s ease-in-out;
 		    cursor: pointer;
+		    /* A small negative margin can help with perfect alignment */
+		    margin-right: -0.5rem; /* -8px */
 		}
 		
 		.delete-history-btn:hover {
@@ -5785,20 +5784,23 @@ function renderBasicSearchHistory(history) {
     container.innerHTML = history.map((item, index) => `
         <div class="bg-dark-primary rounded-lg p-4 hover:bg-dark-tertiary transition-colors cursor-pointer search-history-item relative" data-search-index="${index}" data-history-type="basic">
             
-            <button class="delete-history-btn" title="Delete entry">
-                <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-            </button>
-
             <div class="flex items-center justify-between mb-2">
-                <h3 class="font-semibold text-white pr-8">${item.jobTitle || 'Search'} in ${item.location || 'Any Location'}</h3>
+                <h3 class="font-semibold text-white pr-4">${item.jobTitle || 'Search'} in ${item.location || 'Any Location'}</h3>
+                
                 <div class="flex items-center space-x-3">
-                    <span class="text-sm text-gray-400">${getRelativeTime(item.timestamp)}</span>
-                    <span class="px-2 py-1 bg-accent-cyan/20 text-accent-cyan text-xs rounded-full font-medium">Basic</span>
+                    <span class="text-sm text-gray-400 shrink-0">${getRelativeTime(item.timestamp)}</span>
+                    <span class="px-2 py-1 bg-accent-cyan/20 text-accent-cyan text-xs rounded-full font-medium shrink-0">Basic</span>
+                    
+                    <button class="delete-history-btn" title="Delete entry">
+                        <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
                 </div>
             </div>
+            
             <p class="text-sm text-gray-300 mb-2">${item.industry || 'Any Industry'} • ${item.experience || 'Any Experience'}</p>
+            
             <div class="flex items-center justify-between">
                 <span class="text-sm text-accent-cyan">${item.resultCount} candidates found</span>
                 <button class="px-3 py-1 bg-accent-cyan/20 hover:bg-accent-cyan text-accent-cyan hover:text-dark-primary rounded-lg text-xs font-semibold flex items-center rerun-search-btn">
@@ -5829,23 +5831,27 @@ function renderAnalyticsHistory(history) {
         const isBulk = item.type === 'bulk';
         
         return `
-            <div class="bg-gradient-to-r from-purple-900/20 to-blue-900/20 border border-purple-500/30 rounded-lg p-4 hover:from-purple-500/20 hover:to-blue-500/20 transition-colors cursor-pointer analytics-history-item relative" data-analytics-index="${index}" data-history-type="analytics">
-
-                <button class="delete-history-btn" title="Delete entry">
-                    <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
+            <div class="bg-gradient-to-r from-purple-900/20 to-blue-900/20 border border-purple-500/30 rounded-lg p-4 hover:from-purple-500/20 hover:to-blue-500/20 transition-colors cursor-pointer analytics-history-item" data-analytics-index="${index}" data-history-type="analytics">
 
 			    <div class="flex items-center justify-between mb-2">
-			        <div class="flex items-center space-x-2 pr-8">
-			            <h3 class="font-semibold text-white">${isIndividual ? `${item.candidateName} - Predictive Analytics` : isBulk ? `${item.candidateCount} Candidates - ${item.candidateNames ? item.candidateNames.join(', ') : 'Bulk Analytics'}` : item.jobTitle}</h3>
-			            <span class="px-2 py-1 bg-purple-500/30 text-purple-300 text-xs rounded-full font-medium shrink-0">
+			        
+                    <h3 class="font-semibold text-white">${isIndividual ? `${item.candidateName} - Predictive Analytics` : isBulk ? `${item.candidateCount} Candidates - ${item.candidateNames ? item.candidateNames.join(', ') : 'Bulk Analytics'}` : item.jobTitle}</h3>
+			        
+                    <div class="flex items-center space-x-3">
+                        <span class="text-sm text-gray-400 shrink-0">${getRelativeTime(item.timestamp)}</span>
+                        <span class="px-2 py-1 bg-purple-500/30 text-purple-300 text-xs rounded-full font-medium shrink-0">
 			                ${isIndividual ? 'Individual' : isBulk ? 'Bulk' : 'Analytics'}
 			            </span>
-			        </div>
-			        <span class="text-sm text-gray-400 shrink-0">${getRelativeTime(item.timestamp)}</span>
+                        
+                        <button class="delete-history-btn" title="Delete entry">
+                            <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+
 			    </div>
+			    
 			    <div class="flex items-center justify-between">
 			        <span class="text-sm text-purple-400">
 			            ${isIndividual ? '1 candidate analyzed' : isBulk ? `${item.candidateCount} candidates analyzed` : `${item.resultCount} results`}
