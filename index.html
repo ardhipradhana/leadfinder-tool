@@ -7810,25 +7810,12 @@ setTimeout(() => {
 	                
 	                showCustomToast('Email Found', `Found: ${result.email}`, 'success');
 	                
-	                if (result.success && result.email) {
-					    // Save email to candidate data
-					    activeCandidate.email = result.email;
-					    
-					    // Deduct credit
-					    const creditDeducted = await deductCredit(1);
-					    if (creditDeducted) {
-					        await logCreditTransaction(-1, 'email_search', `Email found: ${activeCandidate.name}`);
-					    }
-					    
-					    showCustomToast('Email Found', `Found: ${result.email}`, 'success');
-					    
-					    // REPLACE THE TODO COMMENT WITH THIS:
-					    // Display email in the modal
-					    displayFoundEmail(result.email);
-					    
-					} else {
-					    showCustomToast('Email Not Found', result.message || 'No email found for this candidate', 'warning');
-					}
+	                // Display email in the modal
+	                displayFoundEmail(result.email);
+	                
+	            } else {
+	                showCustomToast('Email Not Found', result.message || 'No email found for this candidate', 'warning');
+	            }
 	            
 	        } catch (error) {
 	            console.error('Email search failed:', error);
