@@ -5425,6 +5425,48 @@ document.getElementById('analyticsHistoryTab').addEventListener('click', functio
     switchHistoryTab('analytics');
 });
 
+function persistCandidateUpdate(updatedCandidate) {
+    if (!updatedCandidate || !updatedCandidate.id) return;
+
+    const candidateId = updatedCandidate.id;
+
+    // 1. Update Basic Search History
+    try {
+        let basicHistory = JSON.parse(localStorage.getItem('leadfinder_basic_history') || '[]');
+        let historyUpdated = false;
+        for (const historyEntry of basicHistory) {
+            if (historyEntry.candidates && Array.isArray(historyEntry.candidates)) {
+                const candidateIndex = historyEntry.candidates.findIndex(c => c.id === candidateId);
+                if (candidateIndex !== -1) {
+                    // Replace the old candidate object with the updated one
+                    historyEntry.candidates[candidateIndex] = { ...updatedCandidate };
+                    historyUpdated = true;
+                }
+            }
+        }
+        if (historyUpdated) {
+            localStorage.setItem('leadfinder_basic_history', JSON.stringify(basicHistory));
+            console.log('Persisted email update to search history.');
+        }
+    } catch (e) {
+        console.error("Failed to update search history:", e);
+    }
+
+    // 2. Update Saved Candidates (Bookmarks)
+    try {
+        let savedCandidatesList = JSON.parse(localStorage.getItem('leadfinder_saved_candidates') || '[]');
+        const savedCandidateIndex = savedCandidatesList.findIndex(c => c.id === candidateId);
+        if (savedCandidateIndex !== -1) {
+            // Replace the old candidate object in the saved list
+            savedCandidatesList[savedCandidateIndex] = { ...updatedCandidate };
+            localStorage.setItem('leadfinder_saved_candidates', JSON.stringify(savedCandidatesList));
+            console.log('Persisted email update to saved candidates.');
+        }
+    } catch (e) {
+        console.error("Failed to update saved candidates:", e);
+    }
+}
+
 function switchHistoryTab(tabType) {
     // Update tab buttons
     document.querySelectorAll('.history-tab').forEach(tab => {
@@ -8000,6 +8042,8 @@ setTimeout(() => {
 				        if (creditDeducted) {
 				            await logCreditTransaction(-1, 'email_search', `Personal email found: ${activeCandidate.name}`);
 				        }
+
+				    	persistCandidateUpdate(activeCandidate);
 				        
 				        showCustomToast('Email Found', `Found: ${result.email}`, 'success');
 				        displayFoundEmail(result.email, 'personal');
@@ -8042,6 +8086,8 @@ setTimeout(() => {
 				            if (creditDeducted) {
 				                await logCreditTransaction(-1, 'email_search', `Company emails found: ${activeCandidate.name}`);
 				            }
+
+							persistCandidateUpdate(activeCandidate);
 				            
 				            showCustomToast('Company Emails Found', `Found ${allEmails.length} email(s) for ${emailData.company_name}`, 'info');
 				            displayFoundEmail(allEmails[0], 'company', {
