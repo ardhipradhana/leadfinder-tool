@@ -819,51 +819,51 @@
                             <div class="flex items-center justify-between step-item" data-step="1">
                                 <div class="flex items-center space-x-3">
                                     <div class="w-6 h-6 rounded-full bg-gray-600 flex items-center justify-center text-xs text-white">1</div>
-                                    <span>Initializing LinkedIn search parameters</span>
+                                    <span class="step-description">Initializing LinkedIn search parameters</span>
                                 </div>
-                                <span class="text-gray-500">⏸ Pending</span>
+                                <span class="step-status text-gray-500">⏸ Pending</span>
                             </div>
                             <div class="flex items-center justify-between step-item" data-step="2">
                                 <div class="flex items-center space-x-3">
                                     <div class="w-6 h-6 rounded-full bg-gray-600 flex items-center justify-center text-xs text-white">2</div>
-                                    <span>Searching LinkedIn professional profiles</span>
+                                    <span class="step-description">Searching LinkedIn professional profiles</span>
                                 </div>
-                                <span class="text-gray-500">⏸ Pending</span>
+                                <span class="step-status text-gray-500">⏸ Pending</span>
                             </div>
                             <div class="flex items-center justify-between step-item" data-step="3">
                                 <div class="flex items-center space-x-3">
                                     <div class="w-6 h-6 rounded-full bg-gray-600 flex items-center justify-center text-xs text-white">3</div>
-                                    <span>Extracting candidate information</span>
+                                    <span class="step-description">Extracting candidate information</span>
                                 </div>
-                                <span class="text-gray-500">⏸ Pending</span>
+                                <span class="step-status text-gray-500">⏸ Pending</span>
                             </div>
                             <div class="flex items-center justify-between step-item" data-step="4">
                                 <div class="flex items-center space-x-3">
                                     <div class="w-6 h-6 rounded-full bg-gray-600 flex items-center justify-center text-xs text-white">4</div>
-                                    <span>Running AI analysis and scoring</span>
+                                    <span class="step-description">Running AI analysis and scoring</span>
                                 </div>
-                                <span class="text-gray-500">⏸ Pending</span>
+                                <span class="step-status text-gray-500">⏸ Pending</span>
                             </div>
                             <div class="flex items-center justify-between step-item" data-step="5">
                                 <div class="flex items-center space-x-3">
                                     <div class="w-6 h-6 rounded-full bg-gray-600 flex items-center justify-center text-xs text-white">5</div>
-                                    <span>Evaluating role and experience match</span>
+                                    <span class="step-description">Evaluating role and experience match</span>
                                 </div>
-                                <span class="text-gray-500">⏸ Pending</span>
+                                <span class="step-status text-gray-500">⏸ Pending</span>
                             </div>
                             <div class="flex items-center justify-between step-item" data-step="6">
                                 <div class="flex items-center space-x-3">
                                     <div class="w-6 h-6 rounded-full bg-gray-600 flex items-center justify-center text-xs text-white">6</div>
-                                    <span>Ranking candidates by compatibility</span>
+                                    <span class="step-description">Ranking candidates by compatibility</span>
                                 </div>
-                                <span class="text-gray-500">⏸ Pending</span>
+                                <span class="step-status text-gray-500">⏸ Pending</span>
                             </div>
                             <div class="flex items-center justify-between step-item" data-step="7">
                                 <div class="flex items-center space-x-3">
                                     <div class="w-6 h-6 rounded-full bg-gray-600 flex items-center justify-center text-xs text-white">7</div>
-                                    <span>Finalizing results and recommendations</span>
+                                    <span class="step-description">Finalizing results and recommendations</span>
                                 </div>
-                                <span class="text-gray-500">⏸ Pending</span>
+                                <span class="step-status text-gray-500">⏸ Pending</span>
                             </div>
                         </div>
                     </div>
@@ -6207,21 +6207,15 @@ function updateProgressBar(percentage) {
 function updateStepStatus(stepNumber, status) {
     const stepElement = document.querySelector(`[data-step="${stepNumber}"]`);
     if (!stepElement) return;
-    const allSpans = stepElement.querySelectorAll('span');
-    let statusElement = null;
-    for (let i = allSpans.length - 1; i >= 0; i--) {
-        if (allSpans[i].textContent.includes('Pending') || 
-            allSpans[i].textContent.includes('Processing') || 
-            allSpans[i].textContent.includes('Complete')) {
-            statusElement = allSpans[i];
-            break;
-        }
-    }
-    const numberCircle = stepElement.querySelector('.w-6.h-6.rounded-full');
+
+    // Use the new, specific class selectors
+    const statusElement = stepElement.querySelector('.step-status');
+    const numberCircle = stepElement.querySelector('.w-6.h-6');
+
     if (status === 'processing') {
         stepElement.classList.add('bg-dark-tertiary/30', 'rounded-lg', 'scale-[1.02]', 'transition-all');
         if (statusElement) {
-            statusElement.className = 'text-yellow-400 flex items-center';
+            statusElement.className = 'step-status text-yellow-400 flex items-center';
             statusElement.innerHTML = `
                 <svg class="w-4 h-4 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
@@ -6235,7 +6229,7 @@ function updateStepStatus(stepNumber, status) {
     } else if (status === 'complete') {
         stepElement.classList.remove('bg-dark-tertiary/30', 'scale-[1.02]');
         if (statusElement) {
-            statusElement.className = 'text-accent-cyan flex items-center font-medium';
+            statusElement.className = 'step-status text-accent-cyan flex items-center font-medium';
             statusElement.innerHTML = `
                 <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
@@ -7384,39 +7378,34 @@ function updateEmailTabWithFoundEmail(email) {
 
 function resetLoadingAnimation() {
     console.log('Resetting loading animation...');
-    // Reset progress bar and percentage
+    // Reset progress bar
     const progressBar = document.getElementById('progressBar');
     const progressText = document.getElementById('progressPercentage');
     if (progressBar) progressBar.style.width = '0%';
     if (progressText) progressText.textContent = '0%';
 
-    // Reset each loading step
-    const loadingStepsContainer = document.getElementById('loadingSteps');
-    if (loadingStepsContainer) {
-        const steps = loadingStepsContainer.querySelectorAll('.step-item');
-        steps.forEach((step, index) => {
-            const statusSpan = step.querySelector('span:last-child');
-            const numberCircle = step.querySelector('.w-6.h-6');
-            
-            // Reset circle
-            if (numberCircle) {
-                numberCircle.className = 'w-6 h-6 rounded-full bg-gray-600 flex items-center justify-center text-xs text-white';
-                numberCircle.textContent = index + 1;
-            }
-            
-            // Reset status text
-            if (statusSpan) {
-                statusSpan.className = 'text-gray-500';
-                statusSpan.textContent = '⏸ Pending';
-            }
-        });
-    }
+    // Reset each loading step individually
+    const steps = document.querySelectorAll('#loadingSteps .step-item');
+    steps.forEach((step) => {
+        const numberCircle = step.querySelector('.w-6.h-6');
+        const statusSpan = step.querySelector('.step-status'); // Use the new class
+        const stepNumber = step.dataset.step;
+
+        // Reset the number circle
+        if (numberCircle) {
+            numberCircle.className = 'w-6 h-6 rounded-full bg-gray-600 flex items-center justify-center text-xs text-white';
+            numberCircle.innerHTML = `<span>${stepNumber}</span>`; // Restore the number
+        }
+        
+        // Reset the status text
+        if (statusSpan) {
+            statusSpan.className = 'step-status text-gray-500';
+            statusSpan.textContent = '⏸ Pending';
+        }
+    });
 
     // Reset loading tip
-    const loadingTip = document.getElementById('loadingTip');
-    if (loadingTip) {
-        loadingTip.textContent = '💡 Tip: Higher AI scores indicate better search compatibility';
-    }
+    document.getElementById('loadingTip').textContent = '💡 Tip: Higher AI scores indicate better search compatibility';
 }
 
 // Save updated candidate to search history
