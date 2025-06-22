@@ -2814,52 +2814,87 @@ async function handleSearch(e) {
     try {
         const hasValidAuth = await checkAuthAndCredits();
         if (!hasValidAuth) {
-            // No need to set isProcessing = false here, as no async op started
+            // Must re-enable buttons if auth fails before the main try/finally block
+            isProcessing = false;
+            enableActionButtons();
             return;
         }
 
         if (userCredits <= 0) {
             showPricingPage();
+            isProcessing = false; 
+            enableActionButtons();
             return;
         }
 
         const formData = new FormData(searchForm);
         const searchParams = {
             jobTitle: formData.get('jobTitle') || document.getElementById('jobTitle').value,
-            industry: getIndustryValue(), 
-            location: getLocationValue(), 
+            industry: getIndustryValue(),
+            location: getLocationValue(),
             experience: formData.get('experience') || document.getElementById('experience').value
         };
 
         if (!searchParams.jobTitle) {
             showCustomToast('Missing Information', 'Please enter a job title or role', 'error');
+            isProcessing = false;
+            enableActionButtons();
             return;
         }
-        
+
         initialState.classList.add('hidden');
         resultsState.classList.add('hidden');
         loadingState.classList.remove('hidden');
         resetLoadingAnimation();
 
         const loadingPromise = showEnhancedLoading();
-        let timeoutId;
-
-        const controller = new AbortController();
-        timeoutId = setTimeout(() => controller.abort(), 300000);
         
-        const response = await fetch('https://montpro.app.n8n.cloud/webhook/leadfinder-tool', {
-            // ... (your fetch options)
-        });
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 300000);
 
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        // --- CORRECTED WEBHOOK CALL ---
+        const response = await fetch('https://montpro.app.n8n.cloud/webhook/leadfinder-tool', {
+            method: 'POST',
+            signal: controller.signal,
+            keepalive: true,
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer leadfinder_secretkey123`,
+                'X-User-ID': currentUser?.id || 'test-user-123'
+            },
+            body: JSON.stringify({
+                ...searchParams,
+                userId: currentUser?.id || 'test-user-123',
+                timestamp: new Date().toISOString()
+            })
+        });
+        // --- END OF CORRECTION ---
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+             const errorText = await response.text();
+             throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
+        }
 
         const data = await response.json();
         await loadingPromise;
         
-        if (data.success) {
-            // ... (process results, deduct credit, etc.)
+        const responseData = Array.isArray(data) ? data[0] : data;
+
+        if (responseData.success) {
+            cancelLoadingAnimation();
+            const creditDeducted = await deductCredit(1);
+            if (creditDeducted) {
+                await logCreditTransaction(-1, 'search', `Search: ${searchParams.jobTitle} in ${searchParams.location}`);
+                await syncCreditsAfterEvent('search_completed');
+            }
+            saveToSearchHistory(searchParams, responseData.topCandidatesCount, responseData.candidates);
+            processSearchResults(responseData, searchParams);
+            loadingState.classList.add('hidden');
+            resultsState.classList.remove('hidden');
         } else {
-            throw new Error(data.error || 'Search failed');
+            throw new Error(responseData.error || 'Search failed - no success flag');
         }
 
     } catch (error) {
@@ -2867,6 +2902,7 @@ async function handleSearch(e) {
         showCustomToast('Search Failed', error.message || 'An unexpected error occurred.', 'error');
         loadingState.classList.add('hidden');
         initialState.classList.remove('hidden');
+        cancelLoadingAnimation();
     } finally {
         // --- RESET GLOBAL LOADING STATE ---
         isProcessing = false;
@@ -6262,25 +6298,78 @@ async function upgradeIndividualCandidate(candidateId) {
 
     try {
         const candidate = currentCandidates.find(c => c.id === candidateId);
-        if (!candidate) throw new Error('Candidate not found');
+        if (!candidate) {
+            throw new Error('Candidate not found');
+        }
 
+        // Show the dedicated animation modal for this process
         showIndividualAnalyticsAnimation(candidate.name);
-        
-        const requestUrl = 'https://montpro.app.n8n.cloud/webhook/leadfinder-individual-analytics';
-        const response = await fetch(requestUrl, { /* ... your fetch options ... */ });
 
-        if (!response.ok) throw new Error(`Analytics failed. Status: ${response.status}`);
-        
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 minute timeout
+
+        const requestBody = {
+            candidate: candidate,
+            userId: currentUser?.id || 'test-user-123',
+            timestamp: new Date().toISOString(),
+            type: 'individual'
+        };
+
+        const response = await fetch('https://montpro.app.n8n.cloud/webhook/leadfinder-individual-analytics', {
+            method: 'POST',
+            signal: controller.signal,
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer leadfinder_secretkey123`,
+                'X-User-ID': currentUser?.id || 'test-user-123'
+            },
+            body: JSON.stringify(requestBody)
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Analytics failed. Server responded with status: ${response.status}, response: ${errorText}`);
+        }
+
         const data = await response.json();
         if (data && data.success && data.results && data.results.length > 0) {
-            // ... (process analytics result)
+            const result = data.results[0];
+            const candidateIndex = currentCandidates.findIndex(c => c.id === candidateId);
+
+            if (candidateIndex !== -1) {
+                // Update the candidate data in our main list
+                currentCandidates[candidateIndex].careerAnalytics = result.careerAnalytics;
+                updateCandidateCards(currentCandidates); // Refresh the UI
+
+                // Deduct credits and log the transaction
+                const creditDeducted = await deductCredit(5);
+                if (creditDeducted) {
+                    await logCreditTransaction(-5, 'individual_analytics', `Individual Analytics: ${result.candidateName}`);
+                }
+
+                // Save this new data to the analytics history
+                saveToSearchHistory({
+                    jobTitle: 'Individual Predictive Analytics',
+                    candidateName: result.candidateName,
+                    type: 'individual'
+                }, 1, [currentCandidates[candidateIndex]]);
+
+                hideIndividualAnalyticsModal();
+                showCustomToast('Success', `Analytics completed for ${result.candidateName}!`, 'success');
+            } else {
+                throw new Error("Could not find the candidate to update after analysis.");
+            }
         } else {
-            throw new Error(`Analytics failed: ${data.error || 'Unknown error'}`);
+            throw new Error(data.error || 'Analytics process failed');
         }
+
     } catch (error) {
         console.error('Individual analytics failed:', error);
         hideIndividualAnalyticsModal(); // Ensure modal is hidden on error
-        throw error; // Re-throw error to be caught by the click handler
+        // Rethrow the error so the calling function knows it failed
+        throw error;
     } finally {
         // --- RESET GLOBAL LOADING STATE ---
         isProcessing = false;
@@ -6468,7 +6557,7 @@ function cancelIndividualAnalytics() {
 async function upgradeBulkCandidates(candidateIds) {
     // --- GLOBAL LOADING CHECK ---
     if (isProcessing) {
-        showCustomToast('Please Wait', 'Another operation is in progress.', 'info');
+        showCustomToast('Please Wait', 'Another operation is in progress', 'info');
         throw new Error('Operation in progress');
     }
     isProcessing = true;
@@ -6484,8 +6573,7 @@ async function upgradeBulkCandidates(candidateIds) {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 600000); // 10 min timeout
         
-        const response = await fetch('https://montpro.app.n8n.cloud/webhook/leadfinder-bulk-analytics', { 
-            /* ... your fetch options ... */
+        const response = await fetch('https://montpro.app.n8n.cloud/webhook/leadfinder-bulk-analytics', {
             method: 'POST',
             signal: controller.signal,
             headers: { 
@@ -6502,11 +6590,35 @@ async function upgradeBulkCandidates(candidateIds) {
         });
         
         clearTimeout(timeoutId);
-        if (!response.ok) throw new Error(`Bulk analytics failed. Status: ${response.status}`);
+        if (!response.ok && response.status !== 500) {
+            const errorText = await response.text();
+            throw new Error(`HTTP error! status: ${response.status}, response: ${errorText}`);
+        }
         
         const data = await response.json();
+        
         if (data && data.success && data.results) {
-            // ... (your existing logic to process bulk results) ...
+            let updatedCandidates = [];
+            data.results.forEach(result => {
+                const candidateIndex = currentCandidates.findIndex(c => c.name === result.candidateName || c.id === result.candidateId);
+                if (candidateIndex !== -1) {
+                    currentCandidates[candidateIndex].careerAnalytics = result.careerAnalytics;
+                    updatedCandidates.push(currentCandidates[candidateIndex]);
+                }
+            });
+            
+            if (updatedCandidates.length > 0) {
+                updateCandidateCards(currentCandidates);
+                const creditsUsed = data.processed * 3;
+                const creditDeducted = await deductCredit(creditsUsed);
+                if (creditDeducted) {
+                    await logCreditTransaction(-creditsUsed, 'bulk_analytics', `Bulk Analytics: ${data.processed} candidates`);
+                }
+                saveToSearchHistory({ /* ...details... */ }, data.processed, updatedCandidates);
+                document.querySelectorAll('.candidate-checkbox:checked').forEach(cb => cb.checked = false);
+                updateCompareButton();
+                showCustomToast('Bulk Analysis Complete', `Analytics completed for ${data.processed} candidates!`, 'success');
+            }
         } else {
             throw new Error(data.error || 'Failed to process bulk analytics.');
         }
@@ -6514,7 +6626,7 @@ async function upgradeBulkCandidates(candidateIds) {
     } catch (error) {
         console.error('Bulk analytics failed:', error);
         showCustomToast('Bulk Analysis Failed', error.message, 'error');
-        throw error; // Re-throw to be handled by the click listener if needed
+        throw error;
     } finally {
         // --- RESET GLOBAL LOADING STATE ---
         isProcessing = false;
@@ -6528,7 +6640,7 @@ async function generateOutreachMessages(candidateData) {
     // --- GLOBAL LOADING CHECK ---
     if (isProcessing) {
         showCustomToast('Please Wait', 'Another operation is in progress.', 'info');
-        return; // Use return because this function is called directly
+        return;
     }
     isProcessing = true;
     disableActionButtons();
@@ -6563,7 +6675,7 @@ async function generateOutreachMessages(candidateData) {
         
         if (data.success) {
             populateMessages(data.messages);
-            await deductCredit(2); // Assumes credit deduction on success
+            await deductCredit(2);
             await logCreditTransaction(-2, 'message_generation', `Outreach: ${candidateData.name}`);
         } else {
             throw new Error(data.error || 'Failed to generate messages');
@@ -7840,7 +7952,7 @@ setTimeout(() => {
 	// Find Email button click handler
 	document.addEventListener('click', async (e) => {
 	    if (e.target.closest('#findEmailBtn')) {
-		    // This is an async operation, so we wrap it to handle the logic correctly
+		    // This is an async operation, so we wrap it
 		    (async () => {
 		        // --- GLOBAL LOADING CHECK ---
 		        if (isProcessing) {
@@ -7857,24 +7969,19 @@ setTimeout(() => {
 		        try {
 		            if (userCredits < 1) {
 		                showCustomToast('Insufficient Credits', 'You need 1 credit to find an email.', 'error');
-		                // We return here, but the 'finally' block will still run to re-enable buttons
-		                return; 
+		                throw new Error("Insufficient Credits");
 		            }
 		            if (!activeCandidate) {
 		                showCustomToast('No Candidate', 'Please select a candidate first.', 'error');
-		                return;
+		                throw new Error("No candidate selected");
 		            }
 		             if (activeCandidate.email) {
 		                showCustomToast('Email Found', `Email already available: ${activeCandidate.email}`, 'info');
-		                return;
+		                throw new Error("Email already exists");
 		            }
 		
-		            // Show this specific button's loading state
 		            findEmailBtn.innerHTML = `
-		                <svg class="w-4 h-4 mr-1 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-		                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-		                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-		                </svg>
+		                <svg class="w-4 h-4 mr-1 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg>
 		                Finding Email...
 		            `;
 		            
@@ -7886,9 +7993,6 @@ setTimeout(() => {
 		                company: extractCompanyName(activeCandidate.experience || activeCandidate.snippet || ''),
 		                location: activeCandidate.location,
 		                linkedinUrl: activeCandidate.profileUrl,
-		                experience: activeCandidate.experience,
-		                industry: activeCandidate.industry || '',
-		                snippet: activeCandidate.snippet || '',
 		                candidateId: activeCandidate.id
 		            };
 		            
@@ -7897,21 +8001,35 @@ setTimeout(() => {
 		                headers: { 'Content-Type': 'application/json' },
 		                body: JSON.stringify(emailSearchPayload)
 		            });
-		
 		            const result = await response.json();
 		            
-		            // Your logic to process the 'result' goes here
-		            // ...
+		            if (result.success && result.email) {
+		                const emailDataToSave = { email: result.email, emailType: 'personal', emailFoundAt: new Date().toISOString() };
+		                Object.assign(activeCandidate, emailDataToSave);
+		                persistCandidateUpdate(activeCandidate);
+		                await deductCredit(1);
+		                await logCreditTransaction(-1, 'email_search', `Personal email found: ${activeCandidate.name}`);
+		                showCustomToast('Email Found', `Found: ${result.email}`, 'success');
+		                displayFoundEmail(result.email, 'personal');
+		            } else {
+		                showCustomToast('No Email Found', 'No email could be found for this candidate.', 'warning');
+		            }
 		
 		        } catch (error) {
-		            console.error('Email search failed:', error);
-		            showCustomToast('Search Failed', 'Could not find email. Please try again.', 'error');
+		            // Don't show redundant toasts for pre-flight check failures
+		            const knownErrors = ["Insufficient Credits", "No candidate selected", "Email already exists"];
+		            if (!knownErrors.includes(error.message)) {
+		                console.error('Email search failed:', error);
+		                showCustomToast('Search Failed', 'An error occurred while finding the email.', 'error');
+		            }
 		        } finally {
 		            // --- RESET GLOBAL LOADING STATE ---
 		            isProcessing = false;
 		            enableActionButtons();
-		            // Restore this specific button's original text AFTER re-enabling it
-		            findEmailBtn.innerHTML = originalHTML;
+		            // Restore button's original HTML only if it was changed
+		            if (findEmailBtn.innerHTML.includes('spin')) {
+		                 findEmailBtn.innerHTML = originalHTML;
+		            }
 		            // ----------------------------------
 		        }
 		    })();
