@@ -5436,42 +5436,31 @@ function saveToSearchHistory(searchParams, resultCount, candidates) {
         date: new Date().toLocaleDateString(),
         type: searchParams.type || 'basic' // 'basic', 'individual', 'bulk'
     };
-    
+
     // Get existing history from localStorage
     let basicHistory = JSON.parse(localStorage.getItem('leadfinder_basic_history') || '[]');
     let analyticsHistory = JSON.parse(localStorage.getItem('leadfinder_analytics_history') || '[]');
-    
-    if (searchEntry.type === 'basic') {
-        // Add the new search to the beginning of the array
-        basicHistory.unshift(searchEntry);
-        
-        // --- FIX ---
-        // If the history exceeds 50 items, trim the array to the 50 most recent ones
-        if (basicHistory.length > 50) {
-            basicHistory = basicHistory.slice(0, 50);
-        }
-        // -------------
 
-        localStorage.setItem('leadfinder_basic_history', JSON.stringify(basicHistory));
+    // --- CORRECTED LOGIC ---
+    const isAnalytics = searchEntry.type === 'individual' || searchEntry.type === 'bulk';
 
-    } else { // Handles 'individual' and 'bulk' analytics history
-        // Add the new analysis to the beginning of the array
+    if (isAnalytics) {
+        // This is an individual or bulk analysis, save to Analytics History
         analyticsHistory.unshift(searchEntry);
-
-        // --- FIX ---
-        // Apply the same 50-item limit to the analytics history
-        if (analyticsHistory.length > 50) {
-            analyticsHistory = analyticsHistory.slice(0, 50);
-        }
-        // -------------
-
+        analyticsHistory = analyticsHistory.slice(0, 50); // Enforce 50 item limit
         localStorage.setItem('leadfinder_analytics_history', JSON.stringify(analyticsHistory));
+    } else {
+        // This is a standard search, save to Basic Searches
+        basicHistory.unshift(searchEntry);
+        basicHistory = basicHistory.slice(0, 50); // Enforce 50 item limit
+        localStorage.setItem('leadfinder_basic_history', JSON.stringify(basicHistory));
     }
+    // --- END OF CORRECTION ---
     
     // Update the UI counts after saving
     updateHistoryTabCounts();
 }
-
+	
 // Tab switching functionality
 document.getElementById('basicSearchTab').addEventListener('click', function() {
     switchHistoryTab('basic');
