@@ -5452,20 +5452,38 @@ function saveToSearchHistory(searchParams, resultCount, candidates) {
         type: searchParams.type || 'basic' // 'basic', 'individual', 'bulk'
     };
     
-    // Get existing history
+    // Get existing history from localStorage
     let basicHistory = JSON.parse(localStorage.getItem('leadfinder_basic_history') || '[]');
     let analyticsHistory = JSON.parse(localStorage.getItem('leadfinder_analytics_history') || '[]');
     
     if (searchEntry.type === 'basic') {
+        // Add the new search to the beginning of the array
         basicHistory.unshift(searchEntry);
-        basicHistory = basicHistory.slice(0, 50);
+        
+        // --- FIX ---
+        // If the history exceeds 50 items, trim the array to the 50 most recent ones
+        if (basicHistory.length > 50) {
+            basicHistory = basicHistory.slice(0, 50);
+        }
+        // -------------
+
         localStorage.setItem('leadfinder_basic_history', JSON.stringify(basicHistory));
-    } else {
+
+    } else { // Handles 'individual' and 'bulk' analytics history
+        // Add the new analysis to the beginning of the array
         analyticsHistory.unshift(searchEntry);
-        analyticsHistory = analyticsHistory.slice(0, 50);
+
+        // --- FIX ---
+        // Apply the same 50-item limit to the analytics history
+        if (analyticsHistory.length > 50) {
+            analyticsHistory = analyticsHistory.slice(0, 50);
+        }
+        // -------------
+
         localStorage.setItem('leadfinder_analytics_history', JSON.stringify(analyticsHistory));
     }
     
+    // Update the UI counts after saving
     updateHistoryTabCounts();
 }
 
