@@ -2828,6 +2828,9 @@ async function handleSearch(e) {
     initialState.classList.add('hidden');
     resultsState.classList.add('hidden');
     loadingState.classList.remove('hidden');
+	
+	resetLoadingAnimation();
+	
     console.log('Loading state shown');
 
     const loadingPromise = showEnhancedLoading();
@@ -3215,15 +3218,29 @@ function getSourceBadge(source) {
 
 function createSnippet(candidate) {
     const recommendation = candidate.recommendation || '';
+
+    // Find the position of the first colon or semicolon
+    const separatorIndex = recommendation.search(/[:;]/);
+
+    let cleaned;
+    // If a separator is found, take the text after it
+    if (separatorIndex !== -1) {
+        cleaned = recommendation.substring(separatorIndex + 1).trim();
+    } else {
+        // If no separator, use the whole string (as a fallback)
+        cleaned = recommendation.trim();
+    }
+
+    // Additional cleanup for any remaining stray punctuation at the start
+    if (cleaned.startsWith(';') || cleaned.startsWith(':')) {
+        cleaned = cleaned.substring(1).trim();
+    }
     
-    // Extract the meaningful part after the priority label
-    const cleaned = recommendation
-        .replace(/^(High|Medium|Low)\s+priority\s+contact\s*[-–]?\s*/i, '')
-        .replace(/^(High|Medium|Low)\s+priority\s*[-–]?\s*/i, '')
-        .trim();
+    // Capitalize the first letter for a clean look
+    const finalSnippet = cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
     
-    // Capitalize first letter if needed
-    return cleaned.charAt(0).toUpperCase() + cleaned.slice(1) || 'Experienced professional in relevant field';
+    // Provide a default if the snippet is empty after cleaning
+    return finalSnippet || 'Experienced professional in a relevant field.';
 }
 
 // Render 1 candidate card as HTML
@@ -3542,14 +3559,23 @@ function updateModalRecommendation(candidate) {
     const recommendationSection = candidateModal.querySelector('.bg-accent-cyan\\/10 p.text-gray-300');
     if (!recommendationSection) return;
 
-    const priority = candidate.priority || 'medium';
-    const recommendation = candidate.recommendation || 'Review profile for potential match';
+    // Determine priority label based on the numerical AI Score for consistency
+    let priorityLabel = 'Medium';
+    if (candidate.aiScore >= 80) {
+        priorityLabel = 'High';
+    } else if (candidate.aiScore < 60) {
+        priorityLabel = 'Low';
+    }
+    
+    // Use the createSnippet function to get the clean, descriptive part of the recommendation
+    const recommendationText = createSnippet(candidate);
 
+    // Combine the reliable priority label with the cleaned text
     recommendationSection.innerHTML = `
-        <strong>${priority.charAt(0).toUpperCase() + priority.slice(1)} Priority Contact:</strong> ${recommendation}
+        <strong>${priorityLabel} Priority Contact:</strong> ${recommendationText}
     `;
 }
-
+	
 // Update current skills section in modal
 function updateModalCurrentSkills(candidate) {
     const skillsContainer = candidateModal.querySelector('#currentSkillsContainer');
@@ -7353,6 +7379,43 @@ function updateEmailTabWithFoundEmail(email) {
         if (currentContent !== 'Generating message...') {
             elaborateEmailBox.innerHTML = `<div class="text-accent-cyan font-medium mb-2">To: ${email}</div>${currentContent}`;
         }
+    }
+}
+
+function resetLoadingAnimation() {
+    console.log('Resetting loading animation...');
+    // Reset progress bar and percentage
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressPercentage');
+    if (progressBar) progressBar.style.width = '0%';
+    if (progressText) progressText.textContent = '0%';
+
+    // Reset each loading step
+    const loadingStepsContainer = document.getElementById('loadingSteps');
+    if (loadingStepsContainer) {
+        const steps = loadingStepsContainer.querySelectorAll('.step-item');
+        steps.forEach((step, index) => {
+            const statusSpan = step.querySelector('span:last-child');
+            const numberCircle = step.querySelector('.w-6.h-6');
+            
+            // Reset circle
+            if (numberCircle) {
+                numberCircle.className = 'w-6 h-6 rounded-full bg-gray-600 flex items-center justify-center text-xs text-white';
+                numberCircle.textContent = index + 1;
+            }
+            
+            // Reset status text
+            if (statusSpan) {
+                statusSpan.className = 'text-gray-500';
+                statusSpan.textContent = '⏸ Pending';
+            }
+        });
+    }
+
+    // Reset loading tip
+    const loadingTip = document.getElementById('loadingTip');
+    if (loadingTip) {
+        loadingTip.textContent = '💡 Tip: Higher AI scores indicate better search compatibility';
     }
 }
 
