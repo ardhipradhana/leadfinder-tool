@@ -2530,7 +2530,7 @@ async function signInWithMagicLink() {
     
     const { error } = await supabaseClient.auth.signInWithOtp({
         email: email,
-        options: { emailRedirectTo: window.location.origin }
+        options: { emailRedirectTo: 'https://leadfinder.montpro.xyz' }
     });
     
     if (error) {
@@ -2554,7 +2554,7 @@ async function signInWithGoogle() {
     
     const { error } = await supabaseClient.auth.signInWithOAuth({
         provider: 'google',
-        options: { redirectTo: window.location.origin }
+        options: { redirectTo: 'https://leadfinder.montpro.xyz' }
     });
     
     if (error) {
